@@ -36,6 +36,15 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./node_modules/@expo-google-fonts/manrope/400Regular/Manrope_400Regular.ttf",
+            "./node_modules/@expo-google-fonts/open-sans/400Regular/OpenSans_400Regular.ttf"
+          ]
+        }
       ]
     ],
     "experiments": {
