@@ -12,10 +12,6 @@ Nosso projeto busca incentivar o cuidado com a saúde mental dos universitários
 
 * TypeScript
 
-
-
-
-
 ## 🏫Padrão de Projeto
 
 #### 🌐Frontend - Feature-Driven / Modular
