@@ -5,8 +5,16 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     colors: {
-      primary: "#76B5E1",
-      secondary: "#65487a",
+      primary: {
+        min: "#76B5E1",
+        max: "#19648C",
+      },
+      secondary: {
+        min: "#FBF0FF",
+        max: "#65487a",
+      },
+      customblack: "#1F1926",
+      customgray: "#71787F",
     },
     fontFamily: {
       primary: ["Manrope_400Regular", "sans-serif"],
