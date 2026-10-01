@@ -4,23 +4,31 @@ module.exports = {
   content: ["./App.tsx", "./src/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
   theme: {
-    colors: {
-      primary: {
-        min: "#76B5E1",
-        max: "#19648C",
+    extend: {
+      colors: {
+        primary: {
+          min: "#76B5E1",
+          max: "#19648C",
+        },
+        secondary: {
+          min: "#FBF0FF",
+          max: "#65487a",
+        },
+        customblack: { min: "#40484E", max: "#1F1926" },
+        customgray: "#71787F",
       },
-      secondary: {
-        min: "#FBF0FF",
-        max: "#65487a",
+      fontFamily: {
+        "primary-regular": ["Manrope_400Regular"],
+        "primary-medium": ["Manrope_500Medium"],
+        "primary-semibold": ["Manrope_600SemiBold"],
+        "primary-bold": ["Manrope_700Bold"],
+
+        "secondary-regular": ["OpenSans_400Regular"],
+        "secondary-medium": ["OpenSans_500Medium"],
+        "secondary-semibold": ["OpenSans_600SemiBold"],
+        "secondary-bold": ["OpenSans_700Bold"],
       },
-      customblack: "#1F1926",
-      customgray: "#71787F",
     },
-    fontFamily: {
-      primary: ["Manrope_400Regular", "sans-serif"],
-      secondary: ["OpenSans_400Regular", "sans-serif"],
-    },
-    extend: {},
   },
   plugins: [],
 };
