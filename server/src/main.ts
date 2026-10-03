@@ -12,11 +12,11 @@ async function bootstrap() {
     .addTag('eaves')
     .build();
 
-  app.enableVersioning()
+  app.enableVersioning();
+  app.enableShutdownHooks();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
-
 
   await app.listen(process.env.PORT ?? 3000);
 }
