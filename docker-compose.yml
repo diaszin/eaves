@@ -13,6 +13,11 @@ services:
     restart: unless-stopped
     depends_on:
       - eaves-db
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
   eaves-db:
     env_file:
       - ./server/.env
@@ -21,5 +26,10 @@ services:
     restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
 volumes:
   postgres_data:
