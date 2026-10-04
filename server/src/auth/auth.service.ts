@@ -1,14 +1,53 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create.dto.js';
 import { AuthLoginDTO } from './dto/login.dto.js';
+import { PrismaService } from '../prisma/prisma.service.js';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateUserDTO) {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createAuthDto: CreateUserDTO) {
+    const hashedPassword = this.hashPassword(createAuthDto.password);
+
+    await this.prisma.user.create({
+      data: {
+        email: createAuthDto.email,
+        fullname: createAuthDto.fullname,
+        birthday: createAuthDto.birthDate,
+        password: hashedPassword,
+      },
+    });
+  }
+
+  async login(dto: AuthLoginDTO) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+    })
+
+
+    if(!user){
+      throw new Error("User not found");
+    }
+    
+    const isPasswordValid = this.comparePassword(dto.password, user.password);
+
+    if (!isPasswordValid) {
+      throw new Error('Password not matched');
+    }
     return 'This action adds a new auth';
   }
 
-  login(dto: AuthLoginDTO) {
-    return 'This action adds a new auth';
+  private hashPassword(password: string): string {
+    const saltRounds = 10;
+
+    return bcrypt.hashSync(password, saltRounds);
+  }
+
+  private comparePassword(password: string, hashedPassword: string): boolean {
+    return bcrypt.compareSync(password, hashedPassword);
   }
 }
