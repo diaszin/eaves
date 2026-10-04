@@ -256,6 +256,16 @@
   resolved "https://registry.yarnpkg.com/@microsoft/tsdoc/-/tsdoc-0.17.0.tgz#61b4a63f48b583a3d60d1793184a1a2cd9d1175e"
   integrity sha512-p68VexhnH7ojf3U27RdryUDqnKJgKaWUbCL96vJR7N0mqDuhKG5OIECk3sCPPdynxjk+yoVhRkScqtv5KQjzsw==
 
+"@nestjs/authentication@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/authentication/-/authentication-0.0.1.tgz#f005e11a4387be03bde2028b1cb03e8a803240e6"
+  integrity sha512-slL8wfbkxEwVguVzSNQ69roUx5sVXV8/TEfuPXJRaInB4F1dqquuLAB525KIFW6xSrByQXrUilR50Ijwesraag==
+
+"@nestjs/authorization@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/authorization/-/authorization-0.0.1.tgz#406118032d7d9f9d5226bf781ea7f76a258762c3"
+  integrity sha512-I7LQ1L5U6GXVcBkVCL1Jbdb3ccOF/P62q5/nrryf+4VnEbgMmX8yXTOsMKmCkcaxrwkJlNLpm1z07wz0+oRDfA==
+
 "@nestjs/cli@^12.0.0":
   version "12.0.8"
   resolved "https://registry.yarnpkg.com/@nestjs/cli/-/cli-12.0.8.tgz#cdff89355d470da1c1e815aa67819a74a4d987a4"

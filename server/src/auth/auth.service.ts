@@ -3,10 +3,11 @@ import { CreateUserDTO } from './dto/create.dto.js';
 import { AuthLoginDTO } from './dto/login.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly jwtService: JwtService) {}
 
   async create(createAuthDto: CreateUserDTO) {
     const hashedPassword = this.hashPassword(createAuthDto.password);
@@ -26,19 +27,22 @@ export class AuthService {
       where: {
         email: dto.email,
       },
-    })
+    });
 
-
-    if(!user){
-      throw new Error("User not found");
+    if (!user) {
+      throw new Error('User not found');
     }
-    
+
     const isPasswordValid = this.comparePassword(dto.password, user.password);
 
     if (!isPasswordValid) {
       throw new Error('Password not matched');
     }
-    return 'This action adds a new auth';
+
+    const payload = { sub: user.id, email: user.email };
+    const token = this.jwtService.sign(payload);
+
+    return { access_token: token };
   }
 
   private hashPassword(password: string): string {
