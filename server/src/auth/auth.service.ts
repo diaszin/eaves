@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create.dto.js';
 import { AuthLoginDTO } from './dto/login.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -7,7 +7,10 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService, private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async create(createAuthDto: CreateUserDTO) {
     const hashedPassword = this.hashPassword(createAuthDto.password);
@@ -30,13 +33,13 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     const isPasswordValid = this.comparePassword(dto.password, user.password);
 
     if (!isPasswordValid) {
-      throw new Error('Password not matched');
+      throw new BadRequestException('Password not matched');
     }
 
     const payload = { sub: user.id, email: user.email };
