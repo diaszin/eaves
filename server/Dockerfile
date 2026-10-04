@@ -1,23 +1,28 @@
-# Use the official Node.js image as the base image
-FROM node:lts
-
-# Set the working directory inside the container
+FROM node:lts-slim AS dependencies
 WORKDIR /app
+COPY package.json yarn.lock ./
+RUN corepack enable \
+	&& corepack prepare yarn@1.22.22 --activate \
+	&& yarn install --frozen-lockfile
 
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
-
-# Install the application dependencies
-RUN npm install
-
-# Copy the rest of the application files
+FROM dependencies AS build
 COPY . .
+RUN yarn build
 
-# Build the NestJS application
-RUN npm run build
-
-# Expose the application port
+FROM node:lts-slim AS production
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package.json yarn.lock ./
+RUN corepack enable \
+	&& corepack prepare yarn@1.22.22 --activate \
+	&& yarn install --frozen-lockfile --production=true \
+	&& yarn cache clean
+COPY --from=build /app/dist ./dist
+USER node
 EXPOSE 3000
-
-# Command to run the application
 CMD ["node", "dist/main"]
+
+FROM dependencies AS development
+COPY . .
+EXPOSE 3000
+CMD ["yarn", "start:dev"]

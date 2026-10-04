@@ -6,15 +6,19 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+      - "51212:51212"
     env_file:
       - ./server/.env
     environment:
-      - NODE_ENV=production
-    restart: unless-stopped
+      - NODE_ENV=development
+      - TSC_WATCHFILE=DynamicPriorityPolling
+      - TSC_WATCHDIRECTORY=RecursiveDirectoryUsingDynamicPriorityPolling
+    restart: always
     depends_on:
       - eaves-db
     volumes:
       - ./server:/app
+      - /app/node_modules
     deploy:
       resources:
         limits:
