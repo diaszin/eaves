@@ -3,7 +3,13 @@ import { AppModule } from './app.module.js';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors: {
+      origin: (process.env.ALLOWED_ORIGINS || '').split(','),
+      methods: '*',
+      allowedHeaders: '*',
+    },
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Eaves API')
