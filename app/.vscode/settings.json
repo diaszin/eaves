@@ -8,5 +8,6 @@
     "class",
     "className",
     "headerClassName"
-  ]
+  ],
+  "material-icon-theme.activeIconPack": "react"
 }
