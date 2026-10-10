@@ -45,3 +45,6 @@ example
 
 package-*.json
 yarn.lock
+
+.env.*
+.env
