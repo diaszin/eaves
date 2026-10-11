@@ -1,5 +1,5 @@
 import { TouchableOpacity, View, Text } from "react-native";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 
 import InputWithLabel from "../../components/input_with_label";
 import { CustomDateTimePicker } from "../../components/datetime_picker/datetime_picker.web";
@@ -7,15 +7,9 @@ import MaskInputWithLabel from "../../components/masked_input_with_label";
 import { Masks } from "react-native-mask-input";
 import { cpf } from "cpf-cnpj-validator";
 import { MultiStepContext } from "../../contexts/multiStepContext";
-import { Host, Row, Picker, Spacer, PickerItemValue } from "@expo/ui";
 import DropdownWithLabel from "../../components/dropdown_with_label";
 
 export default function PersonalStep() {
-  const FLAVOURS = [
-    { label: "Vanilla", value: "vanilla" },
-    { label: "Chocolate", value: "chocolate" },
-    { label: "Strawberry", value: "strawberry" },
-  ];
 
   const multiStepContext = useContext(MultiStepContext);
   const cpfMask = Masks.BRL_CPF;
