@@ -1,12 +1,7 @@
 import { TouchableOpacity, View, Text } from "react-native";
 import { useContext } from "react";
-import InputWithLabel from "../../components/input_with_label";
-import { CustomDateTimePicker } from "../../components/datetime_picker/datetime_picker.web";
 import MaskInputWithLabel from "../../components/masked_input_with_label";
-import { cpf } from "cpf-cnpj-validator";
 import { MultiStepContext } from "../../contexts/multiStepContext";
-
-import DropdownWithLabel from "../../components/dropdown_with_label";
 import { Masks } from "react-native-mask-input";
 
 export default function CommunicationStep() {
