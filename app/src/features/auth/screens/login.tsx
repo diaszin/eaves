@@ -178,6 +178,24 @@ export default function LoginScreen() {
           <View className="h-0.5 w-20 bg-gray-300" />
         </View>
       </View>
+      <View className="flex flex-col items-center justify-center">
+        <Text className="font-secondary-regular text-sm text-gray-600">
+          Ainda não tem uma conta?{" "}
+          <Link
+            href="/(auth)/sign-up"
+            className="text-primary-max font-secondary-bold text-[1rem]"
+          >
+            Cadastre-se
+          </Link>
+        </Text>
+      </View>
+      <View className="flex flex-row items-center justify-center gap-4">
+        <Text className="text-customblack-min">Privacidade</Text>
+        <Text className="text-customblack-min">•</Text>
+        <Text className="text-customblack-min">Termos</Text>
+        <Text className="text-customblack-min">•</Text>
+        <Text className="text-customblack-min">Ajuda</Text>
+      </View>
     </View>
   );
 }
