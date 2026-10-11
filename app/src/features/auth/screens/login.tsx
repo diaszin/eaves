@@ -6,7 +6,7 @@ import {
   MdOutlineEmail,
   MdOutlineVisibility,
 } from "react-icons/md";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import authService from "../services/auth.service";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
@@ -20,12 +20,16 @@ async function handleLogin(email: string, password: string) {
 
 export default function LoginScreen() {
   const { signIn } = useSession();
+  const router = useRouter();
+
   const mutate = useMutation({
     mutationKey: ["auth", "login"],
     mutationFn: (value: { email: string; password: string }) =>
       handleLogin(value.email, value.password),
     onSuccess: ({ data }) => {
       signIn(data["access_token"]);
+
+      router.replace("/");
     },
   });
 
