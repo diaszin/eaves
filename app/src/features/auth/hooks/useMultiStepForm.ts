@@ -2,20 +2,7 @@ import { FormOptions, useForm } from "@tanstack/react-form";
 import { MultiStepData } from "../types/signup.type";
 
 type UseMultiStepFormProps = Omit<
-  FormOptions<
-    MultiStepData,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  >,
+  Parameters<typeof useForm>[0],
   "defaultValues"
 >;
 
