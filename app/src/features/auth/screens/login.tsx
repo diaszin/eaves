@@ -24,8 +24,8 @@ export default function LoginScreen() {
     mutationKey: ["auth", "login"],
     mutationFn: (value: { email: string; password: string }) =>
       handleLogin(value.email, value.password),
-    onSuccess: ({data}) => {
-      signIn(data['access_token'])
+    onSuccess: ({ data }) => {
+      signIn(data["access_token"]);
     },
   });
 
@@ -33,6 +33,21 @@ export default function LoginScreen() {
     defaultValues: {
       email: "",
       password: "",
+    },
+    validators: {
+      onMount: ({ value }) => {
+        if (value.email.trim().length == 0) {
+          return {
+            email: "O e-mail é obrigatório",
+          };
+        }
+
+        if (value.password.length === 0) {
+          return {
+            password: "A senha é obrigatória",
+          };
+        }
+      },
     },
     onSubmit: ({ value }) => {
       mutate.mutate({
@@ -110,17 +125,25 @@ export default function LoginScreen() {
           }}
         >
           {(field) => (
-            <InputWithLabel
-              value={field.state.value}
-              onChangeText={(text) => field.handleChange(text)}
-              onBlur={field.handleBlur}
-              leading={<MdLockOutline className="text-customgray size-6" />}
-              label="Senha"
-              secureTextEntry={true}
-              trailing={
-                <MdOutlineVisibility className="text-customgray size-6" />
-              }
-            />
+            <View className="flex flex-col gap-2">
+              <InputWithLabel
+                value={field.state.value}
+                onChangeText={(text) => field.handleChange(text)}
+                onBlur={field.handleBlur}
+                leading={<MdLockOutline className="text-customgray size-6" />}
+                label="Senha"
+                secureTextEntry={true}
+                trailing={
+                  <MdOutlineVisibility className="text-customgray size-6" />
+                }
+              />
+
+              {field.state.meta.errors.length > 0 && (
+                <Text className="font-secondary-regular text-error text-[0.5rem]">
+                  {field.state.meta.errors[0]}
+                </Text>
+              )}
+            </View>
           )}
         </authForm.Field>
 
