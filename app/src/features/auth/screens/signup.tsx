@@ -1,8 +1,52 @@
-import { View, Text } from 'react-native'
+import { createContext, useState } from "react";
+import { View, Text, Image, TouchableOpacity } from "react-native";
+import { useMultiStepForm } from "../hooks/useMultiStepForm";
+import PersonalStep from "./signup_steps/personal_step_screen";
+
+type MultiStepContextType = {
+  next: () => void;
+  previous: () => void;
+  step: number;
+  form: ReturnType<typeof useMultiStepForm>;
+};
+
+export const MultiStepContext = createContext<MultiStepContextType | undefined>(undefined);
+
 export default function SignUpScreen() {
+  const [step, setStep] = useState<number>(1);
+  const form = useMultiStepForm({});
+
   return (
-    <View>
-      <Text>SignUp</Text>
-    </View>
-  )
+    <MultiStepContext.Provider
+      value={{
+        next: () => {
+          setStep((value) => value + 1);
+        },
+        previous: () => {
+          setStep((value) => value - 1);
+        },
+        step: step,
+        form: form,
+      }}
+    >
+      <View className="bg-secondary-min h-screen p-4">
+        <View className="flex flex-col items-center justify-center gap-1">
+          <Image
+            style={{
+              width: 79,
+              height: 79,
+            }}
+            source={require("@/assets/images/icon.png")}
+          />
+          <Text className="text-3xl text-secondary-max font-primary-bold">
+            Crie sua conta
+          </Text>
+          <Text className="font-secondary-regular text-[0.8rem] text-customblack-min">
+            Leva menos de 1 minuto para dar o primeiro passo.
+          </Text>
+          {step == 1 && <PersonalStep />}
+        </View>
+      </View>
+    </MultiStepContext.Provider>
+  );
 }
