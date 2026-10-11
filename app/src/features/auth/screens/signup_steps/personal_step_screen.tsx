@@ -1,13 +1,22 @@
 import { TouchableOpacity, View, Text } from "react-native";
-import { useContext } from "react";
-import { MultiStepContext } from "../signup";
+import { useContext, useState } from "react";
+
 import InputWithLabel from "../../components/input_with_label";
 import { CustomDateTimePicker } from "../../components/datetime_picker/datetime_picker.web";
 import MaskInputWithLabel from "../../components/masked_input_with_label";
 import { Masks } from "react-native-mask-input";
 import { cpf } from "cpf-cnpj-validator";
+import { MultiStepContext } from "../../contexts/multiStepContext";
+import { Host, Row, Picker, Spacer, PickerItemValue } from "@expo/ui";
+import DropdownWithLabel from "../../components/dropdown_with_label";
 
 export default function PersonalStep() {
+  const FLAVOURS = [
+    { label: "Vanilla", value: "vanilla" },
+    { label: "Chocolate", value: "chocolate" },
+    { label: "Strawberry", value: "strawberry" },
+  ];
+
   const multiStepContext = useContext(MultiStepContext);
   const cpfMask = Masks.BRL_CPF;
 
@@ -41,7 +50,6 @@ export default function PersonalStep() {
                 {(field) => (
                   <View>
                     <InputWithLabel
-                      
                       defaultValue={field.state.value}
                       onChangeText={(text) => field.handleChange(text)}
                       onBlur={field.handleBlur}
@@ -133,6 +141,106 @@ export default function PersonalStep() {
                     )}
                   </View>
                 )}
+              </multiStepContext.form.Field>
+              <multiStepContext.form.Field
+                name="personal.race"
+                validators={{
+                  onBlur: ({ value }) => {
+                    if (!value || value.trim().length == 0) {
+                      return "Esse campo deve ser preenchido";
+                    }
+                  },
+                }}
+              >
+                {(field) => {
+                  return (
+                    <DropdownWithLabel
+                      label={"Raça"}
+                      data={[
+                        {
+                          label: "Preta",
+                          value: "preta",
+                        },
+                        {
+                          label: "Parda",
+                          value: "parda",
+                        },
+                        {
+                          label: "Amarela",
+                          value: "amarela",
+                        },
+                        {
+                          label: "Indígena",
+                          value: "indigena",
+                        },
+                        {
+                          label: "Branca",
+                          value: "branca",
+                        },
+                        {
+                          label: "Prefiro não informar",
+                          value: "nenhuma",
+                        },
+                      ]}
+                      selectedValue={field.state.value}
+                      onValueChange={(value) =>
+                        field.handleChange(value.toString())
+                      }
+                    />
+                  );
+                }}
+              </multiStepContext.form.Field>
+              <multiStepContext.form.Field
+                name="personal.incomeBraket"
+                validators={{
+                  onBlur: ({ value }) => {
+                    if (!value || value.trim().length == 0) {
+                      return "Esse campo deve ser preenchido";
+                    }
+                  },
+                }}
+              >
+                {(field) => {
+                  return (
+                    <DropdownWithLabel
+                      label={"Raça"}
+                      data={[
+                        {
+                          label: "Até 2 salários mínimos ",
+                          value: "ate-2-salarios-minimos",
+                        },
+                        {
+                          label: "de 2 a 5 salários mínimos",
+                          value: "de-2-a-5-salarios-minimos",
+                        },
+                        {
+                          label: "Mais de 5 salários mínimos",
+                          value: "mais-de-5",
+                        },
+                        {
+                          label: "Mais de 10 salários mínimos",
+                          value: "mais-de-10",
+                        },
+                        {
+                          label: "Mais de 10 a 20 salários mínimos",
+                          value: "mais-de-10-a-20",
+                        },
+                        {
+                          label: "Mais de 20 salários mínimos",
+                          value: "mais-de-20",
+                        },
+                        {
+                          label: "Sem rendimento",
+                          value: "sem-rendimento",
+                        },
+                      ]}
+                      selectedValue={field.state.value}
+                      onValueChange={(value) =>
+                        field.handleChange(value.toString())
+                      }
+                    />
+                  );
+                }}
               </multiStepContext.form.Field>
               <View className="w-full flex items-center justify-center">
                 <TouchableOpacity

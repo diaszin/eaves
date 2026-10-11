@@ -2,15 +2,9 @@ import { createContext, useState } from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useMultiStepForm } from "../hooks/useMultiStepForm";
 import PersonalStep from "./signup_steps/personal_step_screen";
+import { MultiStepContext } from "../contexts/multiStepContext";
 
-type MultiStepContextType = {
-  next: () => void;
-  previous: () => void;
-  step: number;
-  form: ReturnType<typeof useMultiStepForm>;
-};
 
-export const MultiStepContext = createContext<MultiStepContextType | undefined>(undefined);
 
 export default function SignUpScreen() {
   const [step, setStep] = useState<number>(1);
