@@ -3,9 +3,13 @@ import { useContext } from "react";
 import { MultiStepContext } from "../signup";
 import InputWithLabel from "../../components/input_with_label";
 import { CustomDateTimePicker } from "../../components/datetime_picker/datetime_picker.web";
+import MaskInputWithLabel from "../../components/masked_input_with_label";
+import { Masks } from "react-native-mask-input";
+import { cpf } from "cpf-cnpj-validator";
 
 export default function PersonalStep() {
   const multiStepContext = useContext(MultiStepContext);
+  const cpfMask = Masks.BRL_CPF;
 
   if (!multiStepContext) {
     throw new Error("useContext deve ser usado dentro de um MultiStepProvider");
@@ -20,11 +24,25 @@ export default function PersonalStep() {
         return (
           <View className="w-full">
             <View className="flex flex-col bg-white gap-4 py-2 rounded-3xl px-4 w-full">
-              <multiStepContext.form.Field name="personal.fullname">
+              <multiStepContext.form.Field
+                name="personal.fullname"
+                validators={{
+                  onBlur: ({ value }) => {
+                    if (!value || value.trim().length == 0) {
+                      return "O nome é obrigatório";
+                    }
+
+                    if (value.split(" ").length <= 1) {
+                      return "Insira o nome e sobrenome";
+                    }
+                  },
+                }}
+              >
                 {(field) => (
                   <View>
                     <InputWithLabel
-                      value={field.state.value}
+                      
+                      defaultValue={field.state.value}
                       onChangeText={(text) => field.handleChange(text)}
                       onBlur={field.handleBlur}
                       label="Nome completo"
@@ -39,16 +57,33 @@ export default function PersonalStep() {
                   </View>
                 )}
               </multiStepContext.form.Field>
-              <multiStepContext.form.Field name="personal.document">
+              <multiStepContext.form.Field
+                name="personal.document"
+                validators={{
+                  onBlur: ({ value }) => {
+                    if (!value || value.trim().length == 0) {
+                      return "CPF é obrigatório";
+                    }
+
+                    if (!cpf.isValid(value)) {
+                      return "O CPF não é válido";
+                    }
+                  },
+                }}
+              >
                 {(field) => (
                   <View className="flex flex-col gap-2">
-                    <InputWithLabel
+                    <MaskInputWithLabel
+                      defaultValue={undefined}
                       value={field.state.value}
-                      onChangeText={(text) => field.handleChange(text)}
+                      onChangeText={(maskedValue, value) =>
+                        field.handleChange(value)
+                      }
                       onBlur={field.handleBlur}
                       label="CPF"
                       placeholder="123.456.789-00"
-                      inputMode="text"
+                      inputMode="numeric"
+                      mask={cpfMask}
                     />
 
                     {field.state.meta.errors.length > 0 && (
@@ -62,15 +97,22 @@ export default function PersonalStep() {
               <multiStepContext.form.Field
                 name="personal.birthDate"
                 validators={{
-                  onChange: ({value}) => {
-                    const currentDate = new Date(Date.now())
-                    const minimumAge = 18
+                  onChange: ({ value }) => {
+                    const currentDate = new Date(Date.now());
+                    const minimumAge = 18;
 
-                    if(value.getFullYear() > (currentDate.getFullYear() - minimumAge)){
-                      return "É necessário ter pelo menos 18 anos para prosseguir"
+                    if (!value) {
+                      return "Data de nascimento é obrigatória";
                     }
 
-                    return undefined
+                    if (
+                      value.getFullYear() >
+                      currentDate.getFullYear() - minimumAge
+                    ) {
+                      return "É necessário ter pelo menos 18 anos para prosseguir";
+                    }
+
+                    return undefined;
                   },
                 }}
               >
@@ -92,10 +134,16 @@ export default function PersonalStep() {
                   </View>
                 )}
               </multiStepContext.form.Field>
+              <View className="w-full flex items-center justify-center">
+                <TouchableOpacity
+                  disabled={!group.state.meta.canSubmit}
+                  className={`min-h-12 w-full m-2 flex flex-row items-center justify-center ${group.state.meta.canSubmit ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
+                  onPress={group.handleSubmit}
+                >
+                  <Text className="text-white">Avançar</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <TouchableOpacity className="w-full" onPress={group.handleSubmit}>
-              <Text>Funcionou</Text>
-            </TouchableOpacity>
           </View>
         );
       }}
