@@ -9,7 +9,7 @@ class AuthService {
     return await this.client.post("/login", data);
   }
 
-  async singup(data: SignUpRequest) {
+  async signup(data: SignUpRequest) {
     return await this.client.post("/signup", data);
   }
 }
