@@ -2,23 +2,45 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import InputWithLabel from "../components/input_with_label";
 import {
   MdArrowForward,
-  MdArrowRight,
-  MdArrowRightAlt,
   MdLockOutline,
   MdOutlineEmail,
   MdOutlineVisibility,
 } from "react-icons/md";
 import { Link } from "expo-router";
 import authService from "../services/auth.service";
-import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { useMutation } from "@tanstack/react-query";
+import { useSession } from "@/hooks/useSession";
 
-function handleLogin(email: string, password: string) {
-  return authService.login({ email, password });
+async function handleLogin(email: string, password: string) {
+  const response = await authService.login({ email, password });
+
+  return response;
 }
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { signIn } = useSession();
+  const mutate = useMutation({
+    mutationKey: ["auth", "login"],
+    mutationFn: (value: { email: string; password: string }) =>
+      handleLogin(value.email, value.password),
+    onSuccess: ({data}) => {
+      signIn(data['access_token'])
+    },
+  });
+
+  const authForm = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    onSubmit: ({ value }) => {
+      mutate.mutate({
+        email: value.email,
+        password: value.password,
+      });
+    },
+  });
 
   return (
     <View className="bg-secondary-min h-screen p-4">
@@ -38,36 +60,90 @@ export default function LoginScreen() {
         </Text>
       </View>
       <View className="flex flex-col bg-white gap-4 py-2 rounded-3xl px-4">
-        <InputWithLabel
-          onChangeText={(text) => setEmail(text)}
-          leading={<MdOutlineEmail className="text-customgray size-6" />}
-          label="E-mail"
-          keyboardType="email-address"
-          inputMode="email"
-          placeholder="seuemail@exemplo.com"
-        />
-        <InputWithLabel
-          onChangeText={(text) => setPassword(text)}
-          leading={<MdLockOutline className="text-customgray size-6" />}
-          label="Senha"
-          secureTextEntry={true}
-          trailing={<MdOutlineVisibility className="text-customgray size-6" />}
-        />
+        <authForm.Field
+          name="email"
+          validators={{
+            onBlur: ({ value }) => {
+              if (value.trim().length == 0) {
+                return "O e-mail é obrigatório";
+              }
+              if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                return "Informe um e-mail válido";
+              }
+            },
+          }}
+        >
+          {(field) => (
+            <View className="flex flex-col gap-2">
+              <InputWithLabel
+                value={field.state.value}
+                onChangeText={(text) => field.handleChange(text)}
+                onBlur={field.handleBlur}
+                leading={<MdOutlineEmail className="text-customgray size-6" />}
+                label="E-mail"
+                keyboardType="email-address"
+                inputMode="email"
+                placeholder="seuemail@exemplo.com"
+              />
+              {field.state.meta.errors.length > 0 && (
+                <Text className="font-secondary-regular text-error text-[0.5rem]">
+                  {field.state.meta.errors[0]}
+                </Text>
+              )}
+            </View>
+          )}
+        </authForm.Field>
+
+        <authForm.Field
+          name="password"
+          validators={{
+            onBlur: ({ value }) => {
+              value = value.trim();
+              if (value.length === 0) {
+                return "A senha é obrigatória";
+              }
+
+              if (value.length < 8) {
+                return "A senha deve ter no mínimo 8 caracteres";
+              }
+            },
+          }}
+        >
+          {(field) => (
+            <InputWithLabel
+              value={field.state.value}
+              onChangeText={(text) => field.handleChange(text)}
+              onBlur={field.handleBlur}
+              leading={<MdLockOutline className="text-customgray size-6" />}
+              label="Senha"
+              secureTextEntry={true}
+              trailing={
+                <MdOutlineVisibility className="text-customgray size-6" />
+              }
+            />
+          )}
+        </authForm.Field>
+
         <View className="flex flex-row items-end justify-end">
           <Link className="text-primary-max" href="/">
             Esqueci minha senha
           </Link>
         </View>
 
-        <TouchableOpacity
-          onPress={() => {
-            handleLogin(email, password);
-          }}
-          className="min-h-12 flex flex-row items-center justify-center bg-primary-min gap-0.5 rounded-xl"
-        >
-          <Text className="text-white">Entrar</Text>
-          <MdArrowForward className="text-white size-4" />
-        </TouchableOpacity>
+        <authForm.Subscribe selector={(state) => [state.canSubmit]}>
+          {([canSubmit]) => (
+            <TouchableOpacity
+              disabled={!canSubmit}
+              onPress={() => {
+                authForm.handleSubmit();
+              }}
+              className={`min-h-12 flex flex-row items-center justify-center ${canSubmit ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
+            >
+              <Text className="text-white">Entrar</Text>
+              <MdArrowForward className="text-white size-4" />
+            </TouchableOpacity>
+          )}
+        </authForm.Subscribe>
 
         <View className="flex flex-row items-center justify-center">
           <View className="h-0.5 w-20 bg-gray-300" />

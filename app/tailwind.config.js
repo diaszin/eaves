@@ -16,6 +16,7 @@ module.exports = {
         },
         customblack: { min: "#40484E", max: "#1F1926" },
         customgray: "#71787F",
+        error: "#BB2727"
       },
       fontFamily: {
         "primary-regular": ["Manrope_400Regular"],

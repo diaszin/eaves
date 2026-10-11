@@ -1,14 +1,15 @@
+import { JwtPayload } from "jwt-decode";
 import { createContext } from "react";
 
 type AuthContextType = {
-  signIn: () => void;
+  signIn: (token: string) => void;
   signOut: () => void;
-  session?: string | null;
+  session?: JwtPayload | null;
   isAuthenticated: boolean;
 };
 
 export const AuthContext = createContext<AuthContextType>({
-  signIn: () => null,
+  signIn: (token: string) => null,
   signOut: () => null,
   session: null,
   isAuthenticated: false,

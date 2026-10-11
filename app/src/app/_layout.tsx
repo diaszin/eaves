@@ -16,6 +16,9 @@ import { useFonts } from "expo-font";
 import "../../global.css";
 import AuthProvider from "@/components/providers/AuthProvider";
 import { View } from "react-native";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient()
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -34,8 +37,10 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <Slot />
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Slot />
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
