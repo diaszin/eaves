@@ -3,8 +3,7 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useMultiStepForm } from "../hooks/useMultiStepForm";
 import PersonalStep from "./signup_steps/personal_step_screen";
 import { MultiStepContext } from "../contexts/multiStepContext";
-
-
+import CommunicationStep from "./signup_steps/communication_step_screen";
 
 export default function SignUpScreen() {
   const [step, setStep] = useState<number>(1);
@@ -39,6 +38,7 @@ export default function SignUpScreen() {
             Leva menos de 1 minuto para dar o primeiro passo.
           </Text>
           {step == 1 && <PersonalStep />}
+          {step == 2 && <CommunicationStep />}
         </View>
       </View>
     </MultiStepContext.Provider>
