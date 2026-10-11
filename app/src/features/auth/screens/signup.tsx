@@ -1,13 +1,20 @@
 import { createContext, useState } from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import { useMultiStepForm } from "../hooks/useMultiStepForm";
 import PersonalStep from "./signup_steps/personal_step_screen";
 import { MultiStepContext } from "../contexts/multiStepContext";
 import CommunicationStep from "./signup_steps/communication_step_screen";
+import AuthStepScreen from "./signup_steps/auth_step_screen";
+import { MultiStepData } from "../types/signup.type";
+import { FormOptions, useForm } from "@tanstack/react-form";
 
 export default function SignUpScreen() {
   const [step, setStep] = useState<number>(1);
-  const form = useMultiStepForm({});
+  const form = useForm({
+    defaultValues: {} as MultiStepData,
+    onSubmit: (value) => {
+      console.log(value);
+    },
+  });
 
   return (
     <MultiStepContext.Provider
@@ -39,6 +46,7 @@ export default function SignUpScreen() {
           </Text>
           {step == 1 && <PersonalStep />}
           {step == 2 && <CommunicationStep />}
+          {step == 3 && <AuthStepScreen />}
         </View>
       </View>
     </MultiStepContext.Provider>
