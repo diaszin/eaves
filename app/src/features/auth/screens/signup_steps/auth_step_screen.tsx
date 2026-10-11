@@ -124,7 +124,7 @@ export default function AuthStepScreen() {
                   className={`min-h-12 w-full m-2 flex flex-row items-center justify-center ${group.state.meta.canSubmit ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
                   onPress={group.handleSubmit}
                 >
-                  <Text className="text-white">Avançar</Text>
+                  <Text className="text-white">Criar minha conta</Text>
                 </TouchableOpacity>
               </View>
             </View>
