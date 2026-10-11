@@ -10,9 +10,66 @@ import { MultiStepContext } from "../../contexts/multiStepContext";
 import DropdownWithLabel from "../../components/dropdown_with_label";
 
 export default function PersonalStep() {
-
   const multiStepContext = useContext(MultiStepContext);
   const cpfMask = Masks.BRL_CPF;
+
+  const raceOptions = [
+    {
+      label: "Preta",
+      value: "preta",
+    },
+    {
+      label: "Parda",
+      value: "parda",
+    },
+    {
+      label: "Amarela",
+      value: "amarela",
+    },
+    {
+      label: "Indígena",
+      value: "indigena",
+    },
+    {
+      label: "Branca",
+      value: "branca",
+    },
+    {
+      label: "Prefiro não informar",
+      value: "nenhuma",
+    },
+  ];
+
+  const incomeBraketOptions = [
+    {
+      label: "Até 2 salários mínimos ",
+      value: "ate-2-salarios-minimos",
+    },
+    {
+      label: "de 2 a 5 salários mínimos",
+      value: "de-2-a-5-salarios-minimos",
+    },
+    {
+      label: "Mais de 5 salários mínimos",
+      value: "mais-de-5",
+    },
+    {
+      label: "Mais de 10 salários mínimos",
+      value: "mais-de-10",
+    },
+    {
+      label: "Mais de 10 a 20 salários mínimos",
+      value: "mais-de-10-a-20",
+    },
+    {
+      label: "Mais de 20 salários mínimos",
+      value: "mais-de-20",
+    },
+    {
+      label: "Sem rendimento",
+      value: "sem-rendimento",
+    },
+  ];
 
   if (!multiStepContext) {
     throw new Error("useContext deve ser usado dentro de um MultiStepProvider");
@@ -22,6 +79,11 @@ export default function PersonalStep() {
     <multiStepContext.form.FormGroup
       name="personal"
       onGroupSubmit={() => multiStepContext.next()}
+      defaultValue={{
+        ...multiStepContext.form.state.values.personal,
+        incomeBraket: incomeBraketOptions[0].value,
+        race: raceOptions[0].value,
+      }}
     >
       {(group) => {
         return (
@@ -150,33 +212,8 @@ export default function PersonalStep() {
                   return (
                     <DropdownWithLabel
                       label={"Raça"}
-                      data={[
-                        {
-                          label: "Preta",
-                          value: "preta",
-                        },
-                        {
-                          label: "Parda",
-                          value: "parda",
-                        },
-                        {
-                          label: "Amarela",
-                          value: "amarela",
-                        },
-                        {
-                          label: "Indígena",
-                          value: "indigena",
-                        },
-                        {
-                          label: "Branca",
-                          value: "branca",
-                        },
-                        {
-                          label: "Prefiro não informar",
-                          value: "nenhuma",
-                        },
-                      ]}
-                      selectedValue={field.state.value}
+                      data={raceOptions}
+                      selectedValue={field.state.value || raceOptions[0].value}
                       onValueChange={(value) =>
                         field.handleChange(value.toString())
                       }
@@ -197,38 +234,11 @@ export default function PersonalStep() {
                 {(field) => {
                   return (
                     <DropdownWithLabel
-                      label={"Raça"}
-                      data={[
-                        {
-                          label: "Até 2 salários mínimos ",
-                          value: "ate-2-salarios-minimos",
-                        },
-                        {
-                          label: "de 2 a 5 salários mínimos",
-                          value: "de-2-a-5-salarios-minimos",
-                        },
-                        {
-                          label: "Mais de 5 salários mínimos",
-                          value: "mais-de-5",
-                        },
-                        {
-                          label: "Mais de 10 salários mínimos",
-                          value: "mais-de-10",
-                        },
-                        {
-                          label: "Mais de 10 a 20 salários mínimos",
-                          value: "mais-de-10-a-20",
-                        },
-                        {
-                          label: "Mais de 20 salários mínimos",
-                          value: "mais-de-20",
-                        },
-                        {
-                          label: "Sem rendimento",
-                          value: "sem-rendimento",
-                        },
-                      ]}
-                      selectedValue={field.state.value}
+                      label={"Faixa salarial"}
+                      data={incomeBraketOptions}
+                      selectedValue={
+                        field.state.value || incomeBraketOptions[0].value
+                      }
                       onValueChange={(value) =>
                         field.handleChange(value.toString())
                       }
