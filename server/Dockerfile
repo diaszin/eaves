@@ -3,14 +3,12 @@ FROM node:lts-slim
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+COPY package*.json ./
 
-RUN corepack enable \
-    && corepack prepare yarn@1.22.22 --activate \
-    && yarn install --frozen-lockfile
+RUN npm install
 
 COPY . .
 
-EXPOSE 3000
+RUN npm run build
 
-CMD ["yarn", "start:dev"]
+CMD [ "npm", "run", "start:dev" ]

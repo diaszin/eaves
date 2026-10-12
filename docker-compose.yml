@@ -16,7 +16,7 @@ services:
     depends_on:
       - eaves-db
     volumes:
-      - ./server:/app
+      - ./server/src:/app/src
       - /app/node_modules
     deploy:
       resources:

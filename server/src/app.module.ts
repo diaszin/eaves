@@ -1,17 +1,29 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module.js';
-import { ConfigModule } from '@nestjs/config';
-import { PrismaService } from './prisma/prisma.service.js';
-import { PrismaModule } from './prisma/prisma.module.js';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/jwt.guard.js';
 import { JwtStrategy } from './auth/jwt.strategy.js';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [AuthModule, ConfigModule.forRoot({ isGlobal: true }), PrismaModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres' as const,
+        url: configService.getOrThrow<string>('DATABASE_URL'),
+        autoLoadEntities: true,
+        synchronize: false,
+      }),
+    }),
+    AuthModule,
+  ],
   controllers: [],
   providers: [
-    JwtStrategy, 
+    JwtStrategy,
     {
       provide: APP_GUARD,
       useClass: JwtGuard,
