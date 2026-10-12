@@ -1,14 +1,22 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtGuard } from './auth/jwt.guard.js';
-import { JwtStrategy } from './auth/jwt.strategy.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthenticationModule } from '@nestjs/authentication';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    AuthenticationModule.forRootAsync({
+      useFactory: () => ({
+        accessToken: {
+          key: process.env.JWT_SECRET!,
+          issuer: 'https://api.eaves.com',
+          audience: 'eaves-mobile',
+          ttl: '2h',
+        },
+      }),
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -22,12 +30,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     AuthModule,
   ],
   controllers: [],
-  providers: [
-    JwtStrategy,
-    {
-      provide: APP_GUARD,
-      useClass: JwtGuard,
-    },
-  ],
+  providers: [],
 })
 export class AppModule {}

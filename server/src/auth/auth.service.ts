@@ -6,16 +6,16 @@ import {
 import { CreateUserDTO } from './dto/create.dto.js';
 import { AuthLoginDTO } from './dto/login.dto.js';
 import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 import { User } from './entities/user.entity.js';
+import { TokenService } from '@nestjs/authentication';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
-    private readonly jwtService: JwtService,
+    private readonly tokenService: TokenService,
   ) {}
 
   async create(createAuthDto: CreateUserDTO) {
@@ -56,10 +56,12 @@ export class AuthService {
       throw new BadRequestException('Password not matched');
     }
 
-    const payload = { sub: user.id, email: user.email };
-    const token = this.jwtService.sign(payload);
+    const token = await this.tokenService.issue(user.id.toString(), {
+      method: 'password',
+      claims: { amr: ['pwd'] },
+    });
 
-    return { access_token: token };
+    return { access_token: token.accessToken, expires: token.expiresIn };
   }
 
   private hashPassword(password: string): string {
