@@ -3,7 +3,7 @@ services:
     container_name: eaves-api-prod
     build:
       context: ./server
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
       target: production
     ports:
       - "${API_PORT:-3000}:3000"
