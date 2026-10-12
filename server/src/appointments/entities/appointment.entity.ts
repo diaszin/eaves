@@ -12,8 +12,11 @@ export class Appointment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'timestamptz' })
-  date: Date;
+  @Column({ type: 'timestamptz', nullable: false })
+  initialDate: Date;
+
+  @Column({ type: 'timestamptz', nullable: false })
+  endDate: Date;
 
   @CreateDateColumn()
   created: Date;

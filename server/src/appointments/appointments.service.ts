@@ -15,7 +15,12 @@ export class AppointmentsService {
     private readonly userService: AuthService,
   ) {}
 
-  async create(dto: { date: Date; patientId: number; createdBy: User }) {
+  async create(dto: {
+    initialDate: Date;
+    endDate: Date;
+    patientId: number;
+    createdBy: User;
+  }) {
     const patient = await this.userService.findUser(dto.patientId);
 
     if (!patient) {
@@ -25,7 +30,9 @@ export class AppointmentsService {
     }
 
     const appointment = this.appointmentRepository.create({
-      date: dto.date,
+      initialDate: dto.initialDate,
+      endDate: dto.endDate,
+
       createdBy: dto.createdBy,
       patient: patient,
     });
