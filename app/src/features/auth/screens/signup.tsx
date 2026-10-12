@@ -6,13 +6,50 @@ import CommunicationStep from "./signup_steps/communication_step_screen";
 import AuthStepScreen from "./signup_steps/auth_step_screen";
 import { MultiStepData } from "../types/signup.type";
 import { FormOptions, useForm } from "@tanstack/react-form";
+import authService from "../services/auth.service";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
+
+async function signup(
+  fullname: string,
+  email: string,
+  password: string,
+  birthDate: Date,
+) {
+  await authService.signup({
+    birthDate: birthDate.toISOString(),
+    email: email,
+    password: password,
+    fullname: fullname,
+  });
+}
 
 export default function SignUpScreen() {
   const [step, setStep] = useState<number>(1);
+  const router = useRouter();
+
+  const mutation = useMutation({
+    mutationKey: ["auth", "signup"],
+    mutationFn: (value: {
+      email: string;
+      password: string;
+      fullname: string;
+      birthDate: Date;
+    }) => signup(value.fullname, value.email, value.password, value.birthDate),
+    onSuccess: () => {
+      router.replace("/(auth)/sign-in");
+    },
+  });
+
   const form = useForm({
     defaultValues: {} as MultiStepData,
-    onSubmit: (value) => {
-      console.log(value);
+    onSubmit: ({ value }) => {
+      mutation.mutate({
+        birthDate: value.personal.birthDate,
+        email: value.auth.email,
+        password: value.auth.password,
+        fullname: value.personal.fullname,
+      });
     },
   });
 

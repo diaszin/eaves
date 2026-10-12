@@ -6,6 +6,7 @@ import {
   MdOutlineEmail,
   MdOutlineVisibility,
 } from "react-icons/md";
+import { CgSpinner } from "react-icons/cg";
 import { Link, useRouter } from "expo-router";
 import authService from "../services/auth.service";
 import { useForm } from "@tanstack/react-form";
@@ -157,17 +158,26 @@ export default function LoginScreen() {
           </Link>
         </View>
 
-        <authForm.Subscribe selector={(state) => [state.canSubmit]}>
-          {([canSubmit]) => (
+        <authForm.Subscribe
+          selector={(state) => [state.canSubmit, state.isSubmitting]}
+        >
+          {([canSubmit, isSubmitting]) => (
             <TouchableOpacity
-              disabled={!canSubmit}
+              disabled={!canSubmit || isSubmitting}
               onPress={() => {
                 authForm.handleSubmit();
               }}
-              className={`min-h-12 flex flex-row items-center justify-center ${canSubmit ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
+              className={`min-h-12 flex flex-row items-center justify-center ${canSubmit && !isSubmitting ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
             >
-              <Text className="text-white">Entrar</Text>
-              <MdArrowForward className="text-white size-4" />
+              {!isSubmitting ? (
+                <>
+                  <Text className="text-white">Entrar</Text>
+
+                  <MdArrowForward className="text-white size-4" />
+                </>
+              ) : (
+                <CgSpinner className="text-white size-4 animate-spin" />
+              )}
             </TouchableOpacity>
           )}
         </authForm.Subscribe>

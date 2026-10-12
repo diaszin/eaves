@@ -2,7 +2,7 @@ export interface SignUpRequest {
   email: string;
   password: string;
   fullname: string;
-  birthDate: Date;
+  birthDate: string;
 }
 
 export interface SignInRequest {

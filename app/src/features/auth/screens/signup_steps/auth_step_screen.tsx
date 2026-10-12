@@ -3,6 +3,7 @@ import { useContext } from "react";
 import MaskInputWithLabel from "../../components/masked_input_with_label";
 import { MultiStepContext } from "../../contexts/multiStepContext";
 import InputWithLabel from "../../components/input_with_label";
+import { CgSpinner } from "react-icons/cg";
 
 export default function AuthStepScreen() {
   const multiStepContext = useContext(MultiStepContext);
@@ -120,11 +121,18 @@ export default function AuthStepScreen() {
               </multiStepContext.form.Field>
               <View className="w-full flex items-center justify-center">
                 <TouchableOpacity
-                  disabled={!group.state.meta.canSubmit}
-                  className={`min-h-12 w-full m-2 flex flex-row items-center justify-center ${group.state.meta.canSubmit ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
+                  disabled={
+                    !group.state.meta.canSubmit ||
+                    multiStepContext.form.state.isSubmitting
+                  }
+                  className={`min-h-12 w-full m-2 flex flex-row items-center justify-center ${group.state.meta.canSubmit && !multiStepContext.form.state.isSubmitting ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
                   onPress={group.handleSubmit}
                 >
-                  <Text className="text-white">Criar minha conta</Text>
+                  {!multiStepContext.form.state.isSubmitting ? (
+                    <Text className="text-white">Criar minha conta</Text>
+                  ) : (
+                    <CgSpinner className="text-white size-4 animate-spin" />
+                  )}
                 </TouchableOpacity>
               </View>
             </View>
