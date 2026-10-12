@@ -8,7 +8,7 @@ import { AuthLoginDTO } from './dto/login.dto.js';
 import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
-import { User } from './entities/user.entity.js';
+import { Role, User } from './entities/user.entity.js';
 import { TokenService } from '@nestjs/authentication';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class AuthService {
     private readonly tokenService: TokenService,
   ) {}
 
-  async create(createAuthDto: CreateUserDTO) {
+  async create(createAuthDto: CreateUserDTO, role: Role) {
     try {
       const hashedPassword = this.hashPassword(createAuthDto.password);
 
@@ -27,6 +27,7 @@ export class AuthService {
         fullname: createAuthDto.fullname,
         birthday: createAuthDto.birthDate,
         password: hashedPassword,
+        role: role,
       });
       await this.users.save(user);
     } catch (error) {

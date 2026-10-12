@@ -3,6 +3,7 @@ import { AuthService } from './auth.service.js';
 import { CreateUserDTO } from './dto/create.dto.js';
 import { AuthLoginDTO } from './dto/login.dto.js';
 import { Public } from '@nestjs/authentication';
+import { Role } from './entities/user.entity.js';
 
 @Controller('auth')
 export class AuthController {
@@ -11,7 +12,8 @@ export class AuthController {
   @Public()
   @Post('/signup')
   signUp(@Body() dto: CreateUserDTO) {
-    return this.authService.create(dto);
+    const userRole = Role.PATIENT;
+    return this.authService.create(dto, userRole);
   }
 
   @Public()
