@@ -18,9 +18,15 @@ export class JwtAuth extends JwtBearerProvider<User> {
 
     registry.registerProvider(this);
   }
-  validate({ sub }: JwtClaims) {
-    return sub
-      ? this.usersRepository.findOneBy({ id: Number.parseInt(sub) })
-      : null;
+  async validate({ sub }: JwtClaims) {
+    if (!sub) {
+      return null;
+    }
+
+    const user: User | null = await this.usersRepository.findOneBy({
+      id: Number.parseInt(sub),
+    });
+
+    return user;
   }
 }

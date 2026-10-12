@@ -1,0 +1,25 @@
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from '../../auth/entities/user.entity.js';
+
+@Entity()
+export class Appointment {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ type: 'timestamptz' })
+  date: Date;
+
+  @CreateDateColumn()
+  created: Date;
+
+  @ManyToOne(() => User, {
+    nullable: false,
+  })
+  user: User;
+}

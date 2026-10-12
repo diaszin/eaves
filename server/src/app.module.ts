@@ -3,6 +3,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthenticationModule } from '@nestjs/authentication';
+import { AppointmentsModule } from './appointments/appointments.module.js';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AuthenticationModule } from '@nestjs/authentication';
       }),
     }),
     AuthModule,
+    AppointmentsModule,
   ],
   controllers: [],
   providers: [],
