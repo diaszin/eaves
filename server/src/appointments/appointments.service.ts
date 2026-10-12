@@ -1,28 +1,42 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAppointmentDto } from './dto/create-appointment.dto.js';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto.js';
 import { Repository } from 'typeorm';
 import { User } from '../auth/entities/user.entity.js';
 import { Appointment } from './entities/appointment.entity.js';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AuthService } from '../auth/auth.service.js';
 
 @Injectable()
 export class AppointmentsService {
   constructor(
+    @InjectRepository(Appointment)
     private readonly appointmentRepository: Repository<Appointment>,
+    private readonly userService: AuthService,
   ) {}
 
-  create(createAppointmentDto: CreateAppointmentDto) {
+  async create(dto: { date: Date; patientId: number; createdBy: User }) {
+    const patient = await this.userService.findUser(dto.patientId);
+
+    if (!patient) {
+      throw new NotFoundException(
+        'O paciente não existe em nossa base de dados',
+      );
+    }
+
     const appointment = this.appointmentRepository.create({
-      ...createAppointmentDto,
+      date: dto.date,
+      createdBy: dto.createdBy,
+      patient: patient,
     });
 
     return this.appointmentRepository.save(appointment);
   }
 
-  findAllByUser(user: User) {
+  findAllByPatient(patient: User) {
     return this.appointmentRepository.find({
       where: {
-        user: user,
+        patient: patient,
       },
     });
   }

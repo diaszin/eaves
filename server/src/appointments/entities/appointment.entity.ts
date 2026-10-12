@@ -21,5 +21,10 @@ export class Appointment {
   @ManyToOne(() => User, {
     nullable: false,
   })
-  user: User;
+  createdBy: User;
+
+  @ManyToOne(() => User, {
+    nullable: false,
+  })
+  patient: User;
 }

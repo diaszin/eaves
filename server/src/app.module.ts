@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthenticationModule } from '@nestjs/authentication';
 import { AppointmentsModule } from './appointments/appointments.module.js';
+import { AuthorizationModule } from '@nestjs/authorization';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AppointmentsModule } from './appointments/appointments.module.js';
         },
       }),
     }),
+    AuthorizationModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -25,7 +27,7 @@ import { AppointmentsModule } from './appointments/appointments.module.js';
         type: 'postgres' as const,
         url: configService.getOrThrow<string>('DATABASE_URL'),
         autoLoadEntities: true,
-        synchronize: false,
+        synchronize: process.env.NODE_ENV === 'development',
       }),
     }),
     AuthModule,

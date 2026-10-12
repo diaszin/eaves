@@ -65,6 +65,12 @@ export class AuthService {
     return { access_token: token.accessToken, expires: token.expiresIn };
   }
 
+  findUser(id: number) {
+    return this.users.findOneBy({
+      id: id,
+    });
+  }
+
   private hashPassword(password: string): string {
     const saltRounds = 10;
 

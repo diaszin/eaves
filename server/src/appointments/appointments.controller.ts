@@ -12,27 +12,31 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto.js';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto.js';
 import { CurrentUser } from '@nestjs/authentication';
 import { User } from '../auth/entities/user.entity.js';
+import { Can } from '@nestjs/authorization';
+import { AppointmentsPolicy } from './appointments.policy.js';
 
 @Controller('appointments')
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
   @Post()
+  @Can(AppointmentsPolicy, 'create')
   create(
     @CurrentUser() user: User,
     @Body() createAppointmentDto: CreateAppointmentDto,
   ) {
     const data = {
       ...createAppointmentDto,
-      user: user,
+      createdBy: user,
     };
 
     return this.appointmentsService.create(data);
   }
 
   @Get()
+  @Can(AppointmentsPolicy, 'view')
   findAll(@CurrentUser() user: User) {
-    return this.appointmentsService.findAllByUser(user);
+    return this.appointmentsService.findAllByPatient(user);
   }
 
   @Get(':id')
