@@ -9,6 +9,8 @@ import { FormOptions, useForm } from "@tanstack/react-form";
 import authService from "../services/auth.service";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
+import ErrorBottomSheet from "@/components/ErrorBottomSheet";
+import { AxiosError } from "axios";
 
 async function signup(
   fullname: string,
@@ -28,7 +30,16 @@ export default function SignUpScreen() {
   const [step, setStep] = useState<number>(1);
   const router = useRouter();
 
-  const mutation = useMutation({
+  const mutation = useMutation<
+    any,
+    AxiosError,
+    {
+      email: string;
+      password: string;
+      fullname: string;
+      birthDate: Date;
+    }
+  >({
     mutationKey: ["auth", "signup"],
     mutationFn: (value: {
       email: string;
@@ -85,6 +96,7 @@ export default function SignUpScreen() {
           {step == 2 && <CommunicationStep />}
           {step == 3 && <AuthStepScreen />}
         </View>
+        <ErrorBottomSheet error={mutation.error} />
       </View>
     </MultiStepContext.Provider>
   );

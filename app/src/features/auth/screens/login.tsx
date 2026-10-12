@@ -12,6 +12,9 @@ import authService from "../services/auth.service";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useSession } from "@/hooks/useSession";
+import ErrorBottomSheet from "@/components/ErrorBottomSheet";
+import { useEffect } from "react";
+import { AxiosError } from "axios";
 
 async function handleLogin(email: string, password: string) {
   const response = await authService.login({ email, password });
@@ -23,7 +26,11 @@ export default function LoginScreen() {
   const { signIn } = useSession();
   const router = useRouter();
 
-  const mutate = useMutation({
+  const mutate = useMutation<
+    any,
+    AxiosError,
+    { email: string; password: string }
+  >({
     mutationKey: ["auth", "login"],
     mutationFn: (value: { email: string; password: string }) =>
       handleLogin(value.email, value.password),
@@ -206,6 +213,8 @@ export default function LoginScreen() {
         <Text className="text-customblack-min">•</Text>
         <Text className="text-customblack-min">Ajuda</Text>
       </View>
+
+      <ErrorBottomSheet error={mutate.error} />
     </View>
   );
 }
