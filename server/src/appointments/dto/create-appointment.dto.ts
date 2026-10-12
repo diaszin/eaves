@@ -1,4 +1,5 @@
 export class CreateAppointmentDto {
-  date: Date;
+  initialDate: Date;
+  endDate: Date;
   patientId: number;
 }
