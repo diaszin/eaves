@@ -2,6 +2,7 @@ import {
   Column,
   Entity,
   Index,
+  JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -27,8 +28,6 @@ export class User {
   @Column({ type: 'text' })
   password!: string;
 
-  
-
   @Column({
     type: 'enum',
     enum: Role,
@@ -40,5 +39,6 @@ export class User {
   @OneToOne(() => Profile, {
     nullable: false,
   })
+  @JoinColumn()
   profile: Profile;
 }

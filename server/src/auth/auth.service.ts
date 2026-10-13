@@ -36,7 +36,13 @@ export class AuthService {
 
     return await this.dataSource.transaction(async (transaction) => {
       const profile = transaction.create(Profile, {
-        ...createAuthDto,
+        cep: createAuthDto.cep,
+        document: createAuthDto.document,
+        emergencyPhone: createAuthDto.emergencyPhone,
+        fullname: createAuthDto.fullname,
+        incomeBraket: createAuthDto.incomeBraket,
+        race: createAuthDto.race,
+        birthday: createAuthDto.birthDate,
       });
 
       const savedProfile = await transaction.save(profile);

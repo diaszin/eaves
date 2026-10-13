@@ -28,6 +28,7 @@ import { AuthorizationModule } from '@nestjs/authorization';
         url: configService.getOrThrow<string>('DATABASE_URL'),
         autoLoadEntities: true,
         synchronize: process.env.NODE_ENV === 'development',
+        logging: ["query", "error"]
       }),
     }),
     AuthModule,
