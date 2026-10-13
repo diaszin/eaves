@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthenticationModule } from '@nestjs/authentication';
 import { AppointmentsModule } from './appointments/appointments.module.js';
 import { AuthorizationModule } from '@nestjs/authorization';
+import { AuthenticationStorageMigration } from './auth/migrations/authentication-storage.migration.js';
 
 @Module({
   imports: [
@@ -28,6 +29,8 @@ import { AuthorizationModule } from '@nestjs/authorization';
         url: configService.getOrThrow<string>('DATABASE_URL'),
         autoLoadEntities: true,
         synchronize: process.env.NODE_ENV === 'development',
+        migrations: [AuthenticationStorageMigration],
+        migrationsRun: true,
         logging: ["query", "error"]
       }),
     }),
