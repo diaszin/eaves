@@ -3,6 +3,11 @@ export interface SignUpRequest {
   password: string;
   fullname: string;
   birthDate: string;
+  document: string;
+  race: string;
+  incomeBraket: string;
+  emergencyPhone: string;
+  cep: string;
 }
 
 export interface SignInRequest {

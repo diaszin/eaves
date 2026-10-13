@@ -22,3 +22,15 @@ export interface MultiStepData {
   communication: CommunicationStepData;
   auth: AuthStepData;
 }
+
+export interface SignupMutationData {
+  email: string;
+  password: string;
+  fullname: string;
+  birthDate: Date;
+  document: string;
+  race: string;
+  incomeBraket: string;
+  emergencyPhone: string;
+  localization: string;
+}
