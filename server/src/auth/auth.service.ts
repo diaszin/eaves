@@ -6,42 +6,50 @@ import {
 import { CreateUserDTO } from './dto/create.dto.js';
 import { AuthLoginDTO } from './dto/login.dto.js';
 import * as bcrypt from 'bcrypt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { QueryFailedError, Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, QueryFailedError, Repository } from 'typeorm';
 import { Role, User } from './entities/user.entity.js';
 import { TokenService } from '@nestjs/authentication';
+import { Profile } from './entities/profile.entity.js';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
+    @InjectDataSource() private readonly dataSource: DataSource,
     private readonly tokenService: TokenService,
   ) {}
 
   async create(createAuthDto: CreateUserDTO, role: Role) {
-    try {
-      const hashedPassword = this.hashPassword(createAuthDto.password);
-
-      const user = this.users.create({
+    const isEmailSigned =
+      (await this.users.countBy({
         email: createAuthDto.email,
-        fullname: createAuthDto.fullname,
-        birthday: createAuthDto.birthDate,
+      })) > 0;
+
+    if (isEmailSigned) {
+      throw new BadRequestException(
+        'Esse e-mail já foi cadastrado. Faça login ao invés de criar uma nova conta',
+      );
+    }
+
+    const hashedPassword = this.hashPassword(createAuthDto.password);
+
+    return await this.dataSource.transaction(async (transaction) => {
+      const profile = transaction.create(Profile, {
+        ...createAuthDto,
+      });
+
+      const savedProfile = await transaction.save(profile);
+
+      const user = transaction.create(User, {
+        email: createAuthDto.email,
         password: hashedPassword,
         role: role,
+        profile: savedProfile,
       });
-      await this.users.save(user);
-    } catch (error) {
-      if (
-        error instanceof QueryFailedError &&
-        (error.driverError as { code?: string }).code === '23505'
-      ) {
-        throw new BadRequestException(
-          'Esse e-mail já foi cadastrado. Faça login ao invés de criar uma nova conta',
-        );
-      }
 
-      throw error;
-    }
+      await transaction.save(user);
+    });
   }
 
   async login(dto: AuthLoginDTO) {

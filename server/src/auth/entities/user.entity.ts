@@ -1,4 +1,11 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Profile } from './profile.entity.js';
 
 export enum Role {
   PATIENT = 'patient',
@@ -20,17 +27,18 @@ export class User {
   @Column({ type: 'text' })
   password!: string;
 
-  @Column({ type: 'text' })
-  fullname!: string;
-
-  @Column({ type: 'timestamp', precision: 3 })
-  birthday!: Date;
+  
 
   @Column({
-	type: "enum",
+    type: 'enum',
     enum: Role,
     default: Role.PATIENT,
     nullable: false,
   })
   role: Role;
+
+  @OneToOne(() => Profile, {
+    nullable: false,
+  })
+  profile: Profile;
 }
