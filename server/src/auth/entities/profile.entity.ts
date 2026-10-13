@@ -1,12 +1,13 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
+@Entity()
 export class Profile {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({
     nullable: false,
-    type: 'char varying',
+    type: 'text',
   })
   fullname: string;
 
@@ -19,25 +20,25 @@ export class Profile {
 
   @Column({
     nullable: false,
-    type: 'char varying',
+    type: 'text',
   })
   race: string;
 
   @Column({
     nullable: false,
-    type: 'char varying',
+    type: 'text',
   })
   incomeBraket: string;
 
   @Column({
     nullable: false,
-    type: 'char varying',
+    type: 'text',
   })
   emergencyPhone: string;
 
   @Column({
     nullable: false,
-    type: 'char varying',
+    type: 'text',
   })
   cep: string;
 

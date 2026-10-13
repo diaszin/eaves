@@ -4,9 +4,10 @@ import { AuthController } from './auth.controller.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity.js';
 import { JwtAuth } from './jwt_auth.provider.js';
+import { Profile } from './entities/profile.entity.js';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User, Profile])], 
   controllers: [AuthController],
   providers: [AuthService, JwtAuth],
   exports: [AuthService],
