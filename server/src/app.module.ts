@@ -39,7 +39,7 @@ import { AuthenticationStorageMigration } from './auth/migrations/authentication
           configService.get<string>('NODE_ENV') === 'production'
             ? ['dist/db/migrations/*.js']
             : [AuthenticationStorageMigration],
-        migrationsRun: configService.get<string>('NODE_ENV') === 'production',
+        migrationsRun: true,
       }),
     }),
     AuthModule,
