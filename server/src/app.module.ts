@@ -25,13 +25,21 @@ import { AuthenticationStorageMigration } from './auth/migrations/authentication
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        type: 'postgres' as const,
+        type: 'postgres',
         url: configService.getOrThrow<string>('DATABASE_URL'),
+        host: configService.get<string>('POSTGRES_HOST', 'localhost'),
+        port: configService.get<number>('POSTGRES_PORT', 5432),
+        username: configService.get<string>('POSTGRES_USER'),
+        password: configService.get<string>('POSTGRES_PASSWORD'),
+        database: configService.get<string>('POSTGRES_DB'),
         autoLoadEntities: true,
-        synchronize: process.env.NODE_ENV === 'development',
-        migrations: [AuthenticationStorageMigration],
-        migrationsRun: true,
-        logging: ["query", "error"]
+        synchronize: configService.get<string>('NODE_ENV') !== 'production',
+        logging: ['query', 'error'],
+        migrations:
+          configService.get<string>('NODE_ENV') === 'production'
+            ? ['dist/db/migrations/*.js']
+            : [AuthenticationStorageMigration],
+        migrationsRun: configService.get<string>('NODE_ENV') === 'production',
       }),
     }),
     AuthModule,
