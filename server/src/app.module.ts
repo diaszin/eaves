@@ -6,6 +6,7 @@ import { AuthenticationModule } from '@nestjs/authentication';
 import { AppointmentsModule } from './appointments/appointments.module.js';
 import { AuthorizationModule } from '@nestjs/authorization';
 import { AuthenticationStorageMigration } from './auth/migrations/authentication-storage.migration.js';
+import { join } from 'node:path';
 
 @Module({
   imports: [
@@ -34,10 +35,10 @@ import { AuthenticationStorageMigration } from './auth/migrations/authentication
         database: configService.get<string>('POSTGRES_DB'),
         autoLoadEntities: true,
         synchronize: configService.get<string>('NODE_ENV') !== 'production',
-        logging: ['query', 'error'],
+        logging: ['query', 'error', 'migration'],
         migrations:
           configService.get<string>('NODE_ENV') === 'production'
-            ? ['dist/db/migrations/*.js']
+            ? [join(process.cwd(), 'dist', 'db', 'migrations', '*.js')]
             : [AuthenticationStorageMigration],
         migrationsRun: true,
       }),
