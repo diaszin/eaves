@@ -16,6 +16,9 @@ COPY . .
 
 RUN yarn build
 
+RUN yarn migration:generate
+RUN yarn migration:run
+
 
 FROM node:lts-slim AS production
 
