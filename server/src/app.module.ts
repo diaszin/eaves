@@ -36,10 +36,7 @@ import { join } from 'node:path';
         autoLoadEntities: true,
         synchronize: configService.get<string>('NODE_ENV') !== 'production',
         logging: ['query', 'error', 'migration'],
-        migrations:
-          configService.get<string>('NODE_ENV') === 'production'
-            ? [join(process.cwd(), 'dist', 'db', 'migrations', '*.js')]
-            : [AuthenticationStorageMigration],
+        migrations: [join(process.cwd(), 'dist', 'db', 'migrations', '*.js')],
         migrationsRun: true,
       }),
     }),
