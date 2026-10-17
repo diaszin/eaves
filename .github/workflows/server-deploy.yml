@@ -2,12 +2,19 @@ name: Deploy Backend API in Azure VM
 
 on:
   push:
+    paths:
+      - "server/**"
+      - ".github/workflows/server-deploy.yml"
     branches:
       - main
   pull_request:
     types: [opened, synchronize, reopened, closed]
+    paths:
+      - "server/**"
+      - ".github/workflows/server-deploy.yml"
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -29,4 +36,3 @@ jobs:
             docker compose -f docker-compose.prod.yml up -d --build
 
             docker image prune -f
-
