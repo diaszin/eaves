@@ -1,9 +1,6 @@
 import 'dotenv/config';
 import { join } from 'node:path';
 import { DataSource } from 'typeorm';
-import { Appointment } from './appointments/entities/appointment.entity.js';
-import { Profile } from './auth/entities/profile.entity.js';
-import { User } from './auth/entities/user.entity.js';
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -19,8 +16,14 @@ export default new DataSource({
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
-  entities: [User, Profile, Appointment],
-  migrations: [join(process.cwd(), 'dist', '**', '*.migration.js')],
+  entities: [
+    join(process.cwd(), 'dist', '**', '*.entity.js'),
+    join(process.cwd(), 'src', '**', '*.entity.ts'),
+  ],
+
+  migrations: [
+    join(process.cwd(), 'src', 'migration', '*.ts'),
+  ],
   synchronize: false,
   logging: ['query', 'error', 'migration'],
   migrationsRun: false,
