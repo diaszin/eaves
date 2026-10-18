@@ -1,0 +1,50 @@
+<mjml>
+  <mj-head>
+    <mj-font
+      name="Manrope"
+      href="https://fonts.googleapis.com/css2?family=Manrope"
+    />
+    <mj-style inline="inline">
+      .title div { color: #76B5E1 !important; font-size: 30px !important; }
+      .subtitle div { color: #40484E !important; font-size: 16px !important; }
+      .bottom-title {
+        color: #65487a !important;
+        font-weight: 800;
+        font-size: 24px !important;
+      }
+    </mj-style>
+    <mj-attributes>
+      <mj-text font-family="Manrope, Arial" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text align="center" css-class="title">
+          Seja Bem Vindo ao Eaves
+        </mj-text>
+        <mj-text align="center" css-class="subtitle">
+          A sua principal plataforma de saúde mental
+        </mj-text>
+        <mj-image
+          src="https://images.pexels.com/photos/1000445/pexels-photo-1000445.jpeg"
+          alt="Pessoas felizes"
+          border-radius="10px"
+        />
+        <mj-text align="center">
+          Dar o primeiro passo para cuidar da própria mente nem sempre é fácil.
+          Exige coragem reconhecer que, às vezes, o ritmo da vida pesa um pouco
+          mais e que precisamos de um momento para respirar. Seja muito
+          bem-vindo(a) ao seu espaço de pausa, acolhimento e cuidado.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column>
+        <mj-text align="center" css-class="bottom-title">
+          Ei, {{name}}, nunca se esqueça. Você já é um vencedor
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
