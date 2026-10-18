@@ -2,6 +2,7 @@ import { Controller, Post, Body, HttpStatus, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { CreateUserDTO } from './dto/create.dto.js';
 import { AuthLoginDTO } from './dto/login.dto.js';
+import { MicrosoftLoginDTO } from './dto/microsoft-login.dto.js';
 import { Public } from '@nestjs/authentication';
 import { Role } from './entities/user.entity.js';
 import { EmailService } from '../email/email.service.js';
@@ -38,5 +39,12 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   signIn(@Body() dto: AuthLoginDTO) {
     return this.authService.login(dto);
+  }
+
+  @Public()
+  @Post('/microsoft')
+  @HttpCode(HttpStatus.OK)
+  signInWithMicrosoft(@Body() dto: MicrosoftLoginDTO) {
+    return this.authService.loginWithMicrosoft(dto);
   }
 }

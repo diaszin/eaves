@@ -19,6 +19,7 @@ POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 DATABASE_URL=postgresql://eaves:change-me@localhost:5432/eaves
 JWT_SECRET=replace-with-a-long-random-secret
+MICROSOFT_CLIENT_ID=seu-client-id-do-entra
 ALLOWED_ORIGINS=http://localhost:8081
 PORT=3000
 ```
@@ -52,6 +53,7 @@ docker compose logs -f api
 
 - `POST /auth/signup`: cria uma conta.
 - `POST /auth/login`: autentica e retorna os dados de acesso.
+- `POST /auth/microsoft`: troca um código OAuth com PKCE por uma sessão Eaves.
 - `/appointments`: cria e lista agendamentos do usuário autenticado.
 - `/appointments/:id`: consulta, atualiza ou remove um agendamento.
 

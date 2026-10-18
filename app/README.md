@@ -20,7 +20,10 @@ Crie um arquivo `.env` na pasta `app/` e configure a URL base da API:
 
 ```env
 EXPO_PUBLIC_API_URL=http://localhost:3000
+EXPO_PUBLIC_MICROSOFT_CLIENT_ID=seu-client-id-do-entra
 ```
+
+Cadastre o aplicativo no Microsoft Entra ID como cliente público e habilite o fluxo de código de autorização com PKCE. Configure `eaves://auth` como URI de redirecionamento para os builds nativos e também cadastre a URI exibida em desenvolvimento web/Expo Go, quando aplicável. Use o mesmo Client ID na variável `MICROSOFT_CLIENT_ID` da API. O login Microsoft autentica contas Eaves já cadastradas; o cadastro completo continua sendo feito pelo fluxo normal do app.
 
 Em um celular físico, `localhost` aponta para o próprio aparelho. Use o IP local do computador que está executando a API, por exemplo `http://192.168.1.20:3000`, e mantenha os dois dispositivos na mesma rede.
 

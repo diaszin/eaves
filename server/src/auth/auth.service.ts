@@ -1,16 +1,21 @@
 import {
   BadRequestException,
+  InternalServerErrorException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create.dto.js';
 import { AuthLoginDTO } from './dto/login.dto.js';
+import { MicrosoftLoginDTO } from './dto/microsoft-login.dto.js';
 import * as bcrypt from 'bcrypt';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, QueryFailedError, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Role, User } from './entities/user.entity.js';
 import { TokenService } from '@nestjs/authentication';
 import { Profile } from './entities/profile.entity.js';
+import { ConfigService } from '@nestjs/config';
+import { MicrosoftService } from '../microsoft/microsoft.service.js';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +23,7 @@ export class AuthService {
     @InjectRepository(User) private readonly users: Repository<User>,
     @InjectDataSource() private readonly dataSource: DataSource,
     private readonly tokenService: TokenService,
+    private readonly microsoftService: MicrosoftService,
   ) {}
 
   async create(createAuthDto: CreateUserDTO, role: Role) {
@@ -76,6 +82,27 @@ export class AuthService {
     const token = await this.tokenService.issue(user.id.toString(), {
       method: 'password',
       claims: { amr: ['pwd'] },
+    });
+
+    return { access_token: token.accessToken, expires: token.expiresIn };
+  }
+
+  async loginWithMicrosoft(dto: MicrosoftLoginDTO) {
+    const microsoftLoginData =
+      await this.microsoftService.getMicrosoftExternalData(dto);
+
+    const user = await this.users.findOne({
+      where: { email: microsoftLoginData.email },
+    });
+    if (!user) {
+      throw new NotFoundException(
+        'No Eaves account is registered with this Microsoft email',
+      );
+    }
+
+    const token = await this.tokenService.issue(user.id.toString(), {
+      method: 'microsoft',
+      claims: { amr: ['microsoft'] },
     });
 
     return { access_token: token.accessToken, expires: token.expiresIn };

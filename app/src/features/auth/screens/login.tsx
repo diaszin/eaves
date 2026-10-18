@@ -58,7 +58,7 @@ export default function LoginScreen() {
         return authService.loginWithMicrosoft({
           code: data.code!,
           codeVerifier: data.verifier!,
-          redirectUri: "http://localhost:8081",
+          redirectUri: "http://localhost:8081/auth",
         });
       }
     },

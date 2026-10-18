@@ -8,6 +8,7 @@ import { AuthorizationModule } from '@nestjs/authorization';
 import { join } from 'node:path';
 import { EmailModule } from './email/email.module.js';
 import { TemplateModule } from './template/template.module.js';
+import { MicrosoftModule } from './microsoft/microsoft.module.js';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { TemplateModule } from './template/template.module.js';
     AppointmentsModule,
     EmailModule,
     TemplateModule,
+    MicrosoftModule,
   ],
   controllers: [],
   providers: [],

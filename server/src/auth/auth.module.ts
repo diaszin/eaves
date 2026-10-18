@@ -8,9 +8,15 @@ import { Profile } from './entities/profile.entity.js';
 import { AuthenticationStorageProvider } from './authentication-storage.provider.js';
 import { EmailModule } from '../email/email.module.js';
 import { TemplateModule } from '../template/template.module.js';
+import { MicrosoftModule } from '../microsoft/microsoft.module.js';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Profile]), EmailModule, TemplateModule],
+  imports: [
+    TypeOrmModule.forFeature([User, Profile]),
+    EmailModule,
+    TemplateModule,
+    MicrosoftModule,
+  ],
   controllers: [AuthController],
   providers: [AuthService, JwtAuth, AuthenticationStorageProvider],
   exports: [AuthService],
