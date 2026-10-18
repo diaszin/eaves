@@ -15,7 +15,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useSession } from "@/hooks/useSession";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
 import { useState } from "react";
-import { AxiosError } from "axios";
+import { AxiosError, isAxiosError } from "axios";
 import * as AuthSession from "expo-auth-session";
 import { useAutoDiscovery, useAuthRequest } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
@@ -55,11 +55,28 @@ export default function LoginScreen() {
       const data = await microsoft.handleMicrosoftLogin();
 
       if (data) {
-        return authService.loginWithMicrosoft({
+        const signInData = {
           code: data.code!,
           codeVerifier: data.verifier!,
-          redirectUri: "http://localhost:8081/auth",
-        });
+          redirectUri: process.env.EXPO_PUBLIC_MICROSOFT_REDIRECT_URL!,
+        };
+
+        try {
+          await authService.verifyAccount(signInData);
+          return authService.loginWithMicrosoft(signInData);
+        } catch (e) {
+          if (isAxiosError(e)) {
+            const microsftIncompletedData = e.response?.data;
+
+            router.push({
+              pathname: "/sign-up",
+              params: {
+                email: microsftIncompletedData.email as string,
+                redirectByMicrosoftLogin: 1,
+              },
+            });
+          }
+        }
       }
     },
   });

@@ -20,6 +20,10 @@ class AuthService {
   async signup(data: SignUpRequest) {
     return await this.client.post("/signup", data);
   }
+
+  async verifyAccount(data: MicrosoftSignInRequest) {
+    return await this.client.post("/verify-account", data);
+  }
 }
 
 const authService = new AuthService();

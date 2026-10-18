@@ -8,7 +8,7 @@ import { MultiStepData, SignupMutationData } from "../types/signup.type";
 import { FormOptions, useForm } from "@tanstack/react-form";
 import authService from "../services/auth.service";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
 import { AxiosError } from "axios";
 
@@ -37,6 +37,15 @@ async function signup(
 }
 
 export default function SignUpScreen() {
+  const { email, redirectByMicrosoftLogin } = useLocalSearchParams<{
+    email?: string;
+    redirectByMicrosoftLogin?: string;
+  }>();
+
+  const signedByMicrosoft = redirectByMicrosoftLogin
+    ? Number.parseInt(redirectByMicrosoftLogin) > 0
+    : false;
+
   const [step, setStep] = useState<number>(1);
   const router = useRouter();
 
@@ -60,7 +69,11 @@ export default function SignUpScreen() {
   });
 
   const form = useForm({
-    defaultValues: {} as MultiStepData,
+    defaultValues: {
+      auth: {
+        email: email,
+      },
+    } as MultiStepData,
     onSubmit: ({ value }) => {
       mutation.mutate({
         birthDate: value.personal.birthDate,
@@ -104,6 +117,15 @@ export default function SignUpScreen() {
           <Text className="font-secondary-regular text-[0.8rem] text-customblack-min">
             Leva menos de 1 minuto para dar o primeiro passo.
           </Text>
+
+          {signedByMicrosoft && (
+            <View className="bg-blue-100 flex items-center justify-center h-10 w-30 p-7 my-2">
+              <Text className="text-center">
+                Você não possue uma conta! {"\n"}
+                Realize o cadastro antes de fazer o login
+              </Text>
+            </View>
+          )}
           {step == 1 && <PersonalStep />}
           {step == 2 && <CommunicationStep />}
           {step == 3 && <AuthStepScreen />}

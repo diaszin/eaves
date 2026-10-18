@@ -56,6 +56,7 @@ export default function useLoginWithMicrosoft() {
       }
 
       return {
+        ...result,
         code: code,
         verifier: microsoftRequest.codeVerifier,
       };
