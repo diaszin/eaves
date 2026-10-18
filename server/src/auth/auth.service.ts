@@ -55,6 +55,8 @@ export class AuthService {
       });
 
       await transaction.save(user);
+
+      return user;
     });
   }
 

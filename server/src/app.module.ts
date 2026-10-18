@@ -6,6 +6,8 @@ import { AuthenticationModule } from '@nestjs/authentication';
 import { AppointmentsModule } from './appointments/appointments.module.js';
 import { AuthorizationModule } from '@nestjs/authorization';
 import { join } from 'node:path';
+import { EmailModule } from './email/email.module.js';
+import { TemplateModule } from './template/template.module.js';
 
 @Module({
   imports: [
@@ -43,6 +45,8 @@ import { join } from 'node:path';
     }),
     AuthModule,
     AppointmentsModule,
+    EmailModule,
+    TemplateModule,
   ],
   controllers: [],
   providers: [],

@@ -4,16 +4,33 @@ import { CreateUserDTO } from './dto/create.dto.js';
 import { AuthLoginDTO } from './dto/login.dto.js';
 import { Public } from '@nestjs/authentication';
 import { Role } from './entities/user.entity.js';
+import { EmailService } from '../email/email.service.js';
+import { TemplateService } from '../template/template.service.js';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly emailService: EmailService,
+    private readonly templateService: TemplateService,
+  ) {}
 
   @Public()
   @Post('/signup')
-  signUp(@Body() dto: CreateUserDTO) {
+  async signUp(@Body() dto: CreateUserDTO) {
     const userRole = Role.PATIENT;
-    return this.authService.create(dto, userRole);
+    const userCreated = await this.authService.create(dto, userRole);
+    const profileName = userCreated.profile.fullname.split(' ')[0];
+
+    const emailTemplate = await this.templateService.renderWelcomeEmail({
+      name: profileName,
+    });
+
+    this.emailService.sendEmail({
+      to: userCreated.email,
+      html: emailTemplate,
+      subject: 'Cadastro com concluído',
+    });
   }
 
   @Public()
