@@ -6,7 +6,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "app",
+    "scheme": "eaves",
     "userInterfaceStyle": "light",
     "primaryColor": "#76B5E1",
     "ios": {

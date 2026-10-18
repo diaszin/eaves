@@ -14,3 +14,9 @@ export interface SignInRequest {
   email: string;
   password: string;
 }
+
+export interface MicrosoftSignInRequest {
+  code: string;
+  codeVerifier: string;
+  redirectUri: string;
+}

@@ -6,6 +6,7 @@ import {
   MdOutlineEmail,
   MdOutlineVisibility,
 } from "react-icons/md";
+import { FaMicrosoft } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
 import { Link, useRouter } from "expo-router";
 import authService from "../services/auth.service";
@@ -13,8 +14,13 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useSession } from "@/hooks/useSession";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
-import { useEffect } from "react";
+import { useState } from "react";
 import { AxiosError } from "axios";
+import * as AuthSession from "expo-auth-session";
+import { useAutoDiscovery, useAuthRequest } from "expo-auth-session";
+import * as WebBrowser from "expo-web-browser";
+
+WebBrowser.maybeCompleteAuthSession();
 
 async function handleLogin(email: string, password: string) {
   const response = await authService.login({ email, password });
@@ -25,6 +31,27 @@ async function handleLogin(email: string, password: string) {
 export default function LoginScreen() {
   const { signIn } = useSession();
   const router = useRouter();
+  const [isMicrosoftPrompting, setMicrosoftPrompting] = useState(false);
+  const [microsoftError, setMicrosoftError] = useState<Error | null>(null);
+  const microsoftClientId = process.env.EXPO_PUBLIC_MICROSOFT_CLIENT_ID;
+  const microsoftRedirectUri = AuthSession.makeRedirectUri({
+    scheme: "eaves",
+    path: "auth",
+  });
+  const microsoftDiscovery = useAutoDiscovery(
+    "https://login.microsoftonline.com/common/v2.0",
+  );
+  const [microsoftRequest, , promptMicrosoftLogin] = useAuthRequest(
+    {
+      clientId: microsoftClientId ?? "",
+      redirectUri: microsoftRedirectUri,
+      responseType: AuthSession.ResponseType.Code,
+      scopes: ["openid", "profile", "email"],
+      usePKCE: true,
+      prompt: AuthSession.Prompt.SelectAccount,
+    },
+    microsoftDiscovery,
+  );
 
   const mutate = useMutation<
     any,
@@ -40,6 +67,67 @@ export default function LoginScreen() {
       router.replace("/");
     },
   });
+
+  const microsoftMutation = useMutation({
+    mutationKey: ["auth", "microsoft"],
+    mutationFn: (
+      data: Parameters<typeof authService.loginWithMicrosoft>[0],
+    ) => {
+      console.log(data);
+
+      return authService.loginWithMicrosoft(data);
+    },
+  });
+
+  async function handleMicrosoftLogin() {
+    if (!microsoftClientId) {
+      setMicrosoftError(
+        new Error("O login Microsoft ainda não foi configurado neste app."),
+      );
+      return;
+    }
+
+    if (!microsoftRequest?.codeVerifier || !microsoftDiscovery) {
+      setMicrosoftError(
+        new Error("Não foi possível iniciar o login Microsoft."),
+      );
+      return;
+    }
+
+    setMicrosoftError(null);
+    setMicrosoftPrompting(true);
+
+    try {
+      const result = await promptMicrosoftLogin();
+      const code = result.type === "success" ? result.params.code : undefined;
+
+      if (!code) {
+        if (result.type === "error") {
+          setMicrosoftError(new Error("A Microsoft não autorizou o login."));
+        }
+        return;
+      }
+
+      const { data } = await microsoftMutation.mutateAsync({
+        code,
+        codeVerifier: microsoftRequest.codeVerifier,
+        redirectUri: microsoftRedirectUri,
+      });
+
+      signIn(data.access_token);
+      router.replace("/");
+    } catch (error) {
+      if (error instanceof Error) {
+        setMicrosoftError(error);
+      } else {
+        setMicrosoftError(
+          new Error("Não foi possível concluir o login Microsoft."),
+        );
+      }
+    } finally {
+      setMicrosoftPrompting(false);
+    }
+  }
 
   const authForm = useForm({
     defaultValues: {
@@ -194,6 +282,27 @@ export default function LoginScreen() {
           <Text className="px-2 text-customgray">ou continue com</Text>
           <View className="h-0.5 w-20 bg-gray-300" />
         </View>
+
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Continuar com Microsoft"
+          disabled={
+            !microsoftRequest ||
+            isMicrosoftPrompting ||
+            microsoftMutation.isPending
+          }
+          onPress={handleMicrosoftLogin}
+          className="min-h-12 flex flex-row items-center justify-center gap-3 rounded-xl border border-gray-300 bg-white"
+        >
+          {isMicrosoftPrompting || microsoftMutation.isPending ? (
+            <CgSpinner className="text-customgray size-4 animate-spin" />
+          ) : (
+            <FaMicrosoft color="#F25022" size={18} />
+          )}
+          <Text className="font-secondary-medium text-customblack-min">
+            Continuar com Microsoft
+          </Text>
+        </TouchableOpacity>
       </View>
       <View className="flex flex-col items-center justify-center">
         <Text className="font-secondary-regular text-sm text-gray-600">
@@ -214,7 +323,9 @@ export default function LoginScreen() {
         <Text className="text-customblack-min">Ajuda</Text>
       </View>
 
-      <ErrorBottomSheet error={mutate.error} />
+      <ErrorBottomSheet
+        error={microsoftError ?? microsoftMutation.error ?? mutate.error}
+      />
     </View>
   );
 }
