@@ -49,7 +49,7 @@ export default function LoginScreen() {
     },
   });
 
-  const microsoftMutation = useMutation({
+  const microsoftMutation = useMutation<any, AxiosError, any>({
     mutationKey: ["auth", "microsoft"],
     mutationFn: async () => {
       const data = await microsoft.handleMicrosoftLogin();
@@ -62,8 +62,7 @@ export default function LoginScreen() {
         };
 
         try {
-          await authService.verifyAccount(signInData);
-          return authService.loginWithMicrosoft(signInData);
+          return await authService.loginWithMicrosoft(signInData);
         } catch (e) {
           if (isAxiosError(e)) {
             const microsftIncompletedData = e.response?.data;
@@ -78,6 +77,11 @@ export default function LoginScreen() {
           }
         }
       }
+    },
+    onSuccess: ({ data }) => {
+      signIn(data["access_token"]);
+
+      router.replace("/");
     },
   });
 
