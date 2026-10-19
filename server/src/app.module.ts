@@ -40,7 +40,10 @@ import { MicrosoftModule } from './microsoft/microsoft.module.js';
         entities: [
           join(process.cwd(), 'dist', '**', '*.entity.js'),
         ],
-        migrations: [join(process.cwd(), 'dist', 'migration', '*.js')],
+        migrations: [
+          join(process.cwd(), 'dist', 'migration', '*.js'),
+          join(process.cwd(), 'dist', '**', 'migrations', '*.js'),
+        ],
         migrationsRun: true,
       }),
     }),

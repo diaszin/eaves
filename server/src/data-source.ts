@@ -25,6 +25,9 @@ export default new DataSource({
     process.env.NODE_ENV === 'production'
       ? join(process.cwd(), 'dist', 'migration', '*.js')
       : join(process.cwd(), 'src', 'migration', '*.ts'),
+    process.env.NODE_ENV === 'production'
+      ? join(process.cwd(), 'dist', '**', 'migrations', '*.js')
+      : join(process.cwd(), 'src', '**', 'migrations', '*.ts'),
   ],
   synchronize: false,
   logging: ['query', 'error', 'migration'],

@@ -95,10 +95,12 @@ export class AuthService {
       where: { email: microsoftLoginData.email },
     });
     if (!user) {
-      throw new NotFoundException(
-        'No Eaves account is registered with this Microsoft email',
-      );
+      throw new NotFoundException({
+        email: microsoftLoginData.email,
+      });
     }
+
+    console.log('Passou aqui');
 
     const token = await this.tokenService.issue(user.id.toString(), {
       method: 'microsoft',

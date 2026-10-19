@@ -49,6 +49,8 @@ export class MicrosoftService {
       );
     });
 
+    console.log(tokenResponse);
+
     const tokenData = (await tokenResponse.json().catch(() => ({}))) as {
       id_token?: string;
     };
@@ -77,7 +79,9 @@ export class MicrosoftService {
   ): Promise<MicrosoftIdTokenClaims> {
     const [encodedHeader, encodedClaims, encodedSignature] = idToken.split('.');
     if (!encodedHeader || !encodedClaims || !encodedSignature) {
-      throw new UnauthorizedException('Token de identidade do Microsoft inválido');
+      throw new UnauthorizedException(
+        'Token de identidade do Microsoft inválido',
+      );
     }
 
     let header: { alg?: string; kid?: string };
@@ -86,7 +90,9 @@ export class MicrosoftService {
       header = JSON.parse(Buffer.from(encodedHeader, 'base64url').toString());
       claims = JSON.parse(Buffer.from(encodedClaims, 'base64url').toString());
     } catch {
-      throw new UnauthorizedException('Token de identidade do Microsoft inválido');
+      throw new UnauthorizedException(
+        'Token de identidade do Microsoft inválido',
+      );
     }
 
     const now = Math.floor(Date.now() / 1000);
@@ -101,7 +107,9 @@ export class MicrosoftService {
       claims.exp <= now ||
       (claims.nbf !== undefined && claims.nbf > now)
     ) {
-      throw new UnauthorizedException('Token de identidade do Microsoft inválido');
+      throw new UnauthorizedException(
+        'Token de identidade do Microsoft inválido',
+      );
     }
 
     const key = await this.getMicrosoftSigningKey(header.kid);
@@ -117,7 +125,9 @@ export class MicrosoftService {
       Buffer.from(encodedSignature, 'base64url'),
     );
     if (!isSignatureValid) {
-      throw new UnauthorizedException('Token de identidade do Microsoft inválido');
+      throw new UnauthorizedException(
+        'Token de identidade do Microsoft inválido',
+      );
     }
 
     return claims;

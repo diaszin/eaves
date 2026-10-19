@@ -45,6 +45,7 @@ export class AuthController {
   @Post('/microsoft')
   @HttpCode(HttpStatus.OK)
   signInWithMicrosoft(@Body() dto: MicrosoftLoginDTO) {
+    console.log('Ele chamou aqui');
     return this.authService.loginWithMicrosoft(dto);
   }
 }
