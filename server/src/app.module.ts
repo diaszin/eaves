@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import { EmailModule } from './email/email.module.js';
 import { TemplateModule } from './template/template.module.js';
 import { MicrosoftModule } from './microsoft/microsoft.module.js';
+import { SurveyModule } from './survey/survey.module.js';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { MicrosoftModule } from './microsoft/microsoft.module.js';
     EmailModule,
     TemplateModule,
     MicrosoftModule,
+    SurveyModule,
   ],
   controllers: [],
   providers: [],
