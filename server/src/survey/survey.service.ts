@@ -56,7 +56,8 @@ export class SurveyService {
                     id: element.answerId,
                 },
                 answeredBy: user,
-            };
+                type: "PHQ"
+            } as Partial<Survey>;
         });
 
 
