@@ -6,6 +6,7 @@ import { useColorScheme, Text, View, TouchableOpacity } from "react-native";
 
 interface ErrorBottomSheetProps {
   error: AxiosError | Error | null;
+  onDismiss?: () => void;
 }
 
 export default function ErrorBottomSheet(props: ErrorBottomSheetProps) {
@@ -27,7 +28,13 @@ export default function ErrorBottomSheet(props: ErrorBottomSheetProps) {
   }, [props.error]);
 
   return (
-    <BottomSheet isPresented={isOpen} onDismiss={() => setOpen(false)}>
+    <BottomSheet
+      isPresented={isOpen}
+      onDismiss={() => {
+        setOpen(false);
+        props.onDismiss?.();
+      }}
+    >
       <View
         className="flex flex-col items-center justify-center"
         style={{
