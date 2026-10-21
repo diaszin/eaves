@@ -20,5 +20,22 @@ for word in "${words[@]}"; do
   fi
 done
 
+printf '\nTipo de migração:\n'
+printf '1) Criar migração vazia\n'
+printf '2) Gerar migração a partir das alterações nas entidades\n'
+read -r -p "Escolha [1/2]: " migration_type
+
 cd "$(dirname "$0")"
-yarn migration:generate "src/migration/$camel_case" -d src/data-source.ts
+
+case "$migration_type" in
+  1)
+    yarn migration:create "src/migration/$camel_case"
+    ;;
+  2)
+    yarn migration:generate "src/migration/$camel_case" -d src/data-source.ts
+    ;;
+  *)
+    printf 'Opção inválida. Escolha 1 ou 2.\n' >&2
+    exit 1
+    ;;
+esac
