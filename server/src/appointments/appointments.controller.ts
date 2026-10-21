@@ -14,8 +14,10 @@ import { CurrentUser } from '@nestjs/authentication';
 import { User } from '../auth/entities/user.entity.js';
 import { Can } from '@nestjs/authorization';
 import { AppointmentsPolicy } from './appointments.policy.js';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('appointments')
+@ApiBearerAuth('JWT-auth')
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
