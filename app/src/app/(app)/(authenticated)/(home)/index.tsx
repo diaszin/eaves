@@ -4,7 +4,6 @@ import { Text, View } from "react-native";
 export default function HomePage() {
   const currentuser = useAuth();
 
-  console.log(currentuser);
 
   return (
     <View>
