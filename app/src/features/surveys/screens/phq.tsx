@@ -65,6 +65,10 @@ export default function PHQScreen() {
     );
   }
 
+  if(doesPhq9Mutation.error){
+    throw doesPhq9Mutation.error;
+  }
+
   const questions = questionQuery.data!;
   const previous = () =>
     setStep((value) => {
