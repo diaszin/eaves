@@ -30,7 +30,7 @@ class SurveyService {
 
     const response = await this.client.query("/phq/phq9/verify", data);
 
-    console.log("Resposta massa: ", response.data)
+    
 
     return response.data;
   }
