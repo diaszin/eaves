@@ -67,7 +67,17 @@ export class AuthService {
   }
 
   async login(dto: AuthLoginDTO) {
-    const user = await this.users.findOneBy({ email: dto.email });
+    const user = await this.users.findOne({
+      where: { email: dto.email },
+      relations: { profile: true },
+      select: {
+        id: true,
+        password: true,
+        profile: {
+          fullname: true,
+        },
+      },
+    });
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -81,7 +91,7 @@ export class AuthService {
 
     const token = await this.tokenService.issue(user.id.toString(), {
       method: 'password',
-      claims: { amr: ['pwd'] },
+      claims: { amr: ['pwd'], profile: user.profile },
     });
 
     return { access_token: token.accessToken, expires: token.expiresIn };
@@ -93,6 +103,14 @@ export class AuthService {
 
     const user = await this.users.findOne({
       where: { email: microsoftLoginData.email },
+      relations: { profile: true },
+      select: {
+        id: true,
+        password: true,
+        profile: {
+          fullname: true,
+        },
+      },
     });
     if (!user) {
       throw new NotFoundException({
@@ -104,7 +122,7 @@ export class AuthService {
 
     const token = await this.tokenService.issue(user.id.toString(), {
       method: 'microsoft',
-      claims: { amr: ['microsoft'] },
+      claims: { amr: ['microsoft'], profile: user.profile },
     });
 
     return { access_token: token.accessToken, expires: token.expiresIn };
