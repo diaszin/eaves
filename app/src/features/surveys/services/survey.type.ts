@@ -1,17 +1,20 @@
 export interface SurveyQuestionReponse {
-    title: string;
-    id: number;
-    answers: SurveyAnswer[];
+  title: string;
+  id: number;
+  answers: SurveyAnswer[];
 }
 
 export interface SurveyAnswer {
-    score: number;
-    id: number;
-    content: string;
+  score: number;
+  id: number;
+  content: string;
 }
 
-
 export interface AnswerPHQSurveyData {
-    questionId: number,
-    answerId: number
+  questionId: number;
+  answerId: number;
+}
+
+export interface DoesPHQ9QuestionReponse {
+  does: boolean;
 }

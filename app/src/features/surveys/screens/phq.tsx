@@ -7,7 +7,11 @@ import { useEffect, useState } from "react";
 import { CgChevronLeft } from "react-icons/cg";
 import AnswersGrid from "../components/answers-grid.component";
 import { AxiosError } from "axios";
-import { AnswerPHQSurveyData } from "../services/survey.type";
+import {
+  AnswerPHQSurveyData,
+  DoesPHQ9QuestionReponse,
+} from "../services/survey.type";
+import SuccessBottomSheet from "@/components/SuccesssBottomSheet";
 
 export default function PHQScreen() {
   const [step, setStep] = useState<number>(0);
@@ -17,6 +21,7 @@ export default function PHQScreen() {
       answerId: number;
     }[]
   >([]);
+  const [openSuccessModal, setOpenSuccessModal] = useState<boolean>(false);
   const router = useRouter();
 
   const questionQuery = useQuery({
@@ -29,7 +34,20 @@ export default function PHQScreen() {
     mutationKey: ["survey", "phq"],
     mutationFn: (data) => surveyService.answerPHQSurvey(data),
     onSuccess: () => {
-      router.navigate("/(app)/(authenticated)/(home)");
+      setOpenSuccessModal(true);
+    },
+  });
+
+  const doesPhq9Mutation = useMutation<
+    DoesPHQ9QuestionReponse,
+    AxiosError,
+    AnswerPHQSurveyData[]
+  >({
+    mutationKey: ["survey", "phq", "does"],
+    mutationFn: (data) => surveyService.doesPHQ9Questions(data),
+    onSuccess: (data) => {
+      console.log(data);
+      return data;
     },
   });
 
@@ -66,7 +84,7 @@ export default function PHQScreen() {
       return value;
     });
 
-  console.log(data);
+  const isLastStep = step == questions.length - 1;
 
   return (
     <View className="h-full">
@@ -105,23 +123,35 @@ export default function PHQScreen() {
               questionId: questions[step].id,
             };
 
-            setData((currentData) => {
-              const existingIndex = currentData.at(step);
+            const updatedData = [...data];
+            updatedData[step] = questionResponse;
+            setData(updatedData);
 
-              if (!existingIndex) {
-                return [...currentData, questionResponse];
-              } else {
-                currentData[step] = questionResponse;
-              }
-
-              return currentData;
-            });
-
-            if (step == questions.length - 1) {
-              surveyMutation.mutate(data);
+            if (step == 1) {
+              doesPhq9Mutation.mutate(updatedData, {
+                onSuccess: (data) => {
+                  if (!data.does) {
+                    surveyMutation.mutate(updatedData);
+                  } else {
+                    next();
+                  }
+                },
+              });
             } else {
-              next();
+              if (isLastStep) {
+                surveyMutation.mutate(updatedData);
+              } else {
+                next();
+              }
             }
+          }}
+        />
+        <SuccessBottomSheet
+          messsage="Obrigado pela sua resposta"
+          isOpen={openSuccessModal}
+          onDismiss={() => {
+            setOpenSuccessModal(false);
+            router.navigate("/(app)/(authenticated)/(home)");
           }}
         />
       </View>

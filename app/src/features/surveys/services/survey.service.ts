@@ -1,6 +1,10 @@
 import { AxiosInstance } from "axios";
 import { surveyClient } from "./surveys.client";
-import { AnswerPHQSurveyData, SurveyQuestionReponse } from "./survey.type";
+import {
+  AnswerPHQSurveyData,
+  DoesPHQ9QuestionReponse,
+  SurveyQuestionReponse,
+} from "./survey.type";
 
 class SurveyService {
   private client: AxiosInstance = surveyClient;
@@ -15,6 +19,20 @@ class SurveyService {
 
   async answerPHQSurvey(data: AnswerPHQSurveyData[]) {
     await this.client.post("/phq/daily/answer", data);
+  }
+
+  async doesPHQ9Questions(
+    data: AnswerPHQSurveyData[],
+  ): Promise<DoesPHQ9QuestionReponse> {
+    if (data.length != 2) {
+      throw new Error("O quiz não corresponde ao PHQ-2");
+    }
+
+    const response = await this.client.query("/phq/phq9/verify", data);
+
+    console.log("Resposta massa: ", response.data)
+
+    return response.data;
   }
 }
 
