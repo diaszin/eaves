@@ -151,7 +151,8 @@ export default function PHQScreen() {
           isOpen={openSuccessModal}
           onDismiss={() => {
             setOpenSuccessModal(false);
-            router.navigate("/(app)/(authenticated)/(home)");
+            router.dismiss(2);
+            router.replace("/(app)/(authenticated)/(home)");
           }}
         />
       </View>
