@@ -18,3 +18,7 @@ export interface AnswerPHQSurveyData {
 export interface DoesPHQ9QuestionReponse {
   does: boolean;
 }
+
+export interface PHQDailyVerifyResponse {
+  answered: boolean;
+}

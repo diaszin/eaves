@@ -3,6 +3,7 @@ import { surveyClient } from "./surveys.client";
 import {
   AnswerPHQSurveyData,
   DoesPHQ9QuestionReponse,
+  PHQDailyVerifyResponse,
   SurveyQuestionReponse,
 } from "./survey.type";
 
@@ -30,7 +31,11 @@ class SurveyService {
 
     const response = await this.client.query("/phq/phq9/verify", data);
 
-    
+    return response.data;
+  }
+
+  async verifyUserIsAnsweredDailySurvey(): Promise<PHQDailyVerifyResponse> {
+    const response = await this.client.get("/phq/daily/verify");
 
     return response.data;
   }

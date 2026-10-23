@@ -1,17 +1,20 @@
 import { useAuth } from "@/hooks/useAuth";
 import { ScrollView } from "@expo/ui";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { CgChevronRight } from "react-icons/cg";
 import { useEffect, useRef, useState } from "react";
 import {
+  MdCheck,
   MdChevronRight,
   MdFrontHand,
   MdHandshake,
   MdSafetyDivider,
   MdTimelapse,
 } from "react-icons/md";
-import { Animated, Text, View } from "react-native";
+import { Animated, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useQuery } from "@tanstack/react-query";
+import surveyService from "@/features/surveys/services/survey.service";
 
 const motivationalTexts = [
   "Você é capaz de superar os desafios de hoje.",
@@ -48,15 +51,19 @@ function MotivationalText() {
   }, [opacity]);
 
   return (
-    <Animated.Text
-      style={{ opacity, fontSize: 12, color: "#DADADA"  }}
-    >
+    <Animated.Text style={{ opacity, fontSize: 12, color: "#DADADA" }}>
       {motivationalTexts[index]}
     </Animated.Text>
   );
 }
 
 export default function HomePage() {
+  const verifyDailySurveyQuery = useQuery({
+    queryKey: ["survey", "daily", "answered"],
+    queryFn: () => surveyService.verifyUserIsAnsweredDailySurvey(),
+  });
+  const router = useRouter();
+
   const currentuser = useAuth()!;
 
   return (
@@ -64,7 +71,9 @@ export default function HomePage() {
       <ScrollView>
         <View className="flex flex-col m-2 gap-6">
           <View>
-            <Text className="text-[1.5rem] font-primary-regular ">Olá, {currentuser.profile.name.split(" ")[0]}!</Text>
+            <Text className="text-[1.5rem] font-primary-regular ">
+              Olá, {currentuser.profile.name.split(" ")[0]}!
+            </Text>
             <MotivationalText />
           </View>
           <View className="group w-full flex gap-4 border-2 shadow shadow-slate-400 p-4 rounded-md  border-secondary-max active:bg-secondary-min">
@@ -84,17 +93,38 @@ export default function HomePage() {
                 Uma breve reflexão sobre como você está se sentindo hoje.
               </Text>
             </View>
-            <Link
-              href="/(app)/(authenticated)/surveys/phq"
-              className="flex items-center justify-center w-full bg-primary-min py-3"
+            <TouchableOpacity
+              disabled={verifyDailySurveyQuery.data?.answered}
+              onPress={() => {
+                if (!verifyDailySurveyQuery.data?.answered) {
+                  router.push("/(app)/(authenticated)/surveys/phq");
+                }
+              }}
+              className={
+                !verifyDailySurveyQuery.data?.answered
+                  ? "flex items-center justify-center w-full bg-primary-min py-3"
+                  : "flex items-center justify-center w-full bg-success py-3"
+              }
             >
               <View className="flex flex-row items-center justify-center gap-2">
-                <Text className="text-white font-primary-semibold">
-                  Responder
-                </Text>
-                <MdChevronRight size={18} className="text-white" />
+                {!verifyDailySurveyQuery.data?.answered ? (
+                  <>
+                    {" "}
+                    <Text className="text-white font-primary-semibold">
+                      Responder
+                    </Text>
+                    <MdChevronRight size={18} className="text-white" />
+                  </>
+                ) : (
+                  <>
+                    <Text className="text-white font-primary-semibold">
+                      Já respondido
+                    </Text>
+                    <MdCheck size={18} className="text-white" />
+                  </>
+                )}
               </View>
-            </Link>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
