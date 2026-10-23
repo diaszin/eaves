@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { ScrollView } from "@expo/ui";
-import { Link, useRouter } from "expo-router";
+import { Link, Stack, useRouter } from "expo-router";
 import { CgChevronRight } from "react-icons/cg";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -8,6 +8,7 @@ import {
   MdChevronRight,
   MdFrontHand,
   MdHandshake,
+  MdPerson,
   MdSafetyDivider,
   MdTimelapse,
 } from "react-icons/md";
@@ -69,7 +70,22 @@ export default function HomePage() {
   return (
     <SafeAreaView>
       <ScrollView>
-        <View className="flex flex-col m-2 gap-6">
+        <Stack.Screen
+          options={{
+            title: "Home",
+            headerShown: true,
+            headerRight: () => {
+              return (
+                <View className="flex flex-row m-2 px-5 ">
+                  <TouchableOpacity className="bg-primary-max size-8 rounded-full flex items-center justify-center">
+                    <MdPerson className="text-white" size={20} />
+                  </TouchableOpacity>
+                </View>
+              );
+            },
+          }}
+        />
+        <View className="flex flex-col m-2 px-5 gap-6">
           <View>
             <Text className="text-[1.5rem] font-primary-regular ">
               Olá, {currentuser.profile.name.split(" ")[0]}!
