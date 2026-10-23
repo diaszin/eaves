@@ -52,7 +52,7 @@ function MotivationalText() {
   }, [opacity]);
 
   return (
-    <Animated.Text style={{ opacity, fontSize: 12, color: "#DADADA" }}>
+    <Animated.Text style={{ opacity, fontSize: 12, color: "gray" }}>
       {motivationalTexts[index]}
     </Animated.Text>
   );
