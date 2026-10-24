@@ -45,7 +45,8 @@
             "./node_modules/@expo-google-fonts/open-sans/400Regular/OpenSans_400Regular.ttf"
           ]
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
