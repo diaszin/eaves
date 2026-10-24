@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { ScrollView } from "@expo/ui";
-import { Link, Stack, useRouter } from "expo-router";
+import { Link, Stack, Tabs, useRouter } from "expo-router";
 import { CgChevronRight } from "react-icons/cg";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -8,6 +8,7 @@ import {
   MdChevronRight,
   MdFrontHand,
   MdHandshake,
+  MdHome,
   MdPerson,
   MdSafetyDivider,
   MdTimelapse,
@@ -70,13 +71,18 @@ export default function HomePage() {
   return (
     <SafeAreaView>
       <ScrollView>
-        <Stack.Screen
+        <Tabs.Screen
           options={{
-            title: "Home",
+            title: "Inicio",
             headerShown: true,
+            tabBarIcon(props) {
+              return (
+                <MdHome color={props.color.toString()} size={props.size} />
+              );
+            },
             headerRight: () => {
               return (
-                <View className="flex flex-row m-2 px-5 ">
+                <View className="flex flex-row m-2 px-5 bg-transparent ">
                   <TouchableOpacity className="bg-primary-max size-8 rounded-full flex items-center justify-center">
                     <MdPerson className="text-white" size={20} />
                   </TouchableOpacity>
@@ -85,7 +91,7 @@ export default function HomePage() {
             },
           }}
         />
-        <View className="flex flex-col m-2 px-5 gap-6">
+        <View className="flex flex-col m-2 px-5 gap-6 ">
           <View>
             <Text className="text-[1.5rem] font-primary-regular ">
               Olá, {currentuser.profile.name.split(" ")[0]}!
