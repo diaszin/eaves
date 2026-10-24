@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { View, Text, TouchableOpacity } from "react-native";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
 import surveyService from "../services/survey.service";
@@ -14,6 +14,8 @@ import {
 import SuccessBottomSheet from "@/components/SuccesssBottomSheet";
 
 export default function PHQScreen() {
+  const queryProvider = useQueryClient();
+
   const [step, setStep] = useState<number>(0);
   const [data, setData] = useState<
     {
@@ -33,7 +35,10 @@ export default function PHQScreen() {
   const surveyMutation = useMutation<any, AxiosError, AnswerPHQSurveyData[]>({
     mutationKey: ["survey", "phq"],
     mutationFn: (data) => surveyService.answerPHQSurvey(data),
-    onSuccess: () => {
+    onSuccess: async () => {
+      await queryProvider.invalidateQueries({
+        queryKey: ["survey", "daily", "phq"],
+      });
       setOpenSuccessModal(true);
     },
   });
@@ -46,7 +51,6 @@ export default function PHQScreen() {
     mutationKey: ["survey", "phq", "does"],
     mutationFn: (data) => surveyService.doesPHQ9Questions(data),
     onSuccess: (data) => {
-      console.log(data);
       return data;
     },
   });
@@ -65,7 +69,7 @@ export default function PHQScreen() {
     );
   }
 
-  if(doesPhq9Mutation.error){
+  if (doesPhq9Mutation.error) {
     throw doesPhq9Mutation.error;
   }
 

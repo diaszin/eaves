@@ -61,7 +61,7 @@ function MotivationalText() {
 
 export default function HomePage() {
   const verifyDailySurveyQuery = useQuery({
-    queryKey: ["survey", "daily", "answered"],
+    queryKey: ["survey", "daily", "phq", "answered"],
     queryFn: () => surveyService.verifyUserIsAnsweredDailySurvey(),
   });
   const router = useRouter();
