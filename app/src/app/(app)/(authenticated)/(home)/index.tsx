@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { ScrollView } from "@expo/ui";
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import { MdHome, MdPerson } from "react-icons/md";
 import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -9,6 +9,7 @@ import DailySurvey from "@/templates/daily-survey";
 
 export default function HomePage() {
   const currentuser = useAuth()!;
+  const router = useRouter();
 
   return (
     <SafeAreaView>
@@ -25,7 +26,12 @@ export default function HomePage() {
             headerRight: () => {
               return (
                 <View className="flex flex-row m-2 px-5 bg-transparent ">
-                  <TouchableOpacity className="bg-primary-max size-8 rounded-full flex items-center justify-center">
+                  <TouchableOpacity
+                    onPress={() => {
+                      router.push("/(app)/(authenticated)/profile/menu");
+                    }}
+                    className="bg-primary-max size-8 rounded-full flex items-center justify-center"
+                  >
                     <MdPerson className="text-white" size={20} />
                   </TouchableOpacity>
                 </View>
