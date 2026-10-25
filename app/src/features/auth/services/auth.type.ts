@@ -15,6 +15,10 @@ export interface SignInRequest {
   password: string;
 }
 
+export interface SignInResponse {
+  access_token: string
+  expires: number
+}
 export interface MicrosoftSignInRequest {
   code: string;
   codeVerifier: string;

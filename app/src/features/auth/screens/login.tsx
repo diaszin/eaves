@@ -20,6 +20,7 @@ import * as AuthSession from "expo-auth-session";
 import { useAutoDiscovery, useAuthRequest } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import useLoginWithMicrosoft from "../hooks/useLoginWithMicrosoft";
+import { SignInRequest, SignInResponse } from "../services/auth.type";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -34,22 +35,22 @@ export default function LoginScreen() {
   const router = useRouter();
   const microsoft = useLoginWithMicrosoft();
 
-  const mutate = useMutation<
-    any,
-    AxiosError,
-    { email: string; password: string }
-  >({
+  const mutate = useMutation<SignInResponse, AxiosError, SignInRequest>({
     mutationKey: ["auth", "login"],
     mutationFn: (value: { email: string; password: string }) =>
       handleLogin(value.email, value.password),
-    onSuccess: ({ data }) => {
+    onSuccess: (data) => {
       signIn(data["access_token"]);
 
       router.replace("/");
     },
   });
 
-  const microsoftMutation = useMutation<any, AxiosError, any>({
+  const microsoftMutation = useMutation<
+    SignInResponse | undefined,
+    AxiosError,
+    any
+  >({
     mutationKey: ["auth", "microsoft"],
     mutationFn: async () => {
       const data = await microsoft.handleMicrosoftLogin();
@@ -78,10 +79,11 @@ export default function LoginScreen() {
         }
       }
     },
-    onSuccess: ({ data }) => {
-      signIn(data["access_token"]);
-
-      router.replace("/");
+    onSuccess: (data) => {
+      if (data) {
+        signIn(data["access_token"]);
+        router.replace("/");
+      }
     },
   });
 
