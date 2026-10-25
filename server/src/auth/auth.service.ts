@@ -26,6 +26,7 @@ export class AuthService {
     @InjectDataSource() private readonly dataSource: DataSource,
     private readonly tokenService: TokenService,
     private readonly microsoftService: MicrosoftService,
+    @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
   ) {}
 
@@ -163,6 +164,44 @@ export class AuthService {
   }
 
   async update(id: number, updateDTO: UpdateUserDTO) {
+    const user = await this.users.findOne({
+      where: { id: id },
+      relations: {
+        profile: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    const profileUpdates: Partial<Profile> = {
+      fullname: updateDTO.fullname,
+      document: updateDTO.document,
+      race: updateDTO.race,
+      incomeBraket: updateDTO.incomeBraket,
+      emergencyPhone: updateDTO.emergencyPhone,
+      cep: updateDTO.cep,
+    };
+
+    if (updateDTO.birthDate !== undefined) {
+      profileUpdates.birthday = updateDTO.birthDate;
+    }
+
+    if (Object.values(profileUpdates).some((value) => value !== undefined)) {
+      await this.profileRepository.update(user.profile.id, profileUpdates);
+    }
+
+    if (updateDTO.email) {
+      await this.users.update(id, {
+        email: updateDTO.email,
+      });
+    }
+  }
+
+  async changePassword(id: number, changePasswordDTO: ChangePasswordDTO) {
+    const newPasswordHashed = this.hashPassword(changePasswordDTO.newPassword);
+
     const user = await this.users.findOneBy({
       id: id,
     });
@@ -171,26 +210,16 @@ export class AuthService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    await this.users.update(id, {
-      email: updateDTO.email,
-    });
+    const isPasswordValid = this.comparePassword(
+      changePasswordDTO.oldPassword,
+      user.password,
+    );
 
-    await this.profileRepository.update(user.profile.id, {
-      ...updateDTO,
-    });
-  }
-
-  async changePassword(id: number, changePasswordDTO: ChangePasswordDTO) {
-    const user = await this.users.findOneBy({
-      id: id,
-      password: this.hashPassword(changePasswordDTO.oldPassword),
-    });
-
-    if (!user) {
+    if (!isPasswordValid) {
       throw new NotFoundException('A senha antiga não é correspodente');
     }
 
-    user.password = changePasswordDTO.newPassword;
+    user.password = newPasswordHashed;
 
     this.users.save(user);
   }

@@ -6,6 +6,7 @@ import {
   HttpCode,
   Get,
   Patch,
+  Put,
 } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { CreateUserDTO } from './dto/create.dto.js';
@@ -67,13 +68,19 @@ export class AuthController {
 
   @Patch('/profile')
   @HttpCode(HttpStatus.OK)
-  async updateProfile(@CurrentUser('id') id: number, dto: UpdateUserDTO) {
+  async updateProfile(
+    @CurrentUser('id') id: number,
+    @Body() dto: UpdateUserDTO,
+  ) {
     return this.authService.update(id, dto);
   }
 
-  @Patch('/profile/change-password')
+  @Put('/profile/change-password')
   @HttpCode(HttpStatus.OK)
-  async changePassword(@CurrentUser('id') id: number, dto: ChangePasswordDTO) {
+  async changePassword(
+    @CurrentUser('id') id: number,
+    @Body() dto: ChangePasswordDTO,
+  ) {
     return this.authService.changePassword(id, dto);
   }
 }
