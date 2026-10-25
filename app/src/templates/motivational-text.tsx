@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Animated } from "react-native";
+import { Animated, Platform } from "react-native";
 
 export default function MotivationalText() {
   const motivationalTexts = [
@@ -18,12 +18,12 @@ export default function MotivationalText() {
         Animated.timing(opacity, {
           toValue: 0,
           duration: 350,
-          useNativeDriver: true,
+          useNativeDriver: Platform.OS !== "web",
         }),
         Animated.timing(opacity, {
           toValue: 1,
           duration: 350,
-          useNativeDriver: true,
+          useNativeDriver: Platform.OS !== "web",
         }),
       ]).start();
       setIndex((current) => (current + 1) % motivationalTexts.length);
