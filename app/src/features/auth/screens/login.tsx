@@ -14,10 +14,7 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useSession } from "@/hooks/useSession";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
-import { useState } from "react";
 import { AxiosError, isAxiosError } from "axios";
-import * as AuthSession from "expo-auth-session";
-import { useAutoDiscovery, useAuthRequest } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import useLoginWithMicrosoft from "../hooks/useLoginWithMicrosoft";
 import { SignInRequest, SignInResponse } from "../services/auth.type";
@@ -39,8 +36,8 @@ export default function LoginScreen() {
     mutationKey: ["auth", "login"],
     mutationFn: (value: { email: string; password: string }) =>
       handleLogin(value.email, value.password),
-    onSuccess: (data) => {
-      signIn(data["access_token"]);
+    onSuccess: async (data) => {
+      await signIn(data.access_token, data.expires);
 
       router.replace("/");
     },
@@ -79,9 +76,9 @@ export default function LoginScreen() {
         }
       }
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data) {
-        signIn(data["access_token"]);
+        await signIn(data.access_token, data.expires);
         router.replace("/");
       }
     },
