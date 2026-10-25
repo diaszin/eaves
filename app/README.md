@@ -47,14 +47,52 @@ Os comandos `android` e `ios` executam builds nativos locais e exigem as ferrame
 npm run lint
 ```
 
-## Organização do código
+## Arquitetura do aplicativo
 
-- `src/app/`: rotas e layouts do Expo Router.
-- `src/features/`: módulos organizados por funcionalidade, incluindo autenticação.
-- `src/components/`: componentes compartilhados da interface.
-- `src/hooks/`: hooks compartilhados, incluindo acesso à sessão e autenticação.
-- `src/shared/`: infraestrutura compartilhada, como o cliente HTTP.
-- `src/constants/`: constantes globais.
+O app segue uma arquitetura em camadas leves, organizada em torno das rotas e das funcionalidades. O Expo Router resolve a navegação; as telas delegam operações de dados aos serviços de cada funcionalidade; esses serviços usam clientes Axios para conversar com a API NestJS.
+
+```mermaid
+flowchart TD
+  Route["Rotas e layouts<br/>src/app (Expo Router)"]
+  Screen["Telas e componentes<br/>src/features"]
+  State["Estado assíncrono<br/>TanStack Query"]
+  Service["Serviços e tipos<br/>features/*/services"]
+  Client["Clientes Axios<br/>cliente compartilhado e clientes de domínio"]
+  API["API Eaves<br/>HTTP"]
+  Providers["Provedores globais<br/>AuthProvider e QueryClientProvider"]
+
+  Providers --> Route
+  Route --> Screen
+  Screen --> State
+  State --> Service
+  Service --> Client
+  Client --> API
+```
+
+### Estrutura
+
+```text
+src/
+├── app/                 # Rotas, grupos de navegação e layouts do Expo Router
+├── features/
+│   ├── auth/            # Login, cadastro, autenticação Microsoft e formulários
+│   └── surveys/         # Questionários PHQ, respostas e acesso à API de surveys
+├── components/          # Componentes compartilhados e provedores globais
+├── hooks/               # Acesso compartilhado à sessão/autenticação
+├── shared/              # Infraestrutura comum, como o cliente HTTP
+└── templates/           # Composições reutilizáveis da interface, como o card diário
+```
+
+- **Navegação e proteção de rotas:** `src/app/` contém os arquivos de rota. O grupo `(auth)` apresenta login e cadastro; o grupo `(app)` verifica a sessão e redireciona usuários não autenticados para o login. As telas das funcionalidades ficam em `src/features/`, separadas dos pontos de entrada de navegação.
+- **Composição da aplicação:** o layout raiz configura fontes e envolve as rotas com `QueryClientProvider` e `AuthProvider`. O provedor de autenticação mantém a sessão em contexto; os hooks em `src/hooks/` oferecem acesso a ela.
+- **Funcionalidades por domínio:** cada pasta em `src/features/` concentra suas telas, componentes, hooks, tipos e serviços relacionados. Atualmente, os domínios implementados incluem autenticação e questionários PHQ.
+- **Acesso a dados:** TanStack Query coordena consultas e mutações usadas pelas telas, e TanStack Form estrutura formulários. Os serviços de cada domínio encapsulam as chamadas HTTP e os clientes específicos podem ser configurados para suas rotas da API.
+- **HTTP e sessão:** `src/shared/http.client.ts` define a configuração Axios compartilhada. As requisições autenticadas recebem o token da sessão; respostas `403` limpam o token e encerram a sessão no provedor.
+- **Interface multiplataforma:** telas e componentes usam React Native; componentes com implementação dependente da plataforma, como o seletor de data, possuem arquivos específicos para web e nativo.
+
+### Fluxo de uma operação
+
+Por exemplo, ao responder ao questionário diário, a rota em `src/app/` carrega a tela PHQ de `src/features/surveys/`. A tela usa TanStack Query para obter perguntas ou enviar respostas; o `surveyService` encaminha as chamadas pelo cliente de surveys e a resposta da API atualiza o estado apresentado na interface. O mesmo padrão de serviço por domínio é usado pela autenticação.
 
 Para iniciar o restante do ambiente e configurar a API, consulte o [README principal](../README.md) e o [guia do servidor](../server/README.md).
 
