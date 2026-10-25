@@ -16,6 +16,7 @@ import { TokenService } from '@nestjs/authentication';
 import { Profile } from './entities/profile.entity.js';
 import { ConfigService } from '@nestjs/config';
 import { MicrosoftService } from '../microsoft/microsoft.service.js';
+import { UpdateUserDTO } from './dto/update.dto.js';
 
 @Injectable()
 export class AuthService {
@@ -24,6 +25,7 @@ export class AuthService {
     @InjectDataSource() private readonly dataSource: DataSource,
     private readonly tokenService: TokenService,
     private readonly microsoftService: MicrosoftService,
+    private readonly profileRepository: Repository<Profile>,
   ) {}
 
   async create(createAuthDto: CreateUserDTO, role: Role) {
@@ -142,5 +144,38 @@ export class AuthService {
 
   private comparePassword(password: string, hashedPassword: string): boolean {
     return bcrypt.compareSync(password, hashedPassword);
+  }
+
+  async getProfile(userId: number): Promise<Omit<User, 'password'> | null> {
+    const profile = this.users.findOne({
+      where: {
+        id: userId,
+      },
+      select: {
+        email: true,
+        profile: true,
+        role: true,
+      },
+    });
+
+    return profile;
+  }
+
+  async update(id: number, updateDTO: UpdateUserDTO) {
+    const user = await this.users.findOneBy({
+      id: id,
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    await this.users.update(id, {
+      email: updateDTO.email,
+    });
+
+    await this.profileRepository.update(user.profile.id, {
+      ...updateDTO,
+    });
   }
 }

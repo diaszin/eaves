@@ -1,12 +1,22 @@
-import { Controller, Post, Body, HttpStatus, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpStatus,
+  HttpCode,
+  Get,
+  Patch,
+} from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { CreateUserDTO } from './dto/create.dto.js';
 import { AuthLoginDTO } from './dto/login.dto.js';
 import { MicrosoftLoginDTO } from './dto/microsoft-login.dto.js';
-import { Public } from '@nestjs/authentication';
-import { Role } from './entities/user.entity.js';
+import { CurrentUser, Public } from '@nestjs/authentication';
+import { Role, User } from './entities/user.entity.js';
 import { EmailService } from '../email/email.service.js';
 import { TemplateService } from '../template/template.service.js';
+import { UpdateUserDTO } from './dto/update.dto.js';
+import { ChangePasswordDTO } from './dto/change-password.dto.js';
 
 @Controller('auth')
 export class AuthController {
@@ -47,5 +57,17 @@ export class AuthController {
   signInWithMicrosoft(@Body() dto: MicrosoftLoginDTO) {
     console.log('Ele chamou aqui');
     return this.authService.loginWithMicrosoft(dto);
+  }
+
+  @Get('/profile')
+  @HttpCode(HttpStatus.OK)
+  getProfile(@CurrentUser('id') id: number) {
+    return this.authService.getProfile(id);
+  }
+
+  @Patch('/profile')
+  @HttpCode(HttpStatus.OK)
+  async updateProfile(@CurrentUser('id') id: number, dto: UpdateUserDTO) {
+    return this.authService.update(id, dto);
   }
 }
