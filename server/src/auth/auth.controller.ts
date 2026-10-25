@@ -70,4 +70,10 @@ export class AuthController {
   async updateProfile(@CurrentUser('id') id: number, dto: UpdateUserDTO) {
     return this.authService.update(id, dto);
   }
+
+  @Patch('/profile/change-password')
+  @HttpCode(HttpStatus.OK)
+  async changePassword(@CurrentUser('id') id: number, dto: ChangePasswordDTO) {
+    return this.authService.changePassword(id, dto);
+  }
 }

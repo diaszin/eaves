@@ -17,6 +17,7 @@ import { Profile } from './entities/profile.entity.js';
 import { ConfigService } from '@nestjs/config';
 import { MicrosoftService } from '../microsoft/microsoft.service.js';
 import { UpdateUserDTO } from './dto/update.dto.js';
+import { ChangePasswordDTO } from './dto/change-password.dto.js';
 
 @Injectable()
 export class AuthService {
@@ -177,5 +178,20 @@ export class AuthService {
     await this.profileRepository.update(user.profile.id, {
       ...updateDTO,
     });
+  }
+
+  async changePassword(id: number, changePasswordDTO: ChangePasswordDTO) {
+    const user = await this.users.findOneBy({
+      id: id,
+      password: this.hashPassword(changePasswordDTO.oldPassword),
+    });
+
+    if (!user) {
+      throw new NotFoundException('A senha antiga não é correspodente');
+    }
+
+    user.password = changePasswordDTO.newPassword;
+
+    this.users.save(user);
   }
 }
