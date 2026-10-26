@@ -1,10 +1,13 @@
 import { AxiosInstance } from "axios";
 import { authClient } from "./auth.client";
 import {
+  ChangePasswordRequest,
   MicrosoftSignInRequest,
+  ProfileResponse,
   SignInRequest,
   SignInResponse,
   SignUpRequest,
+  UpdateUserRequest,
 } from "./auth.type";
 
 class AuthService {
@@ -28,6 +31,19 @@ class AuthService {
 
   async verifyAccount(data: MicrosoftSignInRequest) {
     return await this.client.post("/verify-account", data);
+  }
+
+  async getProfile(): Promise<ProfileResponse> {
+    const response = await this.client.get("/profile");
+    return response.data;
+  }
+
+  async update(data: UpdateUserRequest) {
+    return await this.client.patch("/profile", data);
+  }
+
+  async changePassword(data: ChangePasswordRequest) {
+    return await this.client.put("/profile/change-password", data);
   }
 }
 

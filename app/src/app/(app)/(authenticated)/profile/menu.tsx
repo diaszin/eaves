@@ -1,4 +1,4 @@
-import ProfileMenu from "@/features/profile/screens/profile-menu";
+import ProfileMenuScreen from "@/features/profile/screens/profile-menu";
 
-export default ProfileMenu;
+export default ProfileMenuScreen;
 

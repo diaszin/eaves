@@ -16,11 +16,42 @@ export interface SignInRequest {
 }
 
 export interface SignInResponse {
-  access_token: string
-  expires: number
+  access_token: string;
+  expires: number;
 }
 export interface MicrosoftSignInRequest {
   code: string;
   codeVerifier: string;
   redirectUri: string;
+}
+
+export interface ProfileResponse {
+  id: number;
+  email: string;
+  role: string;
+  profile: {
+    fullname: string;
+    birthDate: string;
+    document: string;
+    race: string;
+    incomeBraket: string;
+    emergencyPhone: string;
+    cep: string;
+  };
+}
+
+export interface UpdateUserRequest {
+  email?: string;
+  fullname?: string;
+  birthDate?: string;
+  document?: string;
+  race?: string;
+  incomeBraket?: string;
+  emergencyPhone?: string;
+  cep?: string;
+}
+
+export interface ChangePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
 }

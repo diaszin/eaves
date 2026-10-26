@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import {
   MdCardMembership,
   MdContactSupport,
@@ -9,7 +9,9 @@ import {
 } from "react-icons/md";
 import { View, Text } from "react-native";
 import ProfileMenuItem from "../components/profile-menu-item";
-export default function ProfileMenu() {
+export default function ProfileMenuScreen() {
+  const router = useRouter();
+
   return (
     <View>
       <Stack.Screen
@@ -42,13 +44,17 @@ export default function ProfileMenu() {
                 icon={MdPermIdentity}
                 title="Dados pessoais"
                 subtitle="Nome, telefone e documento"
-                onPress={() => {}}
+                onPress={() => {
+                  router.push("/(app)/(authenticated)/profile/change");
+                }}
               />
               <ProfileMenuItem
                 icon={MdLockReset}
                 title="Segurança e Senha"
                 subtitle="Alteração de senha"
-                onPress={() => {}}
+                onPress={() => {
+                  router.push("/(app)/(authenticated)/profile/change-password");
+                }}
               />
             </View>
           </View>

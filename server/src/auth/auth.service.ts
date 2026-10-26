@@ -149,11 +149,15 @@ export class AuthService {
   }
 
   async getProfile(userId: number): Promise<Omit<User, 'password'> | null> {
-    const profile = this.users.findOne({
+    const profile = await this.users.findOne({
       where: {
         id: userId,
       },
+      relations: {
+        profile: true,
+      },
       select: {
+        id: true,
         email: true,
         profile: true,
         role: true,
