@@ -4,13 +4,15 @@ import InputWithLabel from "@/features/auth/components/input_with_label";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import DropdownWithLabel from "@/features/auth/components/dropdown_with_label";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
+import SuccessBottomSheet from "@/components/SuccesssBottomSheet";
 import { UpdateUserRequest } from "@/features/auth/services/auth.type";
 import { Masks } from "react-native-mask-input";
 import MaskInputWithLabel from "@/features/auth/components/masked_input_with_label";
+import { useState } from "react";
 
 export default function ProfileEditScreen() {
   const profileQuery = useQuery<ProfileResponse, AxiosError>({
@@ -41,12 +43,15 @@ export default function ProfileEditScreen() {
 }
 
 function ProfileEditForm({ profile }: { profile: ProfileResponse }) {
+  const router = useRouter();
   const queryClient = useQueryClient();
+  const [profileUpdated, setProfileUpdated] = useState(false);
   const updateMutation = useMutation({
     mutationKey: ["user", "profile", "update"],
     mutationFn: (data: UpdateUserRequest) => authService.update(data),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["user", "profile"] });
+      setProfileUpdated(true);
     },
   });
   const cepMask = Masks.ZIP_CODE;
@@ -182,6 +187,14 @@ function ProfileEditForm({ profile }: { profile: ProfileResponse }) {
         </View>
       </View>
       <ErrorBottomSheet error={updateMutation.error} />
+      <SuccessBottomSheet
+        messsage="Dados alterados"
+        isOpen={profileUpdated}
+        onDismiss={() => {
+          setProfileUpdated(false);
+          router.back();
+        }}
+      />
     </ScrollView>
   );
 }

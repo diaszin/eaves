@@ -1,10 +1,11 @@
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
+import SuccessBottomSheet from "@/components/SuccesssBottomSheet";
 import InputWithLabel from "@/features/auth/components/input_with_label";
 import authService from "@/features/auth/services/auth.service";
 import { ChangePasswordRequest } from "@/features/auth/services/auth.type";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
@@ -27,6 +28,7 @@ function validateOldPasswordConfirmation(value: string, oldPassword: string) {
 }
 
 export default function ProfileChangePasswordScreen() {
+  const router = useRouter();
   const [passwordChanged, setPasswordChanged] = useState(false);
   const changePasswordMutation = useMutation({
     mutationKey: ["user", "profile", "change-password"],
@@ -158,10 +160,6 @@ export default function ProfileChangePasswordScreen() {
             )}
           </form.Field>
 
-          {passwordChanged && (
-            <Text className="text-green-700">Senha alterada com sucesso.</Text>
-          )}
-
           <form.Subscribe
             selector={(state) => [state.canSubmit, state.isSubmitting]}
           >
@@ -186,6 +184,14 @@ export default function ProfileChangePasswordScreen() {
         </View>
       </View>
       <ErrorBottomSheet error={changePasswordMutation.error} />
+      <SuccessBottomSheet
+        messsage="Senha alterada com sucesso !"
+        isOpen={passwordChanged}
+        onDismiss={() => {
+          setPasswordChanged(false);
+          router.back();
+        }}
+      />
     </ScrollView>
   );
 }
