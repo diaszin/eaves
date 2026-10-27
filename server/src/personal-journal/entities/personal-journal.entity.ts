@@ -3,7 +3,6 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../auth/entities/user.entity.js';
@@ -20,7 +19,7 @@ export class PersonalJournal {
   })
   content!: string;
 
-  @OneToOne(() => Emotions)
+  @ManyToOne(() => Emotions, { nullable: false })
   emotion!: Emotions;
 
   @ManyToOne(() => User, {
@@ -28,6 +27,6 @@ export class PersonalJournal {
   })
   createdBy!: User;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdDate!: Date;
 }

@@ -19,7 +19,7 @@ export class PersonalJournalService {
   async create(dto: CreatePersonalJournalDto, userId: number) {
     const [user, emotion] = await Promise.all([
       this.authService.findUser(userId),
-      this.emotionRepository.findOneByOrFail({
+      this.emotionRepository.findOneBy({
         id: dto.emotion,
       }),
     ]);
@@ -47,7 +47,9 @@ export class PersonalJournalService {
     return this.personalJournalRepository.find({
       select: {
         id: true,
-        createdBy: true,
+        createdBy: {
+          id: true
+        },
         createdDate: true,
         emotion: true,
       },
@@ -69,7 +71,7 @@ export class PersonalJournalService {
   findOne(id: number, userId: number) {
     return this.personalJournalRepository.findOne({
       relations: {
-        createdBy: true,
+        emotion: true,
       },
       where: {
         id: id,
