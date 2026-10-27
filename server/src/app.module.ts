@@ -10,6 +10,7 @@ import { EmailModule } from './email/email.module.js';
 import { TemplateModule } from './template/template.module.js';
 import { MicrosoftModule } from './microsoft/microsoft.module.js';
 import { SurveyModule } from './survey/survey.module.js';
+import { PersonalJournalModule } from './personal-journal/personal-journal.module.js';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { SurveyModule } from './survey/survey.module.js';
     TemplateModule,
     MicrosoftModule,
     SurveyModule,
+    PersonalJournalModule,
   ],
   controllers: [],
   providers: [],
