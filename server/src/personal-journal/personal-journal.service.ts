@@ -4,11 +4,14 @@ import { Repository } from 'typeorm';
 import { PersonalJournal } from './entities/personal-journal.entity.js';
 import { Emotions } from './entities/emotions.entity.js';
 import { AuthService } from '../auth/auth.service.js';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class PersonalJournalService {
   constructor(
+    @InjectRepository(PersonalJournal)
     private readonly personalJournalRepository: Repository<PersonalJournal>,
+    @InjectRepository(Emotions)
     private readonly emotionRepository: Repository<Emotions>,
     private readonly authService: AuthService,
   ) {}
