@@ -1,5 +1,45 @@
-import { Tabs } from "expo-router";
-import { MdHome } from "react-icons/md";
+import { Tabs, useRouter } from "expo-router";
+import { MdAutoStories, MdHome, MdPerson } from "react-icons/md";
+import { TouchableOpacity, View } from "react-native";
 export default function TabLyout() {
-  return <Tabs />;
+  const router = useRouter();
+
+  return (
+    <Tabs>
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Inicio",
+          headerShown: true,
+          tabBarIcon(props) {
+            return <MdHome color={props.color.toString()} size={props.size} />;
+          },
+          headerRight: () => {
+            return (
+              <View className="flex flex-row m-2 px-5 bg-transparent ">
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push("/(app)/(authenticated)/profile/menu");
+                  }}
+                  className="bg-primary-max size-8 rounded-full flex items-center justify-center"
+                >
+                  <MdPerson className="text-white" size={20} />
+                </TouchableOpacity>
+              </View>
+            );
+          },
+        }}
+      />
+      <Tabs.Screen
+      name="journal"
+        options={{
+          title: "Meu diário",
+          headerShown: true,
+          tabBarIcon({ size, color }) {
+            return <MdAutoStories color={color.toString()} size={size} />;
+          },
+        }}
+      />
+    </Tabs>
+  );
 }
