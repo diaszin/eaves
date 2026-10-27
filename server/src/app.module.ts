@@ -31,6 +31,7 @@ import { SurveyModule } from './survey/survey.module.js';
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         url: configService.getOrThrow<string>('DATABASE_URL'),
+        extra: { options: '-c timezone=America/Bahia' },
         host: configService.get<string>('POSTGRES_HOST', 'localhost'),
         port: configService.get<number>('POSTGRES_PORT', 5432),
         username: configService.get<string>('POSTGRES_USER'),
