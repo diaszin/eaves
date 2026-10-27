@@ -10,7 +10,7 @@ import { useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 function validatePassword(value: string, label: string) {
-  if (value.length === 0) {
+  if (!value || value.length === 0) {
     return `${label} é obrigatória`;
   }
   if (value.length < 8) {
@@ -19,7 +19,7 @@ function validatePassword(value: string, label: string) {
 }
 
 function validateOldPasswordConfirmation(value: string, oldPassword: string) {
-  if (value.length === 0) {
+  if (!value || value.length === 0) {
     return "Confirme a senha antiga";
   }
   if (value !== oldPassword) {
