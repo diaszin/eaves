@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { PersonalJournalService } from './personal-journal.service.js';
 import { CreatePersonalJournalDto } from './dto/create-personal-journal.dto.js';
-import { UpdatePersonalJournalDto } from './dto/update-personal-journal.dto.js';
+
 import { CurrentUser } from '@nestjs/authentication';
 
 @Controller('personal-journal')
