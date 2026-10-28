@@ -7,3 +7,12 @@ export interface CreatePersonalJournalRequest {
   content: string;
   emotion: number;
 }
+
+export interface ViewAllPersonalJournalResponse {
+  id: number;
+  emotion: EmotionsResponse;
+  createdBy: {
+    id: number;
+  };
+  createdDate: string;
+}

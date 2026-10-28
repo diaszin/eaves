@@ -1,13 +1,33 @@
 import PersonalJournalCreateCard from "@/templates/personal-journal-create-card";
-import { Tabs } from "expo-router";
-import { MdAutoStories } from "react-icons/md";
-import { View, Text, ScrollView } from "react-native";
+import { useQuery } from "@tanstack/react-query";
+import { View, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import personalJournalService from "../services/personal-journal.service";
+import PersonalJournalCard from "../components/personal-journal-card";
 export default function PersonalJournalScreen() {
+  const getAllJournalsQuery = useQuery({
+    queryKey: ["personal-journal", "view"],
+    queryFn: () => personalJournalService.getAll(),
+  });
+
   return (
-    <SafeAreaView>
+    <SafeAreaView className="mx-4 flex-1">
       <PersonalJournalCreateCard />
-      <ScrollView></ScrollView>
+      
+        <FlatList
+          scrollEnabled
+          showsVerticalScrollIndicator={false}
+          className="flex-1 h-full mt-4"
+          data={getAllJournalsQuery.data ?? []}
+          renderItem={({ item }) => (
+            <PersonalJournalCard
+              emotion={item.emotion.emotion}
+              publishDate={item.createdDate}
+            />
+          )}
+          ItemSeparatorComponent={<View className="h-2" />}
+        />
+      
     </SafeAreaView>
   );
 }

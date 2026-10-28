@@ -3,6 +3,7 @@ import { personalJournalClient } from "./personal-journal.client";
 import {
   CreatePersonalJournalRequest,
   EmotionsResponse,
+  ViewAllPersonalJournalResponse,
 } from "./personal-journal.type";
 
 export class PersonalJournalService {
@@ -16,6 +17,12 @@ export class PersonalJournalService {
 
   async create(data: CreatePersonalJournalRequest) {
     const response = await this.client.post("/", data);
+
+    return response.data;
+  }
+
+  async getAll(): Promise<ViewAllPersonalJournalResponse[]> {
+    const response = await this.client.get("/");
 
     return response.data;
   }
