@@ -16,14 +16,14 @@ export default function EmotionButton(props: EmotionButtonProps) {
       }}
       className={
         props.active
-          ? "bg-primary-max text-white rounded-lg border-[0.6px] border-black flex items-center justify-center w-20"
-          : "bg-secondary-min rounded-lg border-[0.6px] border-black flex items-center justify-center w-20"
+          ? "bg-primary-max text-white rounded-lg border-[0.6px] border-black flex items-center justify-center w-20 px-14"
+          : "bg-secondary-min rounded-lg border-[0.6px] border-black flex items-center justify-center w-20 px-14"
       }
     >
       <Text
         className={
           props.active
-            ? "font-secondary-semibold text-white text-sm"
+            ? "font-secondary-semibold text-white text-sm "
             : "font-secondary-semibold text-sm"
         }
       >
