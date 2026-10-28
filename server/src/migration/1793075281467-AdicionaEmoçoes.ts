@@ -7,12 +7,12 @@ export class AdicionaEmoçoes1793075281467 implements MigrationInterface {
         await queryRunner.query(`
             INSERT INTO "Emotions" ("emotion")
             VALUES
-                ('fear'),
-                ('angry'),
-                ('happy'),
-                ('sad'),
-                ('pish'),
-                ('surprise')
+                ('medo'),
+                ('raiva'),
+                ('felicidade'),
+                ('tristeza'),
+                ('nojo'),
+                ('surpresa')
         `);
     }
 
@@ -20,12 +20,12 @@ export class AdicionaEmoçoes1793075281467 implements MigrationInterface {
         await queryRunner.query(`
             DELETE FROM "Emotions"
             WHERE "emotion" IN (
-                'fear',
-                'angry',
-                'happy',
-                'sad',
-                'pish',
-                'surprise'
+                'medo',
+                'raiva',
+                'felicidade',
+                'tristeza',
+                'nojo',
+                'surpresa'
             )
         `);
     }
