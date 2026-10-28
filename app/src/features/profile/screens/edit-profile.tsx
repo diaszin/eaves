@@ -55,6 +55,7 @@ function ProfileEditForm({ profile }: { profile: ProfileResponse }) {
     },
   });
   const cepMask = Masks.ZIP_CODE;
+  const phoneMask = Masks.BRL_PHONE;
 
   const form = useForm({
     defaultValues: {
@@ -153,11 +154,14 @@ function ProfileEditForm({ profile }: { profile: ProfileResponse }) {
           </form.Field>
           <form.Field name="emergencyPhone">
             {(field) => (
-              <InputWithLabel
+              <MaskInputWithLabel
                 label="Telefone de emergência"
-                value={String(field.state.value ?? "")}
+                value={field.state.value}
                 onChangeText={field.handleChange}
                 keyboardType="phone-pad"
+                placeholder="(00) 11234-1234"
+                inputMode="numeric"
+                mask={phoneMask}
               />
             )}
           </form.Field>
