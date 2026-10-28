@@ -16,3 +16,13 @@ export interface ViewAllPersonalJournalResponse {
   };
   createdDate: string;
 }
+
+export interface ViewOnePersonalJournalResponse {
+  id: number;
+  content: string;
+  emotion: EmotionsResponse;
+  createdBy: {
+    id: number;
+  };
+  createdDate: string;
+}

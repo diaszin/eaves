@@ -199,39 +199,3 @@ export default function PersonalJournalCreate() {
     </SafeAreaView>
   );
 }
-
-function BottomSheet({
-  title,
-  message,
-  onClose,
-  isError = false,
-}: {
-  title: string;
-  message: string;
-  onClose: () => void;
-  isError?: boolean;
-}) {
-  return (
-    <View className="absolute inset-0 justify-end bg-black/40">
-      <View className="gap-3 rounded-t-2xl bg-white p-6">
-        <Text
-          className={`font-primary-bold text-lg ${isError ? "text-error" : "text-secondary-max"}`}
-        >
-          {title}
-        </Text>
-        <Text className="font-secondary-regular text-customblack-max">
-          {message}
-        </Text>
-        <TouchableOpacity
-          accessibilityRole="button"
-          onPress={onClose}
-          className="w-full rounded-md bg-primary-min"
-        >
-          <Text className="py-4 text-center font-primary-bold text-white">
-            Fechar
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-}

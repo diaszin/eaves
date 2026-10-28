@@ -4,6 +4,7 @@ import {
   CreatePersonalJournalRequest,
   EmotionsResponse,
   ViewAllPersonalJournalResponse,
+  ViewOnePersonalJournalResponse,
 } from "./personal-journal.type";
 
 export class PersonalJournalService {
@@ -23,6 +24,12 @@ export class PersonalJournalService {
 
   async getAll(): Promise<ViewAllPersonalJournalResponse[]> {
     const response = await this.client.get("/");
+
+    return response.data;
+  }
+
+  async getById(id: number): Promise<ViewOnePersonalJournalResponse> {
+    const response = await this.client.get(`/journal/${id}`);
 
     return response.data;
   }
