@@ -9,8 +9,17 @@ import {
 } from "react-icons/md";
 import { View, Text } from "react-native";
 import ProfileMenuItem from "../components/profile-menu-item";
+import { useQuery } from "@tanstack/react-query";
+import authService from "@/features/auth/services/auth.service";
+import { useAuth } from "@/hooks/useAuth";
 export default function ProfileMenuScreen() {
+  const auth = useAuth();
   const router = useRouter();
+
+  const userProfileQuery = useQuery({
+    queryKey: ["user", "profile"],
+    queryFn: () => authService.getProfile(),
+  });
 
   return (
     <View>
@@ -21,21 +30,23 @@ export default function ProfileMenuScreen() {
         }}
       />
       <View className="flex items-center justify-center m-4">
-        <View className="shadow rounded-lg bg-white  border-gray-700 flex flex-col items-center justify-center gap-2 w-full h-40">
-          <View className="flex flex-col items-center justify-center">
-            <Text className="font-primary-bold text-[1.7rem] leading-8">
-              Maria Sivla
-            </Text>
-            <Text className="font-primary-semibold text-customgray leading-8">
-              mariasilva@exemplo.com
-            </Text>
+        {userProfileQuery.data && (
+          <View className="shadow rounded-lg bg-white  border-gray-700 flex flex-col items-center justify-center gap-2 w-full h-40">
+            <View className="flex flex-col items-center justify-center">
+              <Text className="font-primary-bold text-[1.7rem] leading-8">
+                {userProfileQuery.data.profile.fullname}
+              </Text>
+              <Text className="font-primary-semibold text-customgray leading-8">
+                {userProfileQuery.data.email}
+              </Text>
+            </View>
+            <View className="flex flex-col items-center justify-center py-1 px-4 rounded-md border-gray-700 border-[0.5px] bg-secondary-min">
+              <Text className="text-secondary-max font-primary-bold leading-8">
+                {userProfileQuery.data.role == "patient" && "Paciente"}
+              </Text>
+            </View>
           </View>
-          <View className="flex flex-col items-center justify-center py-1 px-4 rounded-md border-gray-700 border-[0.5px] bg-secondary-min">
-            <Text className="text-secondary-max font-primary-bold leading-8">
-              Membro desde Jan 2024
-            </Text>
-          </View>
-        </View>
+        )}
         <View className="flex flex-col my-4 justify-start w-full gap-4">
           <View className="flex flex-col gap-2">
             <Text className="text-[1.2rem]">Minha conta</Text>
