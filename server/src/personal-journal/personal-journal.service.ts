@@ -48,7 +48,7 @@ export class PersonalJournalService {
       select: {
         id: true,
         createdBy: {
-          id: true
+          id: true,
         },
         createdDate: true,
         emotion: true,
@@ -80,5 +80,15 @@ export class PersonalJournalService {
         },
       },
     });
+  }
+
+  async getEmotions() {
+    const emotions = await this.emotionRepository.find();
+
+    if (!emotions) {
+      throw new NotFoundException('Nenhuma emoção foi liberada para acesso');
+    }
+
+    return emotions;
   }
 }

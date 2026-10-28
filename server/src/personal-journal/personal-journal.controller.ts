@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { PersonalJournalService } from './personal-journal.service.js';
 import { CreatePersonalJournalDto } from './dto/create-personal-journal.dto.js';
@@ -34,9 +35,16 @@ export class PersonalJournalController {
     return this.personalJournalService.findAll(userId);
   }
 
-  @Get(':id')
-  findOne(@CurrentUser('id') userId: number, @Param('id') id: string) {
-    return this.personalJournalService.findOne(+id, userId);
+  @Get('/journal/:id')
+  findOne(
+    @CurrentUser('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.personalJournalService.findOne(id, userId);
   }
 
+  @Get('/emotions')
+  getAllEmotions() {
+    return this.personalJournalService.getEmotions();
+  }
 }
