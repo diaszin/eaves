@@ -5,10 +5,11 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --global yarn@1.22.22
+RUN yarn install
 
 COPY . .
 
-RUN npm run build
+RUN yarn build
 
-CMD [ "npm", "run", "start:dev" ]
+CMD [ "yarn", "start:dev" ]
