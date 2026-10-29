@@ -38,7 +38,7 @@ import { PersonalJournalModule } from './personal-journal/personal-journal.modul
         username: configService.get<string>('POSTGRES_USER'),
         password: configService.get<string>('POSTGRES_PASSWORD'),
         database: configService.get<string>('POSTGRES_DB'),
-        synchronize: configService.get<string>('NODE_ENV') !== 'production',
+        synchronize: false,
         logging: ['query', 'error', 'migration'],
         entities: [
           join(process.cwd(), 'dist', '**', '*.entity.js'),
