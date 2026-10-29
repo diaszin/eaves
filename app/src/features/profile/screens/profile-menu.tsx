@@ -2,18 +2,21 @@ import { Stack, useRouter } from "expo-router";
 import {
   MdCardMembership,
   MdContactSupport,
+  MdExitToApp,
   MdLockReset,
   MdNotificationsActive,
+  MdOutlineDoorBack,
   MdPermIdentity,
   MdPolicy,
 } from "react-icons/md";
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import ProfileMenuItem from "../components/profile-menu-item";
 import { useQuery } from "@tanstack/react-query";
 import authService from "@/features/auth/services/auth.service";
 import { useAuth } from "@/hooks/useAuth";
+import { useSession } from "@/hooks/useSession";
 export default function ProfileMenuScreen() {
-  const auth = useAuth();
+  const session = useSession();
   const router = useRouter();
 
   const userProfileQuery = useQuery({
@@ -95,6 +98,16 @@ export default function ProfileMenuScreen() {
               />
             </View>
           </View>
+          <TouchableOpacity
+            onPress={() => {
+              session.signOut();
+              router.dismissAll();
+            }}
+            className="bg-red-500 w-full h-10 flex flex-row items-center justify-center gap-1"
+          >
+            <MdExitToApp className="text-white" />
+            <Text className="text-white font-primary-bold">Sair do App</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
