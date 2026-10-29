@@ -219,7 +219,7 @@ export default function LoginScreen() {
               }}
               className={`min-h-12 flex flex-row items-center justify-center ${canSubmit && !isSubmitting ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
             >
-              {!isSubmitting ? (
+              {!isSubmitting || !mutate.isPending ? (
                 <>
                   <Text className="text-white">Entrar</Text>
 
