@@ -19,12 +19,14 @@ POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 DATABASE_URL=postgresql://eaves:change-me@localhost:5432/eaves
 JWT_SECRET=replace-with-a-long-random-secret
+PASSWORD_RESET_URL=https://app.eaves.com/reset-password
 MICROSOFT_CLIENT_ID=seu-client-id-do-entra
 ALLOWED_ORIGINS=http://localhost:8081
 PORT=3000
 ```
 
 `DATABASE_URL` é obrigatório. Os valores de usuário, senha e banco devem corresponder ao PostgreSQL em uso. Não versione `.env` nem use os valores de exemplo em produção.
+`PASSWORD_RESET_URL` deve apontar para a página que recebe o token de redefinição; se omitida, a API usa `https://app.eaves.com/reset-password`.
 
 Instale as dependências e execute a API em modo de desenvolvimento:
 

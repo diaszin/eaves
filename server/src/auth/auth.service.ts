@@ -138,6 +138,12 @@ export class AuthService {
     });
   }
 
+  findByEmail(email: string) {
+    return this.users.findOneBy({
+      email: email,
+    });
+  }
+
   private hashPassword(password: string): string {
     const saltRounds = 10;
 
@@ -226,5 +232,23 @@ export class AuthService {
     user.password = newPasswordHashed;
 
     this.users.save(user);
+  }
+
+  async updatePassword(id: string, newPassword: string) {
+    const newPasswordHashed = this.hashPassword(newPassword);
+
+    const user = await this.users.findOneBy({
+      id: +id,
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    user.password = newPasswordHashed;
+
+    this.users.save(user);
+
+    return user;
   }
 }

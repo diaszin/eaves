@@ -16,12 +16,19 @@ import { PersonalJournalModule } from './personal-journal/personal-journal.modul
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     AuthenticationModule.forRootAsync({
-      useFactory: () => ({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
         accessToken: {
           key: process.env.JWT_SECRET!,
           issuer: 'https://api.eaves.com',
           audience: 'eaves-mobile',
           ttl: '2h',
+        },
+        passwordReset: {
+          url: configService.get<string>(
+            'PASSWORD_RESET_URL',
+            'https://app.eaves.com/reset-password',
+          ),
         },
       }),
     }),

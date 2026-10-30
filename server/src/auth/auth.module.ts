@@ -9,6 +9,7 @@ import { AuthenticationStorageProvider } from './authentication-storage.provider
 import { EmailModule } from '../email/email.module.js';
 import { TemplateModule } from '../template/template.module.js';
 import { MicrosoftModule } from '../microsoft/microsoft.module.js';
+import { PasswordResetAction } from './password-reset.action.js';
 
 @Module({
   imports: [
@@ -18,7 +19,12 @@ import { MicrosoftModule } from '../microsoft/microsoft.module.js';
     MicrosoftModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuth, AuthenticationStorageProvider],
+  providers: [
+    AuthService,
+    JwtAuth,
+    AuthenticationStorageProvider,
+    PasswordResetAction,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

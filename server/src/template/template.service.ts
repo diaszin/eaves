@@ -33,4 +33,22 @@ export class TemplateService {
 
     return result.html;
   }
+
+  async renderResetPasswordEmail(data: { url: string }) {
+    const resetPasswordPath = this.templatePath + 'reset-password.hbs.mjml';
+    const source = await readFile(resetPasswordPath, 'utf-8');
+
+    const renderTemplate = Handlebars.compile(source);
+    const template = renderTemplate({
+      url: data.url,
+    });
+
+    const result = await mjml2html(template, {
+      validationLevel: 'strict',
+      ignoreIncludes: false,
+      minify: true,
+    });
+
+    return result.html;
+  }
 }

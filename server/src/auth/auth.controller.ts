@@ -7,17 +7,25 @@ import {
   Get,
   Patch,
   Put,
+  BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { CreateUserDTO } from './dto/create.dto.js';
 import { AuthLoginDTO } from './dto/login.dto.js';
 import { MicrosoftLoginDTO } from './dto/microsoft-login.dto.js';
-import { CurrentUser, Public } from '@nestjs/authentication';
-import { Role, User } from './entities/user.entity.js';
+import {
+  CurrentUser,
+  PasswordResetService,
+  Public,
+} from '@nestjs/authentication';
+import { Role } from './entities/user.entity.js';
 import { EmailService } from '../email/email.service.js';
 import { TemplateService } from '../template/template.service.js';
 import { UpdateUserDTO } from './dto/update.dto.js';
 import { ChangePasswordDTO } from './dto/change-password.dto.js';
+import { ResetPasswordSendEmailDTO } from './dto/reset-password-send-email.dto.js';
+import { ResetPasswordDTO } from './dto/reset-password.dto.js';
 
 @Controller('auth')
 export class AuthController {
@@ -25,6 +33,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly emailService: EmailService,
     private readonly templateService: TemplateService,
+    private readonly passwordResetService: PasswordResetService,
   ) {}
 
   @Public()
@@ -82,5 +91,32 @@ export class AuthController {
     @Body() dto: ChangePasswordDTO,
   ) {
     return this.authService.changePassword(id, dto);
+  }
+
+  @Public()
+  @Post('/password/forgot')
+  @HttpCode(HttpStatus.ACCEPTED)
+  async forgot(@Body() body: ResetPasswordSendEmailDTO) {
+    const user = await this.authService.findByEmail(body.email);
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+    
+    return this.passwordResetService.request(body.email);
+  }
+
+  @Public()
+  @Post('/password/reset')
+  @HttpCode(HttpStatus.OK)
+  async reset(@Body() body: ResetPasswordDTO) {
+    const result = await this.passwordResetService.reset(
+      body.token,
+      body.password,
+      { signIn: true },
+    );
+    if (!result) {
+      throw new BadRequestException('O link pode estar inválido ou expirado');
+    }
+    return { mfaRequired: result.signedIn?.session.mfa === 'pending' };
   }
 }
