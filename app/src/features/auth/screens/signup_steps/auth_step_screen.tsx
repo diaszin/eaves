@@ -38,9 +38,7 @@ export default function AuthStepScreen() {
                 {(field) => (
                   <View className="flex flex-col gap-2">
                     <InputWithLabel
-                      disabled={field.state.value.length > 0}
-                      value={field.state.value}
-                      onChangeText={(value) => field.handleChange(value)}
+                      onChangeText={(value) => field.handleChange(value)} 
                       onBlur={field.handleBlur}
                       label="E-mail"
                       placeholder="seuemail@exemplo.com"
