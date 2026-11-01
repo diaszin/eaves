@@ -43,7 +43,7 @@ export class AuthService {
       );
     }
 
-    const hashedPassword = this.hashPassword(createAuthDto.password);
+    const hashedPassword = await this.passwordHasherService.hash(createAuthDto.password);
 
     return await this.dataSource.transaction(async (transaction) => {
       const profile = transaction.create(Profile, {
@@ -226,7 +226,7 @@ export class AuthService {
   }
 
   async changePassword(id: number, changePasswordDTO: ChangePasswordDTO) {
-    const newPasswordHashed = this.hashPassword(changePasswordDTO.newPassword);
+    const newPasswordHashed = await this.passwordHasherService.hash(changePasswordDTO.newPassword);
 
     const user = await this.users.findOneBy({
       id: id,
