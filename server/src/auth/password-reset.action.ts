@@ -49,6 +49,7 @@ export class PasswordResetAction extends PasswordResetHandler {
   }
 
   async updatePassword(userId: string, passwordHash: string): Promise<void> {
+    console.log(passwordHash);
     await this.authService.updatePassword(userId, passwordHash);
   }
 }

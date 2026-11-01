@@ -12,7 +12,7 @@ import * as bcrypt from 'bcrypt';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Role, User } from './entities/user.entity.js';
-import { TokenService } from '@nestjs/authentication';
+import { PasswordHasher, TokenService } from '@nestjs/authentication';
 import { Profile } from './entities/profile.entity.js';
 import { ConfigService } from '@nestjs/config';
 import { MicrosoftService } from '../microsoft/microsoft.service.js';
@@ -28,6 +28,7 @@ export class AuthService {
     private readonly microsoftService: MicrosoftService,
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+    private readonly passwordHasherService: PasswordHasher,
   ) {}
 
   async create(createAuthDto: CreateUserDTO, role: Role) {
@@ -87,10 +88,22 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    const isPasswordValid = this.comparePassword(dto.password, user.password);
+    const isPasswordValid = await this.passwordHasherService.verify(
+      dto.password,
+      user.password,
+    );
 
     if (!isPasswordValid) {
-      throw new BadRequestException('Password not matched');
+      const isBcryptPasswordValid = this.compareOldAlgorithmPassword(
+        dto.password,
+        user.password,
+      );
+
+      if (isBcryptPasswordValid) {
+        await this.updatePassword(user.id.toString(), dto.password);
+      } else {
+        throw new NotFoundException('Email ou senha está incorreto !');
+      }
     }
 
     const token = await this.tokenService.issue(user.id.toString(), {
@@ -150,7 +163,10 @@ export class AuthService {
     return bcrypt.hashSync(password, saltRounds);
   }
 
-  private comparePassword(password: string, hashedPassword: string): boolean {
+  private compareOldAlgorithmPassword(
+    password: string,
+    hashedPassword: string,
+  ): boolean {
     return bcrypt.compareSync(password, hashedPassword);
   }
 
@@ -220,7 +236,7 @@ export class AuthService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    const isPasswordValid = this.comparePassword(
+    const isPasswordValid = this.compareOldAlgorithmPassword(
       changePasswordDTO.oldPassword,
       user.password,
     );
@@ -235,7 +251,8 @@ export class AuthService {
   }
 
   async updatePassword(id: string, newPassword: string) {
-    const newPasswordHashed = this.hashPassword(newPassword);
+    const newPasswordHashed =
+      await this.passwordHasherService.hash(newPassword);
 
     const user = await this.users.findOneBy({
       id: +id,
