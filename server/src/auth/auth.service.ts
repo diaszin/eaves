@@ -50,8 +50,9 @@ export class AuthService {
     let role: Role = Role.PATIENT;
 
     const [username, domain] = createAuthDto.email.split('@');
+    const emailRoleIdentifier = domain.split('.')[0];
 
-    if(domain[0] === "professores"){
+    if(emailRoleIdentifier === "professores"){
       role = Role.PROFESSOR;
     }
 
