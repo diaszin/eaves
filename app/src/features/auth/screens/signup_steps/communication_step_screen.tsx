@@ -87,6 +87,12 @@ export default function CommunicationStep() {
               </multiStepContext.form.Field>
               <View className="w-full flex items-center justify-center">
                 <TouchableOpacity
+                  className={`min-h-12 w-full m-2 flex flex-row items-center justify-center bg-white border border-secondary-max gap-0.5 rounded-xl`}
+                  onPress={multiStepContext.previous}
+                >
+                  <Text className="text-secondary-max">Voltar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
                   disabled={!group.state.meta.canSubmit}
                   className={`min-h-12 w-full m-2 flex flex-row items-center justify-center ${group.state.meta.canSubmit ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
                   onPress={group.handleSubmit}

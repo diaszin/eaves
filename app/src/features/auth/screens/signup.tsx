@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, Pressable } from "react-native";
 import PersonalStep from "./signup_steps/personal_step_screen";
 import { MultiStepContext } from "../contexts/multiStepContext";
 import CommunicationStep from "./signup_steps/communication_step_screen";
@@ -8,9 +8,10 @@ import { MultiStepData, SignupMutationData } from "../types/signup.type";
 import { FormOptions, useForm } from "@tanstack/react-form";
 import authService from "../services/auth.service";
 import { useMutation } from "@tanstack/react-query";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Link, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
 import { AxiosError } from "axios";
+import { MdChevronLeft } from "react-icons/md";
 
 async function signup(
   fullname: string,
@@ -129,6 +130,18 @@ export default function SignUpScreen() {
           {step == 1 && <PersonalStep />}
           {step == 2 && <CommunicationStep />}
           {step == 3 && <AuthStepScreen />}
+
+          <View className="flex flex-col items-center justify-center">
+            <Text className="font-secondary-regular text-sm text-gray-600">
+              Já tem uma conta?{" "}
+              <Link
+                href="/(auth)/sign-in"
+                className="text-primary-max font-secondary-bold text-[1rem]"
+              >
+                Faça login
+              </Link>
+            </Text>
+          </View>
         </View>
         <ErrorBottomSheet error={mutation.error} />
       </View>

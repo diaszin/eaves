@@ -123,6 +123,12 @@ export default function AuthStepScreen() {
               </multiStepContext.form.Field>
               <View className="w-full flex items-center justify-center">
                 <TouchableOpacity
+                  className={`min-h-12 w-full m-2 flex flex-row items-center justify-center bg-white border border-secondary-max  gap-0.5 rounded-xl`}
+                  onPress={multiStepContext.previous}
+                >
+                  <Text className="text-secondary-max">Voltar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
                   disabled={
                     !group.state.meta.canSubmit ||
                     multiStepContext.form.state.isSubmitting
