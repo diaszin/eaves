@@ -13,7 +13,7 @@ export default function useLoginWithMicrosoft() {
   const microsoftClientId = process.env.EXPO_PUBLIC_MICROSOFT_CLIENT_ID;
   const microsoftRedirectUri =
     Platform.OS == "web"
-      ? "http://localhost:8081/auth"
+      ? process.env.EXPO_PUBLIC_MICROSOFT_REDIRECT_URL!
       : makeRedirectUri({
           scheme: "eaves",
           path: "auth",
