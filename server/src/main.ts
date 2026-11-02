@@ -10,6 +10,7 @@ async function bootstrap() {
       methods: '*',
       allowedHeaders: '*',
     },
+    logger: ['log', 'error', 'warn', 'debug'],
   });
 
   app.useGlobalPipes(
