@@ -37,10 +37,9 @@ export class AuthController {
   @Public()
   @Post('/signup')
   async signUp(@Body() dto: CreateUserDTO) {
-    const userRole = Role.PATIENT;
-    const userCreated = await this.authService.create(dto, userRole);
-    const profileName = userCreated.profile.fullname.split(' ')[0];
+    const userCreated = await this.authService.create(dto);
 
+    const profileName = userCreated.profile.fullname.split(' ')[0];
     await this.mailService.sendWelcomeEmail(userCreated.email, profileName);
   }
 
@@ -91,7 +90,7 @@ export class AuthController {
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
-    
+
     return this.passwordResetService.request(body.email);
   }
 

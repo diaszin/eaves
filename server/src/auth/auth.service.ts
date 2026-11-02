@@ -31,7 +31,7 @@ export class AuthService {
     private readonly passwordHasherService: PasswordHasher,
   ) {}
 
-  async create(createAuthDto: CreateUserDTO, role: Role) {
+  async create(createAuthDto: CreateUserDTO) {
     const isEmailSigned =
       (await this.users.countBy({
         email: createAuthDto.email,
@@ -43,7 +43,17 @@ export class AuthService {
       );
     }
 
-    const hashedPassword = await this.passwordHasherService.hash(createAuthDto.password);
+    const hashedPassword = await this.passwordHasherService.hash(
+      createAuthDto.password,
+    );
+
+    let role: Role = Role.PATIENT;
+
+    const [username, domain] = createAuthDto.email.split('@');
+
+    if(domain[0] === "professores"){
+      role = Role.PROFESSOR;
+    }
 
     return await this.dataSource.transaction(async (transaction) => {
       const profile = transaction.create(Profile, {
@@ -226,7 +236,9 @@ export class AuthService {
   }
 
   async changePassword(id: number, changePasswordDTO: ChangePasswordDTO) {
-    const newPasswordHashed = await this.passwordHasherService.hash(changePasswordDTO.newPassword);
+    const newPasswordHashed = await this.passwordHasherService.hash(
+      changePasswordDTO.newPassword,
+    );
 
     const user = await this.users.findOneBy({
       id: id,
