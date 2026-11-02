@@ -6,8 +6,6 @@ import { AuthenticationModule } from '@nestjs/authentication';
 import { AppointmentsModule } from './appointments/appointments.module.js';
 import { AuthorizationModule } from '@nestjs/authorization';
 import { join } from 'node:path';
-import { EmailModule } from './email/email.module.js';
-import { TemplateModule } from './template/template.module.js';
 import { MicrosoftModule } from './microsoft/microsoft.module.js';
 import { SurveyModule } from './survey/survey.module.js';
 import { PersonalJournalModule } from './personal-journal/personal-journal.module.js';
@@ -59,8 +57,6 @@ import { PersonalJournalModule } from './personal-journal/personal-journal.modul
     }),
     AuthModule,
     AppointmentsModule,
-    EmailModule,
-    TemplateModule,
     MicrosoftModule,
     SurveyModule,
     PersonalJournalModule,

@@ -6,16 +6,14 @@ import { User } from './entities/user.entity.js';
 import { JwtAuth } from './jwt_auth.provider.js';
 import { Profile } from './entities/profile.entity.js';
 import { AuthenticationStorageProvider } from './authentication-storage.provider.js';
-import { EmailModule } from '../email/email.module.js';
-import { TemplateModule } from '../template/template.module.js';
+import { MailModule } from '../mail/mail.module.js';
 import { MicrosoftModule } from '../microsoft/microsoft.module.js';
 import { PasswordResetAction } from './password-reset.action.js';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Profile]),
-    EmailModule,
-    TemplateModule,
+    MailModule,
     MicrosoftModule,
   ],
   controllers: [AuthController],

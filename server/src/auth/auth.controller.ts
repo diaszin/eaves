@@ -20,8 +20,7 @@ import {
   Public,
 } from '@nestjs/authentication';
 import { Role } from './entities/user.entity.js';
-import { EmailService } from '../email/email.service.js';
-import { TemplateService } from '../template/template.service.js';
+import { MailService } from '../mail/mail.service.js';
 import { UpdateUserDTO } from './dto/update.dto.js';
 import { ChangePasswordDTO } from './dto/change-password.dto.js';
 import { ResetPasswordSendEmailDTO } from './dto/reset-password-send-email.dto.js';
@@ -31,8 +30,7 @@ import { ResetPasswordDTO } from './dto/reset-password.dto.js';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly emailService: EmailService,
-    private readonly templateService: TemplateService,
+    private readonly mailService: MailService,
     private readonly passwordResetService: PasswordResetService,
   ) {}
 
@@ -43,15 +41,7 @@ export class AuthController {
     const userCreated = await this.authService.create(dto, userRole);
     const profileName = userCreated.profile.fullname.split(' ')[0];
 
-    const emailTemplate = await this.templateService.renderWelcomeEmail({
-      name: profileName,
-    });
-
-    this.emailService.sendEmail({
-      to: userCreated.email,
-      html: emailTemplate,
-      subject: 'Cadastro com concluído',
-    });
+    await this.mailService.sendWelcomeEmail(userCreated.email, profileName);
   }
 
   @Public()

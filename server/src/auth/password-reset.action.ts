@@ -5,16 +5,14 @@ import {
   PasswordResetLink,
 } from '@nestjs/authentication';
 import { AuthService } from './auth.service.js';
-import { EmailService } from '../email/email.service.js';
-import { TemplateService } from '../template/template.service.js';
+import { MailService } from '../mail/mail.service.js';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PasswordResetAction extends PasswordResetHandler {
   constructor(
     private readonly authService: AuthService,
-    private readonly emailService: EmailService,
-    private readonly templateService: TemplateService,
+    private readonly mailService: MailService,
     registry: AuthenticationRegistry,
   ) {
     super();
@@ -37,15 +35,7 @@ export class PasswordResetAction extends PasswordResetHandler {
     return null;
   }
   async send(link: PasswordResetLink): Promise<void> {
-    const template = await this.templateService.renderResetPasswordEmail({
-      url: link.url,
-    });
-
-    await this.emailService.sendEmail({
-      to: link.email,
-      subject: 'Redefinição de senha',
-      html: template,
-    });
+    await this.mailService.sendPasswordResetEmail(link.email, link.url);
   }
 
   async updatePassword(userId: string, passwordHash: string): Promise<void> {
