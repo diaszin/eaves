@@ -21,6 +21,22 @@ services:
           cpus: "1.0"
           memory: 1G
 
+  platform:
+    container_name: eaves-platform-prod
+    build:
+      context: ./platform
+      dockerfile: Dockerfile
+    ports:
+      - "${PLATFORM_PORT:-8080}:80"
+    restart: unless-stopped
+    depends_on:
+      - api
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
   eaves-db:
     container_name: eaves-db-prod
     image: postgres:17-alpine
