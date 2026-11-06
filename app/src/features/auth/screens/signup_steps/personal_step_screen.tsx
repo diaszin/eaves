@@ -2,7 +2,7 @@ import { TouchableOpacity, View, Text } from "react-native";
 import { useContext } from "react";
 
 import InputWithLabel from "../../components/input_with_label";
-import { CustomDateTimePicker } from "../../components/datetime_picker/datetime_picker.web";
+import { CustomDateTimePicker } from "../../components/datetime_picker/datetime_picker";
 import MaskInputWithLabel from "../../components/masked_input_with_label";
 import { Masks } from "react-native-mask-input";
 import { cpf } from "cpf-cnpj-validator";
