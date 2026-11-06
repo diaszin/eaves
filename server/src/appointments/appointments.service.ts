@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAppointmentDto } from './dto/create-appointment.dto.js';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto.js';
 import { Repository } from 'typeorm';
-import { User } from '../auth/entities/user.entity.js';
+import { Role, User } from '../auth/entities/user.entity.js';
 import { Appointment } from './entities/appointment.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from '../auth/auth.service.js';
@@ -40,16 +40,42 @@ export class AppointmentsService {
     return this.appointmentRepository.save(appointment);
   }
 
-  findAllByPatient(patient: User) {
+  findAll(user: User) {
+    if (user.role === Role.PATIENT) {
+      return this.appointmentRepository.find({
+        where: {
+          patient: { id: user.id },
+        },
+        relations: {
+          patient: { profile: true },
+          createdBy: { profile: true },
+        },
+      });
+    }
+
     return this.appointmentRepository.find({
-      where: {
-        patient: patient,
+      relations: {
+        patient: { profile: true },
+        createdBy: { profile: true },
+      },
+      order: {
+        initialDate: 'DESC',
       },
     });
   }
 
+  findAllByPatient(patient: User) {
+    return this.findAll(patient);
+  }
+
   findOneByUser(user: User, id: number) {
-    return `This action returns a #${id} appointment`;
+    return this.appointmentRepository.findOne({
+      where: { id },
+      relations: {
+        patient: { profile: true },
+        createdBy: { profile: true },
+      },
+    });
   }
 
   update(id: number, updateAppointmentDto: UpdateAppointmentDto) {
@@ -57,6 +83,6 @@ export class AppointmentsService {
   }
 
   remove(id: number) {
-    return `This action removes a #${id} appointment`;
+    return this.appointmentRepository.delete(id);
   }
 }

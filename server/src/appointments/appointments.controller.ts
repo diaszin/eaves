@@ -38,7 +38,7 @@ export class AppointmentsController {
   @Get()
   @Can(AppointmentsPolicy, 'view')
   findAll(@CurrentUser() user: User) {
-    return this.appointmentsService.findAllByPatient(user);
+    return this.appointmentsService.findAll(user);
   }
 
   @Get(':id')
