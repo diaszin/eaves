@@ -40,7 +40,7 @@ export interface UpdateUserDto {
 
 export const usersService = {
   list: async (params?: { role?: string; search?: string }): Promise<User[]> => {
-    const data = await http.get<User[]>('/users', { params }).then((r) => r.data)
+    const data = await http.get<User[]>('/employees', { params }).then((r) => r.data)
     if (Array.isArray(data)) {
       return data
     }

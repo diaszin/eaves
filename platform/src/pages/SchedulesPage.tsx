@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Plus,
   CalendarRange,
@@ -13,147 +13,159 @@ import {
   CheckCircle2,
   XCircle,
   X,
-} from 'lucide-react'
-import clsx from 'clsx'
-import { useAuth } from '@/lib/auth'
+} from "lucide-react";
+import clsx from "clsx";
+import { useAuth } from "@/lib/auth";
 import {
   schedulesService,
   type Schedule,
   type ScheduleShift,
   type CreateScheduleDto,
   type UpdateScheduleDto,
-} from '@/services/schedules.service'
-import { usersService } from '@/services/users.service'
-import { Button } from '@/components/ui/Button'
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
-import { EmptyState } from '@/components/ui/EmptyState'
-import { Avatar } from '@/components/ui/Avatar'
-import { Badge } from '@/components/ui/Badge'
+} from "@/services/schedules.service";
+import { usersService } from "@/services/users.service";
+import { Button } from "@/components/ui/Button";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Avatar } from "@/components/ui/Avatar";
+import { Badge } from "@/components/ui/Badge";
 
 const DAYS_OF_WEEK = [
-  { value: 0, label: 'Domingo', short: 'Dom' },
-  { value: 1, label: 'Segunda-feira', short: 'Seg' },
-  { value: 2, label: 'Terça-feira', short: 'Ter' },
-  { value: 3, label: 'Quarta-feira', short: 'Qua' },
-  { value: 4, label: 'Quinta-feira', short: 'Qui' },
-  { value: 5, label: 'Sexta-feira', short: 'Sex' },
-  { value: 6, label: 'Sábado', short: 'Sáb' },
-]
+  { value: 0, label: "Domingo", short: "Dom" },
+  { value: 1, label: "Segunda-feira", short: "Seg" },
+  { value: 2, label: "Terça-feira", short: "Ter" },
+  { value: 3, label: "Quarta-feira", short: "Qua" },
+  { value: 4, label: "Quinta-feira", short: "Qui" },
+  { value: 5, label: "Sexta-feira", short: "Sex" },
+  { value: 6, label: "Sábado", short: "Sáb" },
+];
 
 function formatDate(dateStr?: string | null): string {
-  if (!dateStr) return 'Não informada'
+  if (!dateStr) return "Não informada";
   try {
-    return new Date(dateStr).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    })
+    return new Date(dateStr).toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   } catch {
-    return dateStr
+    return dateStr;
   }
 }
 
 function calculateDurationHours(startTime: string, endTime: string): number {
   try {
-    const [startH, startM] = startTime.split(':').map(Number)
-    const [endH, endM] = endTime.split(':').map(Number)
-    const startTotal = startH * 60 + startM
-    const endTotal = endH * 60 + endM
-    return Math.max(0, (endTotal - startTotal) / 60)
+    const [startH, startM] = startTime.split(":").map(Number);
+    const [endH, endM] = endTime.split(":").map(Number);
+    const startTotal = startH * 60 + startM;
+    const endTotal = endH * 60 + endM;
+    return Math.max(0, (endTotal - startTotal) / 60);
   } catch {
-    return 0
+    return 0;
   }
 }
 
 interface ShiftFormItem {
-  key: string
-  type: 'recurring' | 'custom'
-  dayOfWeek: number
-  customDate: string
-  startTime: string
-  endTime: string
-  location: string
-  notes: string
-  maxCapacity: number
+  key: string;
+  type: "recurring" | "custom";
+  dayOfWeek: number;
+  customDate: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+  notes: string;
+  maxCapacity: number;
 }
 
 export default function SchedulesPage() {
-  const { id } = useParams<{ id?: string }>()
-  const navigate = useNavigate()
-  const { user } = useAuth()
-  const queryClient = useQueryClient()
+  const { id } = useParams<{ id?: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  const [showModal, setShowModal] = useState(false)
-  const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null)
+  const [showModal, setShowModal] = useState(false);
+  const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
 
-  const canManage = user?.role === 'coordinator' || user?.role === 'professor'
+  const canManage = user?.role === "coordinator" || user?.role === "professor";
 
   // Query detalhe
   const detailQ = useQuery({
-    queryKey: ['schedules', id],
+    queryKey: ["schedules", id],
     queryFn: () => schedulesService.getById(Number(id)),
     enabled: !!id,
-  })
+  });
 
   // Query lista geral
   const listQ = useQuery({
-    queryKey: ['schedules'],
+    queryKey: ["schedules"],
     queryFn: () => schedulesService.list(),
-  })
+  });
 
   // Query usuários para o select do form
   const usersQ = useQuery({
-    queryKey: ['users'],
-    queryFn: () => usersService.list(),
+    queryKey: ["users"],
+    queryFn: () =>
+      usersService.list({
+        role: "trainee",
+      }),
     enabled: showModal,
-  })
+  });
 
   // Mutações
   const createMutation = useMutation({
     mutationFn: (dto: CreateScheduleDto) => schedulesService.create(dto),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['schedules'] })
-      setShowModal(false)
-      navigate(`/schedules/${data.id}`)
+      queryClient.invalidateQueries({ queryKey: ["schedules"] });
+      setShowModal(false);
+      navigate(`/schedules/${data.id}`);
     },
-  })
+  });
 
   const updateMutation = useMutation({
-    mutationFn: ({ schedId, dto }: { schedId: number; dto: UpdateScheduleDto }) =>
-      schedulesService.update(schedId, dto),
+    mutationFn: ({
+      schedId,
+      dto,
+    }: {
+      schedId: number;
+      dto: UpdateScheduleDto;
+    }) => schedulesService.update(schedId, dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['schedules'] })
-      queryClient.invalidateQueries({ queryKey: ['schedules', id] })
-      setShowModal(false)
-      setEditingSchedule(null)
+      queryClient.invalidateQueries({ queryKey: ["schedules"] });
+      queryClient.invalidateQueries({ queryKey: ["schedules", id] });
+      setShowModal(false);
+      setEditingSchedule(null);
     },
-  })
+  });
 
   const removeMutation = useMutation({
     mutationFn: (schedId: number) => schedulesService.remove(schedId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['schedules'] })
-      navigate('/schedules')
+      queryClient.invalidateQueries({ queryKey: ["schedules"] });
+      navigate("/schedules");
     },
-  })
+  });
 
   function handleOpenCreate() {
-    setEditingSchedule(null)
-    setShowModal(true)
+    setEditingSchedule(null);
+    setShowModal(true);
   }
 
   function handleOpenEdit(schedule: Schedule) {
-    setEditingSchedule(schedule)
-    setShowModal(true)
+    setEditingSchedule(schedule);
+    setShowModal(true);
   }
 
   function handleDelete(schedId: number) {
-    if (confirm('Tem certeza que deseja remover esta escala? Todos os turnos associados serão excluídos.')) {
-      removeMutation.mutate(schedId)
+    if (
+      confirm(
+        "Tem certeza que deseja remover esta escala? Todos os turnos associados serão excluídos.",
+      )
+    ) {
+      removeMutation.mutate(schedId);
     }
   }
 
-  const selectedSchedule = detailQ.data
+  const selectedSchedule = detailQ.data;
 
   return (
     <div className="flex h-full flex-col bg-slate-50/50">
@@ -161,12 +173,14 @@ export default function SchedulesPage() {
       <div className="flex items-center justify-between border-b border-slate-200 bg-white px-8 py-5">
         <div>
           <h1 className="text-xl font-semibold text-slate-900">
-            {selectedSchedule ? selectedSchedule.title : 'Escalas de Atendimento'}
+            {selectedSchedule
+              ? selectedSchedule.title
+              : "Escalas de Atendimento"}
           </h1>
           <p className="mt-0.5 text-xs text-slate-500">
             {selectedSchedule
-              ? 'Gerenciamento de turnos, dias e horários customizados'
-              : 'Definição e organização de escalas e horários customizados para a equipe'}
+              ? "Gerenciamento de turnos, dias e horários customizados"
+              : "Definição e organização de escalas e horários customizados para a equipe"}
           </p>
         </div>
 
@@ -190,7 +204,10 @@ export default function SchedulesPage() {
               title="Escala não encontrada"
               description="A escala solicitada não existe ou foi removida."
               action={
-                <Button variant="secondary" onClick={() => navigate('/schedules')}>
+                <Button
+                  variant="secondary"
+                  onClick={() => navigate("/schedules")}
+                >
                   Voltar para lista
                 </Button>
               }
@@ -222,20 +239,20 @@ export default function SchedulesPage() {
           availableUsers={usersQ.data ?? []}
           isSubmitting={createMutation.isPending || updateMutation.isPending}
           onClose={() => {
-            setShowModal(false)
-            setEditingSchedule(null)
+            setShowModal(false);
+            setEditingSchedule(null);
           }}
           onSubmit={(dto) => {
             if (editingSchedule) {
-              updateMutation.mutate({ schedId: editingSchedule.id, dto })
+              updateMutation.mutate({ schedId: editingSchedule.id, dto });
             } else {
-              createMutation.mutate(dto)
+              createMutation.mutate(dto);
             }
           }}
         />
       )}
     </div>
-  )
+  );
 }
 
 // -------------------------------------------------------------
@@ -247,22 +264,24 @@ function ScheduleDetailView({
   onEdit,
   onDelete,
 }: {
-  schedule: Schedule
-  canManage: boolean
-  onEdit: () => void
-  onDelete: () => void
+  schedule: Schedule;
+  canManage: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
 }) {
-  const shifts = schedule.shifts || []
+  const shifts = schedule.shifts || [];
 
   // Agrupamento de turnos recorrentes por dia da semana
-  const recurringShifts = shifts.filter((s) => s.dayOfWeek !== null && s.dayOfWeek !== undefined)
-  const customDateShifts = shifts.filter((s) => s.customDate)
+  const recurringShifts = shifts.filter(
+    (s) => s.dayOfWeek !== null && s.dayOfWeek !== undefined,
+  );
+  const customDateShifts = shifts.filter((s) => s.customDate);
 
   // Cálculo total de horas semanais recorrentes
   const totalWeeklyHours = recurringShifts.reduce(
     (acc, curr) => acc + calculateDurationHours(curr.startTime, curr.endTime),
     0,
-  )
+  );
 
   return (
     <div className="space-y-6">
@@ -275,13 +294,15 @@ function ScheduleDetailView({
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-lg font-bold text-slate-900">{schedule.title}</h2>
+                <h2 className="text-lg font-bold text-slate-900">
+                  {schedule.title}
+                </h2>
                 <span
                   className={clsx(
-                    'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold',
+                    "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold",
                     schedule.isActive
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-slate-100 text-slate-600',
+                      ? "bg-green-100 text-green-700"
+                      : "bg-slate-100 text-slate-600",
                   )}
                 >
                   {schedule.isActive ? (
@@ -298,7 +319,9 @@ function ScheduleDetailView({
                 </span>
               </div>
               {schedule.description && (
-                <p className="mt-1 text-sm text-slate-600">{schedule.description}</p>
+                <p className="mt-1 text-sm text-slate-600">
+                  {schedule.description}
+                </p>
               )}
             </div>
           </div>
@@ -320,7 +343,14 @@ function ScheduleDetailView({
         {/* Metadados e Profissional */}
         <div className="mt-6 grid grid-cols-1 gap-4 border-t border-slate-100 pt-5 sm:grid-cols-3">
           <div className="flex items-center gap-3">
-            <Avatar name={schedule.user?.profile?.fullname || schedule.user?.email || 'User'} size="md" />
+            <Avatar
+              name={
+                schedule.user?.profile?.fullname ||
+                schedule.user?.email ||
+                "User"
+              }
+              size="md"
+            />
             <div>
               <span className="block text-xs font-medium text-slate-400 uppercase tracking-wider">
                 Profissional Escalado
@@ -329,7 +359,10 @@ function ScheduleDetailView({
                 {schedule.user?.profile?.fullname || schedule.user?.email}
               </span>
               {schedule.user?.role && (
-                <Badge role={schedule.user.role as any} className="mt-1 ml-0.5" />
+                <Badge
+                  role={schedule.user.role as any}
+                  className="mt-1 ml-0.5"
+                />
               )}
             </div>
           </div>
@@ -342,7 +375,11 @@ function ScheduleDetailView({
               <Calendar className="h-4 w-4 text-slate-400" />
               <span>{formatDate(schedule.startDate)}</span>
               <span className="text-slate-400">até</span>
-              <span>{schedule.endDate ? formatDate(schedule.endDate) : 'Indeterminado'}</span>
+              <span>
+                {schedule.endDate
+                  ? formatDate(schedule.endDate)
+                  : "Indeterminado"}
+              </span>
             </div>
           </div>
 
@@ -354,7 +391,11 @@ function ScheduleDetailView({
               <Clock className="h-4 w-4 text-indigo-500" />
               <span>{totalWeeklyHours} horas / semana</span>
               <span className="text-xs font-normal text-slate-500">
-                ({shifts.length} {shifts.length === 1 ? 'turno configurado' : 'turnos configurados'})
+                ({shifts.length}{" "}
+                {shifts.length === 1
+                  ? "turno configurado"
+                  : "turnos configurados"}
+                )
               </span>
             </div>
           </div>
@@ -365,13 +406,16 @@ function ScheduleDetailView({
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-slate-900">Grade Semanal Recorrente</h3>
+            <h3 className="font-semibold text-slate-900">
+              Grade Semanal Recorrente
+            </h3>
             <p className="text-xs text-slate-500">
               Dias e horários customizados semanais de atendimento e supervisão
             </p>
           </div>
           <span className="text-xs font-medium text-slate-500">
-            {recurringShifts.length} {recurringShifts.length === 1 ? 'turno' : 'turnos'}
+            {recurringShifts.length}{" "}
+            {recurringShifts.length === 1 ? "turno" : "turnos"}
           </span>
         </div>
 
@@ -382,8 +426,10 @@ function ScheduleDetailView({
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {DAYS_OF_WEEK.map((day) => {
-              const dayShifts = recurringShifts.filter((s) => s.dayOfWeek === day.value)
-              if (dayShifts.length === 0) return null
+              const dayShifts = recurringShifts.filter(
+                (s) => s.dayOfWeek === day.value,
+              );
+              if (dayShifts.length === 0) return null;
 
               return (
                 <div
@@ -391,15 +437,21 @@ function ScheduleDetailView({
                   className="flex flex-col rounded-xl border border-slate-200 bg-slate-50/60 p-4"
                 >
                   <div className="mb-3 flex items-center justify-between border-b border-slate-200/80 pb-2">
-                    <span className="font-semibold text-slate-800">{day.label}</span>
+                    <span className="font-semibold text-slate-800">
+                      {day.label}
+                    </span>
                     <span className="rounded bg-indigo-50 px-2 py-0.5 text-xs font-bold text-indigo-700">
-                      {dayShifts.length} {dayShifts.length === 1 ? 'horário' : 'horários'}
+                      {dayShifts.length}{" "}
+                      {dayShifts.length === 1 ? "horário" : "horários"}
                     </span>
                   </div>
 
                   <div className="space-y-2.5">
                     {dayShifts.map((shift, idx) => {
-                      const duration = calculateDurationHours(shift.startTime, shift.endTime)
+                      const duration = calculateDurationHours(
+                        shift.startTime,
+                        shift.endTime,
+                      );
                       return (
                         <div
                           key={shift.id || idx}
@@ -430,15 +482,16 @@ function ScheduleDetailView({
 
                           {shift.maxCapacity && shift.maxCapacity > 1 && (
                             <div className="mt-1.5 text-xs text-indigo-600 font-medium">
-                              Capacidade: até {shift.maxCapacity} atendimentos simultâneos
+                              Capacidade: até {shift.maxCapacity} atendimentos
+                              simultâneos
                             </div>
                           )}
                         </div>
-                      )
+                      );
                     })}
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         )}
@@ -490,7 +543,7 @@ function ScheduleDetailView({
         </div>
       )}
     </div>
-  )
+  );
 }
 
 // -------------------------------------------------------------
@@ -503,16 +556,19 @@ function SchedulesOverview({
   onOpenCreate,
   onSelect,
 }: {
-  schedules: Schedule[]
-  isLoading: boolean
-  canManage: boolean
-  onOpenCreate: () => void
-  onSelect: (id: number) => void
+  schedules: Schedule[];
+  isLoading: boolean;
+  canManage: boolean;
+  onOpenCreate: () => void;
+  onSelect: (id: number) => void;
 }) {
-  if (isLoading) return <LoadingSpinner centered />
+  if (isLoading) return <LoadingSpinner centered />;
 
-  const activeSchedules = schedules.filter((s) => s.isActive)
-  const totalShifts = schedules.reduce((acc, s) => acc + (s.shifts?.length || 0), 0)
+  const activeSchedules = schedules.filter((s) => s.isActive);
+  const totalShifts = schedules.reduce(
+    (acc, s) => acc + (s.shifts?.length || 0),
+    0,
+  );
 
   return (
     <div className="space-y-6">
@@ -523,7 +579,9 @@ function SchedulesOverview({
             Total de Escalas
           </span>
           <div className="mt-2 flex items-baseline justify-between">
-            <span className="text-3xl font-bold text-slate-900">{schedules.length}</span>
+            <span className="text-3xl font-bold text-slate-900">
+              {schedules.length}
+            </span>
             <CalendarRange className="h-6 w-6 text-indigo-500" />
           </div>
           <span className="mt-1 block text-xs text-slate-500">
@@ -536,7 +594,9 @@ function SchedulesOverview({
             Turnos Customizados
           </span>
           <div className="mt-2 flex items-baseline justify-between">
-            <span className="text-3xl font-bold text-slate-900">{totalShifts}</span>
+            <span className="text-3xl font-bold text-slate-900">
+              {totalShifts}
+            </span>
             <Clock className="h-6 w-6 text-green-500" />
           </div>
           <span className="mt-1 block text-xs text-slate-500">
@@ -564,9 +624,12 @@ function SchedulesOverview({
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-bold text-slate-900">Todas as Escalas</h2>
+            <h2 className="text-base font-bold text-slate-900">
+              Todas as Escalas
+            </h2>
             <p className="text-xs text-slate-500">
-              Selecione uma escala para inspecionar os dias e horários detalhados
+              Selecione uma escala para inspecionar os dias e horários
+              detalhados
             </p>
           </div>
           {canManage && (
@@ -594,7 +657,7 @@ function SchedulesOverview({
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {schedules.map((schedule) => {
-              const shifts = schedule.shifts || []
+              const shifts = schedule.shifts || [];
               return (
                 <div
                   key={schedule.id}
@@ -607,13 +670,13 @@ function SchedulesOverview({
                     </h3>
                     <span
                       className={clsx(
-                        'rounded-full px-2 py-0.5 text-xs font-semibold flex-shrink-0',
+                        "rounded-full px-2 py-0.5 text-xs font-semibold flex-shrink-0",
                         schedule.isActive
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-slate-100 text-slate-500',
+                          ? "bg-green-100 text-green-700"
+                          : "bg-slate-100 text-slate-500",
                       )}
                     >
-                      {schedule.isActive ? 'Ativa' : 'Inativa'}
+                      {schedule.isActive ? "Ativa" : "Inativa"}
                     </span>
                   </div>
 
@@ -626,12 +689,17 @@ function SchedulesOverview({
                   {/* Usuário vinculado */}
                   <div className="mt-4 flex items-center gap-2.5 border-t border-slate-100 pt-3">
                     <Avatar
-                      name={schedule.user?.profile?.fullname || schedule.user?.email || 'User'}
+                      name={
+                        schedule.user?.profile?.fullname ||
+                        schedule.user?.email ||
+                        "User"
+                      }
                       size="sm"
                     />
                     <div className="min-w-0 flex-1">
                       <span className="block truncate text-xs font-medium text-slate-800">
-                        {schedule.user?.profile?.fullname || schedule.user?.email}
+                        {schedule.user?.profile?.fullname ||
+                          schedule.user?.email}
                       </span>
                       <span className="block text-[11px] text-slate-400">
                         {schedule.user?.role}
@@ -643,18 +711,21 @@ function SchedulesOverview({
                   <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
                     <span className="inline-flex items-center gap-1 font-medium text-indigo-600">
                       <Clock className="h-3.5 w-3.5" />
-                      {shifts.length} {shifts.length === 1 ? 'turno configurado' : 'turnos configurados'}
+                      {shifts.length}{" "}
+                      {shifts.length === 1
+                        ? "turno configurado"
+                        : "turnos configurados"}
                     </span>
                     <span>{formatDate(schedule.startDate)}</span>
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
 
 // -------------------------------------------------------------
@@ -667,108 +738,117 @@ function ScheduleModal({
   onClose,
   onSubmit,
 }: {
-  initialSchedule: Schedule | null
-  availableUsers: any[]
-  isSubmitting: boolean
-  onClose: () => void
-  onSubmit: (dto: CreateScheduleDto) => void
+  initialSchedule: Schedule | null;
+  availableUsers: any[];
+  isSubmitting: boolean;
+  onClose: () => void;
+  onSubmit: (dto: CreateScheduleDto) => void;
 }) {
-  const [title, setTitle] = useState(initialSchedule?.title ?? '')
-  const [description, setDescription] = useState(initialSchedule?.description ?? '')
+  const [title, setTitle] = useState(initialSchedule?.title ?? "");
+  const [description, setDescription] = useState(
+    initialSchedule?.description ?? "",
+  );
   const [userId, setUserId] = useState<number>(
     initialSchedule?.user?.id ?? availableUsers[0]?.id ?? 0,
-  )
+  );
   const [startDate, setStartDate] = useState(
-    initialSchedule?.startDate ? initialSchedule.startDate.slice(0, 10) : new Date().toISOString().slice(0, 10),
-  )
+    initialSchedule?.startDate
+      ? initialSchedule.startDate.slice(0, 10)
+      : new Date().toISOString().slice(0, 10),
+  );
   const [endDate, setEndDate] = useState(
-    initialSchedule?.endDate ? initialSchedule.endDate.slice(0, 10) : '',
-  )
-  const [isActive, setIsActive] = useState(initialSchedule?.isActive ?? true)
+    initialSchedule?.endDate ? initialSchedule.endDate.slice(0, 10) : "",
+  );
+  const [isActive, setIsActive] = useState(initialSchedule?.isActive ?? true);
 
   // Lista dinâmica de turnos customizados
   const [shifts, setShifts] = useState<ShiftFormItem[]>(() => {
     if (initialSchedule?.shifts && initialSchedule.shifts.length > 0) {
       return initialSchedule.shifts.map((s) => ({
         key: String(Math.random()),
-        type: s.customDate ? 'custom' : 'recurring',
-        dayOfWeek: s.dayOfWeek !== null && s.dayOfWeek !== undefined ? s.dayOfWeek : 1,
-        customDate: s.customDate ?? '',
-        startTime: s.startTime || '08:00',
-        endTime: s.endTime || '12:00',
-        location: s.location ?? '',
-        notes: s.notes ?? '',
+        type: s.customDate ? "custom" : "recurring",
+        dayOfWeek:
+          s.dayOfWeek !== null && s.dayOfWeek !== undefined ? s.dayOfWeek : 1,
+        customDate: s.customDate ?? "",
+        startTime: s.startTime || "08:00",
+        endTime: s.endTime || "12:00",
+        location: s.location ?? "",
+        notes: s.notes ?? "",
         maxCapacity: s.maxCapacity ?? 1,
-      }))
+      }));
     }
     // Padrão inicial: Segunda 08:00 às 12:00
     return [
       {
-        key: 'initial-1',
-        type: 'recurring',
+        key: "initial-1",
+        type: "recurring",
         dayOfWeek: 1,
-        customDate: '',
-        startTime: '08:00',
-        endTime: '12:00',
-        location: 'Consultório 1',
-        notes: 'Atendimento Clínico',
+        customDate: "",
+        startTime: "08:00",
+        endTime: "12:00",
+        location: "Consultório 1",
+        notes: "Atendimento Clínico",
         maxCapacity: 1,
       },
-    ]
-  })
+    ];
+  });
 
-  function handleAddShift(preset?: { start: string; end: string; notes: string }) {
+  function handleAddShift(preset?: {
+    start: string;
+    end: string;
+    notes: string;
+  }) {
     setShifts((prev) => [
       ...prev,
       {
         key: String(Date.now() + Math.random()),
-        type: 'recurring',
+        type: "recurring",
         dayOfWeek: 1,
-        customDate: '',
-        startTime: preset ? preset.start : '14:00',
-        endTime: preset ? preset.end : '18:00',
-        location: 'Consultório 1',
-        notes: preset ? preset.notes : 'Atendimento',
+        customDate: "",
+        startTime: preset ? preset.start : "14:00",
+        endTime: preset ? preset.end : "18:00",
+        location: "Consultório 1",
+        notes: preset ? preset.notes : "Atendimento",
         maxCapacity: 1,
       },
-    ])
+    ]);
   }
 
   function handleRemoveShift(key: string) {
-    setShifts((prev) => prev.filter((s) => s.key !== key))
+    setShifts((prev) => prev.filter((s) => s.key !== key));
   }
 
   function handleUpdateShift(key: string, updates: Partial<ShiftFormItem>) {
     setShifts((prev) =>
       prev.map((s) => (s.key === key ? { ...s, ...updates } : s)),
-    )
+    );
   }
 
   function handleFormSubmit(e: React.FormEvent) {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!title.trim()) {
-      alert('Por favor, informe o título da escala.')
-      return
+      alert("Por favor, informe o título da escala.");
+      return;
     }
     if (!userId) {
-      alert('Por favor, selecione o profissional escalado.')
-      return
+      alert("Por favor, selecione o profissional escalado.");
+      return;
     }
     if (!startDate) {
-      alert('Por favor, informe a data inicial.')
-      return
+      alert("Por favor, informe a data inicial.");
+      return;
     }
 
     const payloadShifts: ScheduleShift[] = shifts.map((s) => ({
-      dayOfWeek: s.type === 'recurring' ? s.dayOfWeek : null,
-      customDate: s.type === 'custom' && s.customDate ? s.customDate : null,
+      dayOfWeek: s.type === "recurring" ? s.dayOfWeek : null,
+      customDate: s.type === "custom" && s.customDate ? s.customDate : null,
       startTime: s.startTime,
       endTime: s.endTime,
       location: s.location || null,
       notes: s.notes || null,
       maxCapacity: s.maxCapacity || 1,
-    }))
+    }));
 
     onSubmit({
       title,
@@ -778,7 +858,7 @@ function ScheduleModal({
       endDate: endDate || null,
       isActive,
       shifts: payloadShifts,
-    })
+    });
   }
 
   return (
@@ -788,7 +868,7 @@ function ScheduleModal({
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
           <div>
             <h2 className="text-lg font-bold text-slate-900">
-              {initialSchedule ? 'Editar Escala' : 'Nova Escala de Atendimento'}
+              {initialSchedule ? "Editar Escala" : "Nova Escala de Atendimento"}
             </h2>
             <p className="text-xs text-slate-500">
               Configure os dados gerais e os dias e horários customizados
@@ -803,7 +883,10 @@ function ScheduleModal({
         </div>
 
         {/* Modal Form Body */}
-        <form onSubmit={handleFormSubmit} className="flex flex-1 flex-col overflow-hidden">
+        <form
+          onSubmit={handleFormSubmit}
+          className="flex flex-1 flex-col overflow-hidden"
+        >
           <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
             {/* Informações Básicas */}
             <div className="space-y-4">
@@ -831,6 +914,7 @@ function ScheduleModal({
                     Profissional / Estagiário Escalado *
                   </label>
                   <select
+                    id="trainee-select"
                     value={userId}
                     onChange={(e) => setUserId(Number(e.target.value))}
                     required
@@ -839,13 +923,11 @@ function ScheduleModal({
                     <option value="" disabled>
                       Selecione um profissional...
                     </option>
-                    {availableUsers
-                      .filter((u) => u.role !== 'patient')
-                      .map((u) => (
-                        <option key={u.id} value={u.id}>
-                          {u.profile?.fullname || u.email} ({u.role})
-                        </option>
-                      ))}
+                    {availableUsers.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.profile?.fullname || u.email}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -911,7 +993,8 @@ function ScheduleModal({
                     2. Dias e Horários Customizados
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Adicione os turnos de atendimento, definindo horários específicos por dia
+                    Adicione os turnos de atendimento, definindo horários
+                    específicos por dia
                   </p>
                 </div>
 
@@ -930,11 +1013,17 @@ function ScheduleModal({
 
               {/* Botões de presets rápidos */}
               <div className="flex flex-wrap items-center gap-2 rounded-lg bg-slate-50 p-2.5 text-xs text-slate-600">
-                <span className="font-semibold text-slate-700">Atalhos rápidos:</span>
+                <span className="font-semibold text-slate-700">
+                  Atalhos rápidos:
+                </span>
                 <button
                   type="button"
                   onClick={() =>
-                    handleAddShift({ start: '08:00', end: '12:00', notes: 'Manhã' })
+                    handleAddShift({
+                      start: "08:00",
+                      end: "12:00",
+                      notes: "Manhã",
+                    })
                   }
                   className="rounded border border-slate-200 bg-white px-2 py-1 hover:bg-slate-100"
                 >
@@ -943,7 +1032,11 @@ function ScheduleModal({
                 <button
                   type="button"
                   onClick={() =>
-                    handleAddShift({ start: '13:00', end: '17:00', notes: 'Tarde' })
+                    handleAddShift({
+                      start: "13:00",
+                      end: "17:00",
+                      notes: "Tarde",
+                    })
                   }
                   className="rounded border border-slate-200 bg-white px-2 py-1 hover:bg-slate-100"
                 >
@@ -952,7 +1045,11 @@ function ScheduleModal({
                 <button
                   type="button"
                   onClick={() =>
-                    handleAddShift({ start: '18:00', end: '22:00', notes: 'Noite' })
+                    handleAddShift({
+                      start: "18:00",
+                      end: "22:00",
+                      notes: "Noite",
+                    })
                   }
                   className="rounded border border-slate-200 bg-white px-2 py-1 hover:bg-slate-100"
                 >
@@ -993,7 +1090,7 @@ function ScheduleModal({
                           value={shift.type}
                           onChange={(e) =>
                             handleUpdateShift(shift.key, {
-                              type: e.target.value as 'recurring' | 'custom',
+                              type: e.target.value as "recurring" | "custom",
                             })
                           }
                           className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none"
@@ -1005,7 +1102,7 @@ function ScheduleModal({
 
                       {/* Dia da semana ou data customizada */}
                       <div>
-                        {shift.type === 'recurring' ? (
+                        {shift.type === "recurring" ? (
                           <>
                             <label className="block text-[11px] font-semibold text-slate-600">
                               Dia da Semana
@@ -1056,7 +1153,9 @@ function ScheduleModal({
                           required
                           value={shift.startTime}
                           onChange={(e) =>
-                            handleUpdateShift(shift.key, { startTime: e.target.value })
+                            handleUpdateShift(shift.key, {
+                              startTime: e.target.value,
+                            })
                           }
                           className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none"
                         />
@@ -1072,7 +1171,9 @@ function ScheduleModal({
                           required
                           value={shift.endTime}
                           onChange={(e) =>
-                            handleUpdateShift(shift.key, { endTime: e.target.value })
+                            handleUpdateShift(shift.key, {
+                              endTime: e.target.value,
+                            })
                           }
                           className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none"
                         />
@@ -1088,7 +1189,9 @@ function ScheduleModal({
                           placeholder="Ex: Sala 02, Ambulatório A"
                           value={shift.location}
                           onChange={(e) =>
-                            handleUpdateShift(shift.key, { location: e.target.value })
+                            handleUpdateShift(shift.key, {
+                              location: e.target.value,
+                            })
                           }
                           className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none"
                         />
@@ -1104,7 +1207,9 @@ function ScheduleModal({
                           placeholder="Ex: Triagem, Acolhimento, Supervisão"
                           value={shift.notes}
                           onChange={(e) =>
-                            handleUpdateShift(shift.key, { notes: e.target.value })
+                            handleUpdateShift(shift.key, {
+                              notes: e.target.value,
+                            })
                           }
                           className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none"
                         />
@@ -1122,11 +1227,11 @@ function ScheduleModal({
               Cancelar
             </Button>
             <Button type="submit" variant="primary" isLoading={isSubmitting}>
-              {initialSchedule ? 'Salvar Alterações' : 'Criar Escala'}
+              {initialSchedule ? "Salvar Alterações" : "Criar Escala"}
             </Button>
           </div>
         </form>
       </div>
     </div>
-  )
+  );
 }
