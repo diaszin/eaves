@@ -94,7 +94,7 @@ export default function ProfileMenuScreen() {
               <ProfileMenuItem
                 icon={MdPolicy}
                 title="Termos & Política de Privacidade"
-                onPress={() => {}}
+                onPress={() => router.push("/legal_terms")}
               />
             </View>
           </View>

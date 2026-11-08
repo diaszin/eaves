@@ -271,7 +271,9 @@ export default function LoginScreen() {
       <View className="flex flex-row items-center justify-center gap-4">
         <Text className="text-customblack-min">Privacidade</Text>
         <Text className="text-customblack-min">•</Text>
-        <Text className="text-customblack-min">Termos</Text>
+        <TouchableOpacity onPress={() => router.push("/legal_terms")}>
+          <Text className="text-customblack-min">Termos</Text>
+        </TouchableOpacity>
         <Text className="text-customblack-min">•</Text>
         <Text className="text-customblack-min">Ajuda</Text>
       </View>
