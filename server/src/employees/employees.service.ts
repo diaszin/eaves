@@ -34,4 +34,23 @@ export class EmployeesService {
       },
     });
   }
+
+  async findEmployeeById(id: string) {
+    return this.userRepository.findOne({
+      where: { id: +id },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        profile: {
+          fullname: true,
+          emergencyPhone: true,
+          birthday: true,
+        },
+      },
+      relations: {
+        profile: true,
+      },
+    });
+  }
 }

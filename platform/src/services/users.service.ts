@@ -8,7 +8,7 @@ export interface User {
   isActive?: boolean
   profile?: {
     fullname: string
-    phone?: string
+    emergencyPhone  ?: string
     birthdate?: string
     [key: string]: unknown
   }
@@ -48,7 +48,7 @@ export const usersService = {
   },
 
   getById: async (id: number): Promise<User> => {
-    return http.get<User>(`/users/${id}`).then((r) => r.data)
+    return http.get<User>(`/employees/${id}`).then((r) => r.data)
   },
 
   create: (dto: CreateUserDto) =>
