@@ -43,11 +43,11 @@ export const router = createBrowserRouter([
         element: <SchedulesPage />,
       },
       {
-        path: 'users',
+        path: 'trainees',
         element: <UsersPage />,
       },
       {
-        path: 'users/:id',
+        path: 'trainees/:id',
         element: <UsersPage />,
       },
       {

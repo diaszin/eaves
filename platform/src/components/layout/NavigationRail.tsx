@@ -44,10 +44,10 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['coordinator', 'professor', 'lobby', 'trainee'],
   },
   {
-    key: 'users',
-    label: 'Usuários',
+    key: 'trainees',
+    label: 'Estagiários',
     icon: Users,
-    path: '/users',
+    path: '/trainees',
     roles: ['coordinator', 'lobby'],
   },
   {
