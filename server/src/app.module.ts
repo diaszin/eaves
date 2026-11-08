@@ -10,6 +10,7 @@ import { MicrosoftModule } from './microsoft/microsoft.module.js';
 import { SurveyModule } from './survey/survey.module.js';
 import { PersonalJournalModule } from './personal-journal/personal-journal.module.js';
 import { SchedulesModule } from './schedules/schedules.module.js';
+import { EmployeesModule } from './employees/employees.module.js';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { SchedulesModule } from './schedules/schedules.module.js';
     SurveyModule,
     PersonalJournalModule,
     SchedulesModule,
+    EmployeesModule,
   ],
   controllers: [],
   providers: [],

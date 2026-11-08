@@ -19,7 +19,6 @@ import {
   PasswordResetService,
   Public,
 } from '@nestjs/authentication';
-import { Role } from './entities/user.entity.js';
 import { MailService } from '../mail/mail.service.js';
 import { UpdateUserDTO } from './dto/update.dto.js';
 import { ChangePasswordDTO } from './dto/change-password.dto.js';
