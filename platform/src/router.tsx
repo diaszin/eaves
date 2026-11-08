@@ -3,6 +3,7 @@ import { ProtectedLayout } from '@/components/layout/ProtectedLayout'
 import LoginPage from '@/pages/LoginPage'
 import DashboardPage from '@/pages/DashboardPage'
 import AppointmentsPage from '@/pages/AppointmentsPage'
+import SchedulesPage from '@/pages/SchedulesPage'
 import UsersPage from '@/pages/UsersPage'
 import SurveysPage from '@/pages/SurveysPage'
 import JournalsPage from '@/pages/JournalsPage'
@@ -32,6 +33,14 @@ export const router = createBrowserRouter([
       {
         path: 'appointments/:id',
         element: <AppointmentsPage />,
+      },
+      {
+        path: 'schedules',
+        element: <SchedulesPage />,
+      },
+      {
+        path: 'schedules/:id',
+        element: <SchedulesPage />,
       },
       {
         path: 'users',

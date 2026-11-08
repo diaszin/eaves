@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import { MicrosoftModule } from './microsoft/microsoft.module.js';
 import { SurveyModule } from './survey/survey.module.js';
 import { PersonalJournalModule } from './personal-journal/personal-journal.module.js';
+import { SchedulesModule } from './schedules/schedules.module.js';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { PersonalJournalModule } from './personal-journal/personal-journal.modul
     MicrosoftModule,
     SurveyModule,
     PersonalJournalModule,
+    SchedulesModule,
   ],
   controllers: [],
   providers: [],

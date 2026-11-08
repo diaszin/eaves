@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard,
   CalendarDays,
+  CalendarRange,
   Users,
   ClipboardList,
   BookOpen,
@@ -36,6 +37,13 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['coordinator', 'professor', 'lobby', 'trainee'],
   },
   {
+    key: 'schedules',
+    label: 'Escalas',
+    icon: CalendarRange,
+    path: '/schedules',
+    roles: ['coordinator', 'professor', 'lobby', 'trainee'],
+  },
+  {
     key: 'users',
     label: 'Usuários',
     icon: Users,
@@ -63,7 +71,10 @@ export function NavigationRail() {
   const navigate = useNavigate()
 
   const visibleItems = NAV_ITEMS.filter(
-    (item) => user?.role && item.roles.includes(user.role),
+    (item) =>
+      user?.role &&
+      user.role !== 'patient' &&
+      item.roles.includes(user.role as PlatformRole),
   )
 
   function handleSignOut() {

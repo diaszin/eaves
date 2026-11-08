@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { useAuth } from '@/lib/auth'
 import { appointmentsService } from '@/services/appointments.service'
+import { schedulesService } from '@/services/schedules.service'
 import { usersService } from '@/services/users.service'
 import { surveysService } from '@/services/surveys.service'
 import { journalsService } from '@/services/journals.service'
@@ -23,6 +24,7 @@ function useCurrentSection() {
   const location = useLocation()
   const path = location.pathname
   if (path.startsWith('/appointments')) return 'appointments'
+  if (path.startsWith('/schedules')) return 'schedules'
   if (path.startsWith('/users')) return 'users'
   if (path.startsWith('/surveys')) return 'surveys'
   if (path.startsWith('/journals')) return 'journals'
@@ -34,6 +36,7 @@ function useCurrentSection() {
 const SECTION_TITLES: Record<string, string> = {
   dashboard: 'Dashboard',
   appointments: 'Agendamentos',
+  schedules: 'Escalas de Atendimento',
   users: 'Usuários',
   surveys: 'Questionários PHQ-9',
   journals: 'Diários',
@@ -51,6 +54,13 @@ export function SectionPanel() {
     queryKey: ['appointments'],
     queryFn: () => appointmentsService.list(),
     enabled: section === 'appointments',
+  })
+
+  // Schedules query
+  const schedulesQ = useQuery({
+    queryKey: ['schedules'],
+    queryFn: () => schedulesService.list(),
+    enabled: section === 'schedules',
   })
 
   // Users query
@@ -124,6 +134,14 @@ export function SectionPanel() {
             onSelect={(id) => navigate(`/appointments/${id}`)}
           />
         )}
+        {section === 'schedules' && (
+          <SchedulesList
+            isLoading={schedulesQ.isLoading}
+            items={schedulesQ.data ?? []}
+            search={search}
+            onSelect={(id) => navigate(`/schedules/${id}`)}
+          />
+        )}
         {section === 'users' && (
           <UsersList
             isLoading={usersQ.isLoading}
@@ -155,6 +173,76 @@ export function SectionPanel() {
 }
 
 // ----- Sub-lists -----
+
+function SchedulesList({
+  isLoading,
+  items,
+  search,
+  onSelect,
+}: {
+  isLoading: boolean
+  items: Awaited<ReturnType<typeof schedulesService.list>>
+  search: string
+  onSelect: (id: number) => void
+}) {
+  const location = useLocation()
+  const q = search.toLowerCase()
+  const filtered = items.filter((s) => {
+    const title = s.title.toLowerCase()
+    const userName = (s.user?.profile?.fullname ?? s.user?.email ?? '').toLowerCase()
+    return title.includes(q) || userName.includes(q)
+  })
+
+  if (isLoading) return <LoadingSpinner centered />
+
+  return (
+    <ul>
+      {filtered.map((s) => {
+        const isActive = location.pathname === `/schedules/${s.id}`
+        const shiftsCount = s.shifts?.length ?? 0
+        return (
+          <li key={s.id}>
+            <button
+              onClick={() => onSelect(s.id)}
+              className={clsx(
+                'w-full px-4 py-3 text-left transition-colors hover:bg-slate-50 border-b border-slate-50',
+                isActive && 'bg-indigo-50 border-l-2 border-l-indigo-600',
+              )}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-sm font-medium text-slate-800 truncate">
+                  {s.title}
+                </span>
+                <span
+                  className={clsx(
+                    'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold',
+                    s.isActive
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-slate-100 text-slate-500',
+                  )}
+                >
+                  {s.isActive ? 'Ativa' : 'Inativa'}
+                </span>
+              </div>
+              <div className="mt-0.5 text-xs text-slate-600 truncate">
+                {s.user?.profile?.fullname ?? s.user?.email ?? 'Sem profissional'}
+              </div>
+              <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
+                <span>{shiftsCount} {shiftsCount === 1 ? 'turno configurado' : 'turnos configurados'}</span>
+                <span>{formatDate(s.startDate)}</span>
+              </div>
+            </button>
+          </li>
+        )
+      })}
+      {filtered.length === 0 && (
+        <li className="py-10 text-center text-sm text-slate-400">
+          Nenhuma escala encontrada
+        </li>
+      )}
+    </ul>
+  )
+}
 
 function AppointmentsList({
   isLoading,
