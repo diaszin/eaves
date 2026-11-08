@@ -43,6 +43,8 @@ Eaves é um projeto acadêmico voltado ao bem-estar e à saúde mental de estuda
    - A plataforma backoffice estará disponível em: [http://localhost:5173](http://localhost:5173)
    - A documentação interativa da API fica em: [http://localhost:3000/api](http://localhost:3000/api)
 
+   O Compose de desenvolvimento monitora alterações em `server/src` e reinicia a API automaticamente. Alterações em `platform/src` são atualizadas pelo HMR do Vite; o polling está habilitado para funcionar com os volumes do Docker, inclusive no Windows.
+
 3. Em outro terminal, configure e inicie o aplicativo móvel (se necessário):
    
    ```bash
