@@ -40,7 +40,8 @@ export class AppointmentsService {
       throw new BadRequestException('A data inicial do agendamento é inválida');
     }
 
-    const { therapySessionDurationMinutes } = await this.settingsService.get();
+    const therapySessionDurationMinutes =
+      await this.settingsService.getSessionDurationInMinutes();
     const endDate = new Date(
       initialDate.getTime() + therapySessionDurationMinutes * 60_000,
     );
