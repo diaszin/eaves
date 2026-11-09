@@ -11,6 +11,7 @@ import { SurveyModule } from './survey/survey.module.js';
 import { PersonalJournalModule } from './personal-journal/personal-journal.module.js';
 import { SchedulesModule } from './schedules/schedules.module.js';
 import { EmployeesModule } from './employees/employees.module.js';
+import { GeneralSettingsModule } from './settings/general-settings.module.js';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { EmployeesModule } from './employees/employees.module.js';
     PersonalJournalModule,
     SchedulesModule,
     EmployeesModule,
+    GeneralSettingsModule,
   ],
   controllers: [],
   providers: [],

@@ -18,6 +18,9 @@ export class Appointment {
   @Column({ type: 'timestamptz', nullable: false })
   endDate: Date;
 
+  @Column({ type: 'text', nullable: true })
+  notes: string | null;
+
   @CreateDateColumn()
   created: Date;
 

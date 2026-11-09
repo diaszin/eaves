@@ -6,9 +6,14 @@ import { Appointment } from './entities/appointment.entity.js';
 import { AppointmentsPolicy } from './appointments.policy.js';
 import { AuthModule } from '../auth/auth.module.js';
 import { AuthService } from '../auth/auth.service.js';
+import { GeneralSettingsModule } from '../settings/general-settings.module.js';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Appointment]), AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([Appointment]),
+    AuthModule,
+    GeneralSettingsModule,
+  ],
   controllers: [AppointmentsController],
   providers: [AppointmentsService, AppointmentsPolicy],
 })

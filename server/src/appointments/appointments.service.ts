@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAppointmentDto } from './dto/create-appointment.dto.js';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto.js';
 import { Repository } from 'typeorm';
@@ -6,6 +10,7 @@ import { Role, User } from '../auth/entities/user.entity.js';
 import { Appointment } from './entities/appointment.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from '../auth/auth.service.js';
+import { GeneralSettingsService } from '../settings/general-settings.service.js';
 
 @Injectable()
 export class AppointmentsService {
@@ -13,12 +18,13 @@ export class AppointmentsService {
     @InjectRepository(Appointment)
     private readonly appointmentRepository: Repository<Appointment>,
     private readonly userService: AuthService,
+    private readonly settingsService: GeneralSettingsService,
   ) {}
 
   async create(dto: {
-    initialDate: Date;
-    endDate: Date;
+    initialDate: string;
     patientId: number;
+    notes?: string;
     createdBy: User;
   }) {
     const patient = await this.userService.findUser(dto.patientId);
@@ -29,9 +35,20 @@ export class AppointmentsService {
       );
     }
 
+    const initialDate = new Date(dto.initialDate);
+    if (Number.isNaN(initialDate.getTime())) {
+      throw new BadRequestException('A data inicial do agendamento é inválida');
+    }
+
+    const { therapySessionDurationMinutes } = await this.settingsService.get();
+    const endDate = new Date(
+      initialDate.getTime() + therapySessionDurationMinutes * 60_000,
+    );
+
     const appointment = this.appointmentRepository.create({
-      initialDate: dto.initialDate,
-      endDate: dto.endDate,
+      initialDate,
+      endDate,
+      notes: dto.notes ?? null,
 
       createdBy: dto.createdBy,
       patient: patient,
