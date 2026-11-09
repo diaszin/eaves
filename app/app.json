@@ -24,6 +24,17 @@
     },
     "web": {
       "output": "static",
+      "name": "Eaves",
+      "shortName": "Eaves",
+      "lang": "pt-BR",
+      "description": "Cuide da sua saúde mental.",
+      "display": "standalone",
+      "orientation": "portrait",
+      "startUrl": "/",
+      "scope": "/",
+      "themeColor": "#76B5E1",
+      "backgroundColor": "#FFFFFF",
+      "preferRelatedApplications": false,
       "favicon": "./assets/images/favicon.png",
       "bundler": "metro"
     },

@@ -47,6 +47,16 @@ Os comandos `android` e `ios` executam builds nativos locais e exigem as ferrame
 npm run lint
 ```
 
+### Aplicativo web instalável
+
+O destino web usa um manifesto PWA para permitir que o Eaves seja instalado na tela inicial ou como aplicativo de desktop. Durante o desenvolvimento, execute `npm run web`; para gerar os arquivos de produção, execute:
+
+```bash
+npm run build:web
+```
+
+O resultado fica em `dist/`. Publique esse diretório em um domínio com HTTPS (ou teste localmente em `localhost`) para que os navegadores permitam a instalação. Em navegadores compatíveis, use a opção de instalar/adicionar à tela inicial. O app continua precisando de conexão com a API para os recursos que dependem do servidor.
+
 ## Arquitetura do aplicativo
 
 O app segue uma arquitetura em camadas leves, organizada em torno das rotas e das funcionalidades. O Expo Router resolve a navegação; as telas delegam operações de dados aos serviços de cada funcionalidade; esses serviços usam clientes Axios para conversar com a API NestJS.
