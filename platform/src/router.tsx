@@ -8,6 +8,7 @@ import UsersPage from '@/pages/UsersPage'
 import SurveysPage from '@/pages/SurveysPage'
 import JournalsPage from '@/pages/JournalsPage'
 import ProfilePage from '@/pages/ProfilePage'
+import GeneralSettingsPage from '@/pages/GeneralSettingsPage'
 
 export const router = createBrowserRouter([
   {
@@ -69,6 +70,10 @@ export const router = createBrowserRouter([
       {
         path: 'profile',
         element: <ProfilePage />,
+      },
+      {
+        path: 'settings',
+        element: <GeneralSettingsPage />,
       },
     ],
   },

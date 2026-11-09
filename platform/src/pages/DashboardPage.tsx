@@ -7,7 +7,8 @@ import { usersService } from '@/services/users.service'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import clsx from 'clsx'
 
-function formatTime(dateStr: string) {
+function formatTime(dateStr?: string) {
+  if (!dateStr) return '—'
   try {
     return new Date(dateStr).toLocaleTimeString('pt-BR', {
       hour: '2-digit',
@@ -18,7 +19,8 @@ function formatTime(dateStr: string) {
   }
 }
 
-function formatDate(dateStr: string) {
+function formatDate(dateStr?: string) {
+  if (!dateStr) return '—'
   try {
     return new Date(dateStr).toLocaleDateString('pt-BR', {
       day: '2-digit',
@@ -62,10 +64,14 @@ export default function DashboardPage() {
 
   const today = new Date().toISOString().split('T')[0]
   const todayAppointments = (appointmentsQ.data ?? []).filter(
-    (a) => a.date?.startsWith(today),
+    (a) => (a.initialDate ?? a.date)?.startsWith(today),
   )
   const upcomingAppointments = (appointmentsQ.data ?? [])
-    .filter((a) => a.status === 'scheduled' || a.status === 'confirmed')
+    .filter(
+      (a) =>
+        (a.status ?? 'scheduled') === 'scheduled' ||
+        a.status === 'confirmed',
+    )
     .slice(0, 5)
 
   const hour = new Date().getHours()
@@ -161,17 +167,19 @@ export default function DashboardPage() {
                       {a.patient?.profile?.fullname ?? a.patient?.email ?? `Paciente #${a.patient?.id}`}
                     </p>
                     <p className="text-xs text-slate-500">
-                      {formatDate(a.date)} às {a.time ?? formatTime(a.date)}
+                      {formatDate(a.initialDate ?? a.date)} às{' '}
+                      {a.time ?? formatTime(a.initialDate ?? a.date)}
                     </p>
                   </div>
                 </div>
                 <span
                   className={clsx(
                     'rounded-full px-2.5 py-0.5 text-xs font-medium',
-                    STATUS_COLORS[a.status] ?? 'bg-slate-100 text-slate-600',
+                    STATUS_COLORS[a.status ?? 'scheduled'] ??
+                      'bg-slate-100 text-slate-600',
                   )}
                 >
-                  {STATUS_LABELS[a.status] ?? a.status}
+                  {STATUS_LABELS[a.status ?? 'scheduled'] ?? a.status ?? 'Agendado'}
                 </span>
               </div>
             ))}

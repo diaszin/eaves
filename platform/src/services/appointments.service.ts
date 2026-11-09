@@ -9,9 +9,11 @@ export type AppointmentStatus =
 
 export interface Appointment {
   id: number
-  date: string
-  time: string
-  status: AppointmentStatus
+  date?: string
+  time?: string
+  initialDate?: string
+  endDate?: string
+  status?: AppointmentStatus
   notes?: string
   patient?: {
     id: number
@@ -23,15 +25,13 @@ export interface Appointment {
     email: string
     profile?: { fullname: string }
   }
-  createdAt: string
-  updatedAt: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface CreateAppointmentDto {
-  date: string
-  time: string
+  initialDate: string
   patientId: number
-  therapistId?: number
   notes?: string
 }
 

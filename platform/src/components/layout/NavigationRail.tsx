@@ -8,6 +8,7 @@ import {
   BookOpen,
   LogOut,
   User,
+  Settings,
 } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuth, type PlatformRole } from '@/lib/auth'
@@ -63,6 +64,13 @@ const NAV_ITEMS: NavItem[] = [
     icon: BookOpen,
     path: '/journals',
     roles: ['coordinator', 'professor'],
+  },
+  {
+    key: 'settings',
+    label: 'Configurações',
+    icon: Settings,
+    path: '/settings',
+    roles: ['coordinator'],
   },
 ]
 

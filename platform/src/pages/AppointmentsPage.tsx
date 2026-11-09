@@ -30,7 +30,8 @@ const STATUS_COLORS: Record<AppointmentStatus, string> = {
   no_show: 'bg-orange-100 text-orange-700 border-orange-200',
 }
 
-function formatDate(dateStr: string) {
+function formatDate(dateStr?: string) {
+  if (!dateStr) return '—'
   try {
     return new Date(dateStr).toLocaleDateString('pt-BR', {
       day: '2-digit',
@@ -40,6 +41,46 @@ function formatDate(dateStr: string) {
   } catch {
     return dateStr
   }
+}
+
+function formatAppointmentTime(appointment: {
+  initialDate?: string
+  endDate?: string
+  time?: string
+}) {
+  if (!appointment.initialDate) return appointment.time ?? '—'
+
+  const start = new Date(appointment.initialDate)
+  if (Number.isNaN(start.getTime())) return '—'
+
+  const startTime = start.toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+  if (!appointment.endDate) return startTime
+
+  const end = new Date(appointment.endDate)
+  if (Number.isNaN(end.getTime())) return startTime
+
+  return `${startTime} - ${end.toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })}`
+}
+
+function getAppointmentDuration(appointment: {
+  initialDate?: string
+  endDate?: string
+}) {
+  if (!appointment.initialDate || !appointment.endDate) return null
+
+  const minutes =
+    (new Date(appointment.endDate).getTime() -
+      new Date(appointment.initialDate).getTime()) /
+    60_000
+  return Number.isFinite(minutes) && minutes >= 0
+    ? `${minutes} minutos`
+    : null
 }
 
 export default function AppointmentsPage() {
@@ -157,8 +198,11 @@ function AppointmentDetail({
   onCancel: () => void
   isCancelling: boolean
 }) {
+  const status = appointment.status ?? 'scheduled'
+  const date = appointment.initialDate ?? appointment.date
+  const duration = getAppointmentDuration(appointment)
   const isCancellable =
-    appointment.status === 'scheduled' || appointment.status === 'confirmed'
+    status === 'scheduled' || status === 'confirmed'
 
   return (
     <div className="max-w-2xl rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
@@ -174,10 +218,10 @@ function AppointmentDetail({
         <span
           className={clsx(
             'rounded-full border px-3 py-1 text-sm font-medium',
-            STATUS_COLORS[appointment.status],
+            STATUS_COLORS[status],
           )}
         >
-          {STATUS_LABELS[appointment.status]}
+          {STATUS_LABELS[status]}
         </span>
       </div>
 
@@ -185,13 +229,20 @@ function AppointmentDetail({
         <InfoField
           icon={<CalendarDays className="h-4 w-4" />}
           label="Data"
-          value={formatDate(appointment.date)}
+          value={formatDate(date)}
         />
         <InfoField
           icon={<Clock className="h-4 w-4" />}
           label="Horário"
-          value={appointment.time ?? '—'}
+          value={formatAppointmentTime(appointment)}
         />
+        {duration && (
+          <InfoField
+            icon={<Clock className="h-4 w-4" />}
+            label="Duração"
+            value={duration}
+          />
+        )}
         <InfoField
           icon={<User className="h-4 w-4" />}
           label="Terapeuta"
@@ -276,10 +327,9 @@ function NewAppointmentForm({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!date || !patientId) return
+    if (!date || !time || !patientId) return
     onSubmit({
-      date,
-      time,
+      initialDate: new Date(`${date}T${time}`).toISOString(),
       patientId: Number(patientId),
       notes: notes || undefined,
     })
@@ -299,6 +349,7 @@ function NewAppointmentForm({
         type="time"
         value={time}
         onChange={(e) => setTime(e.target.value)}
+        required
       />
       <Input
         label="ID do Paciente"

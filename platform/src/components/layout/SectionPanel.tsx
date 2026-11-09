@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/Badge";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 function formatDate(dateStr: string) {
+  if (!dateStr) return "—";
   try {
     return new Date(dateStr).toLocaleDateString("pt-BR");
   } catch {
@@ -30,6 +31,7 @@ function useCurrentSection() {
   if (path.startsWith("/journals")) return "journals";
   if (path.startsWith("/dashboard")) return "dashboard";
   if (path.startsWith("/profile")) return "profile";
+  if (path.startsWith("/settings")) return "settings";
   return null;
 }
 
@@ -41,6 +43,7 @@ const SECTION_TITLES: Record<string, string> = {
   surveys: "Questionários PHQ-9",
   journals: "Diários",
   profile: "Meu Perfil",
+  settings: "Configuração geral",
 };
 
 export function SectionPanel() {
@@ -87,7 +90,12 @@ export function SectionPanel() {
     enabled: section === "journals",
   });
 
-  if (!section || section === "dashboard" || section === "profile") {
+  if (
+    !section ||
+    section === "dashboard" ||
+    section === "profile" ||
+    section === "settings"
+  ) {
     return (
       <aside className="flex h-screen w-[280px] flex-shrink-0 flex-col border-r border-slate-200 bg-white">
         <div className="border-b border-slate-100 px-4 py-4">
@@ -97,7 +105,11 @@ export function SectionPanel() {
         </div>
         <div className="flex flex-1 items-center justify-center">
           <p className="text-sm text-slate-400">
-            {section === "profile" ? "Edite seu perfil ao lado." : ""}
+            {section === "profile"
+              ? "Edite seu perfil ao lado."
+              : section === "settings"
+                ? "Configure os padrões da plataforma."
+                : ""}
           </p>
         </div>
       </aside>
@@ -273,7 +285,8 @@ function AppointmentsList({
   const q = search.toLowerCase();
   const filtered = items.filter((a) => {
     const name = a.patient?.profile?.fullname ?? a.patient?.email ?? "";
-    return name.toLowerCase().includes(q) || a.status.toLowerCase().includes(q);
+    const status = a.status ?? "scheduled";
+    return name.toLowerCase().includes(q) || status.toLowerCase().includes(q);
   });
 
   const STATUS_LABELS: Record<string, string> = {
@@ -306,11 +319,11 @@ function AppointmentsList({
                     `#${a.id}`}
                 </span>
                 <span className="text-xs text-slate-400 flex-shrink-0">
-                  {formatDate(a.date)}
+                  {formatDate(a.initialDate ?? a.date ?? "")}
                 </span>
               </div>
               <div className="mt-0.5 text-xs text-slate-500">
-                {STATUS_LABELS[a.status] ?? a.status}
+                {STATUS_LABELS[a.status ?? "scheduled"] ?? a.status ?? "Agendado"}
               </div>
             </button>
           </li>
