@@ -11,6 +11,7 @@ import { AuthService } from '../auth/auth.service.js';
 import { User, Role } from '../auth/entities/user.entity.js';
 import { CreateScheduleDto } from './dto/create-schedule.dto.js';
 import { UpdateScheduleDto } from './dto/update-schedule.dto.js';
+import { GeneralSettingsService } from '../settings/general-settings.service.js';
 
 @Injectable()
 export class SchedulesService {
@@ -20,6 +21,7 @@ export class SchedulesService {
     @InjectRepository(ScheduleShift)
     private readonly shiftRepository: Repository<ScheduleShift>,
     private readonly authService: AuthService,
+    private readonly settingsService: GeneralSettingsService,
   ) {}
 
   async create(dto: CreateScheduleDto, createdBy: User) {
@@ -41,7 +43,8 @@ export class SchedulesService {
     if (dto.shifts && dto.shifts.length > 0) {
       schedule.shifts = dto.shifts.map((shiftDto) =>
         this.shiftRepository.create({
-          dayOfWeek: shiftDto.dayOfWeek !== undefined ? shiftDto.dayOfWeek : null,
+          dayOfWeek:
+            shiftDto.dayOfWeek !== undefined ? shiftDto.dayOfWeek : null,
           customDate: shiftDto.customDate ?? null,
           startTime: shiftDto.startTime,
           endTime: shiftDto.endTime,
@@ -133,7 +136,8 @@ export class SchedulesService {
 
       schedule.shifts = dto.shifts.map((shiftDto) =>
         this.shiftRepository.create({
-          dayOfWeek: shiftDto.dayOfWeek !== undefined ? shiftDto.dayOfWeek : null,
+          dayOfWeek:
+            shiftDto.dayOfWeek !== undefined ? shiftDto.dayOfWeek : null,
           customDate: shiftDto.customDate ?? null,
           startTime: shiftDto.startTime,
           endTime: shiftDto.endTime,
@@ -190,5 +194,92 @@ export class SchedulesService {
     }
 
     return activeSlots;
+  }
+
+  async getCalendarByTrainee(
+    traineeId: number,
+    startDate: Date,
+    endDate: Date,
+  ) {
+    if (
+      !(startDate instanceof Date) ||
+      isNaN(startDate.getTime()) ||
+      !(endDate instanceof Date) ||
+      isNaN(endDate.getTime())
+    ) {
+      throw new BadRequestException('Período ou intervalo inválido.');
+    }
+
+    const rangeStart = startDate.toISOString().slice(0, 10);
+    const rangeEnd = endDate.toISOString().slice(0, 10);
+    if (rangeStart > rangeEnd) {
+      throw new BadRequestException('Período inválido.');
+    }
+
+    const slotDuration =
+      (await this.settingsService.getSessionDurationInMinutes()) ?? 20;
+    if (!Number.isInteger(slotDuration) || slotDuration < 1) {
+      throw new BadRequestException('Intervalo de horário inválido.');
+    }
+
+    const schedules = await this.scheduleRepository
+      .createQueryBuilder('schedule')
+      .leftJoinAndSelect('schedule.shifts', 'shifts')
+      .where('schedule.userId = :traineeId', { traineeId })
+      .andWhere('schedule.isActive = :isActive', { isActive: true })
+      .getMany();
+
+
+    return schedules.map((schedule) => {
+      const firstDate =
+        schedule.startDate > rangeStart ? schedule.startDate : rangeStart;
+      const lastDate =
+        schedule.endDate && schedule.endDate < rangeEnd
+          ? schedule.endDate
+          : rangeEnd;
+      const date = new Date(`${firstDate}T00:00:00.000Z`);
+      const last = new Date(`${lastDate}T00:00:00.000Z`);
+      const shiftsForDates = [];
+
+      while (date <= last) {
+        const dateString = date.toISOString().slice(0, 10);
+        const dayOfWeek = date.getUTCDay();
+
+        for (const shift of schedule.shifts) {
+          if (
+            shift.customDate === dateString ||
+            (!shift.customDate && shift.dayOfWeek === dayOfWeek)
+          ) {
+            const shiftStart =
+              Number(shift.startTime.slice(0, 2)) * 60 +
+              Number(shift.startTime.slice(3, 5));
+            const shiftEnd =
+              Number(shift.endTime.slice(0, 2)) * 60 +
+              Number(shift.endTime.slice(3, 5));
+
+            for (
+              let slotStart = shiftStart;
+              slotStart + slotDuration <= shiftEnd;
+              slotStart += slotDuration
+            ) {
+              const slotEnd = slotStart + slotDuration;
+              const formatTime = (minutes: number) =>
+                `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+
+              shiftsForDates.push({
+                ...shift,
+                date: dateString,
+                startTime: formatTime(slotStart),
+                endTime: formatTime(slotEnd),
+              });
+            }
+          }
+        }
+
+        date.setUTCDate(date.getUTCDate() + 1);
+      }
+
+      return { ...schedule, shifts: shiftsForDates };
+    });
   }
 }

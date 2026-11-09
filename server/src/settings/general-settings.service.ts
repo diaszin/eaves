@@ -14,10 +14,17 @@ export class GeneralSettingsService {
   async get() {
     const settings = await this.settingsRepository.findOneBy({ id: 1 });
     if (!settings) {
-      throw new NotFoundException('As configurações gerais não foram inicializadas');
+      throw new NotFoundException(
+        'As configurações gerais não foram inicializadas',
+      );
     }
 
     return settings;
+  }
+
+  async getSessionDurationInMinutes() {
+    const settings = await this.get();
+    return settings.therapySessionDurationMinutes;
   }
 
   async update(dto: UpdateGeneralSettingsDto) {

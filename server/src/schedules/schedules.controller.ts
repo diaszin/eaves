@@ -82,4 +82,18 @@ export class SchedulesController {
   ) {
     return this.schedulesService.getSlotsByUserAndDate(userId, date);
   }
+
+  @Get('user/:userId/calendar')
+  @Can(SchedulesPolicy, 'view')
+  getCalendarByTrainee(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.schedulesService.getCalendarByTrainee(
+      userId,
+      new Date(startDate ?? ''),
+      new Date(endDate ?? ''),
+    );
+  }
 }

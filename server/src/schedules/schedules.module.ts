@@ -6,11 +6,13 @@ import { SchedulesService } from './schedules.service.js';
 import { SchedulesController } from './schedules.controller.js';
 import { SchedulesPolicy } from './schedules.policy.js';
 import { AuthModule } from '../auth/auth.module.js';
+import { GeneralSettingsModule } from '../settings/general-settings.module.js';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Schedule, ScheduleShift]),
     AuthModule,
+    GeneralSettingsModule,
   ],
   controllers: [SchedulesController],
   providers: [SchedulesService, SchedulesPolicy],

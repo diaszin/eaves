@@ -11,7 +11,7 @@ import { AppointmentsService } from './appointments.service.js';
 import { CreateAppointmentDto } from './dto/create-appointment.dto.js';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto.js';
 import { CurrentUser } from '@nestjs/authentication';
-import { User } from '../auth/entities/user.entity.js';
+import { Role, User } from '../auth/entities/user.entity.js';
 import { Can } from '@nestjs/authorization';
 import { AppointmentsPolicy } from './appointments.policy.js';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -29,6 +29,8 @@ export class AppointmentsController {
   ) {
     const data = {
       ...createAppointmentDto,
+      patientId:
+        user.role === Role.PATIENT ? user.id : createAppointmentDto.patientId,
       createdBy: user,
     };
 

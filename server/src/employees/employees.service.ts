@@ -8,8 +8,6 @@ import { Repository } from 'typeorm';
 export class EmployeesService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-    @InjectRepository(Profile)
-    private readonly profileRepository: Repository<Profile>,
   ) {}
 
   findEmployeesByRole(role: string): Promise<User[]> {

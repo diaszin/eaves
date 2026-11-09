@@ -14,6 +14,10 @@ export class AppointmentsPolicy {
   }
 
   create(user: User | null) {
-    return user?.role === Role.LOBBY || user?.role === Role.COORDINATOR;
+    return (
+      user?.role === Role.LOBBY ||
+      user?.role === Role.COORDINATOR ||
+      user?.role == Role.PATIENT
+    );
   }
 }
