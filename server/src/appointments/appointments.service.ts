@@ -3,7 +3,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateAppointmentDto } from './dto/create-appointment.dto.js';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto.js';
 import { Repository } from 'typeorm';
 import { Role, User } from '../auth/entities/user.entity.js';
@@ -24,6 +23,7 @@ export class AppointmentsService {
   async create(dto: {
     initialDate: string;
     patientId: number;
+    professionalId: number;
     notes?: string;
     createdBy: User;
   }) {
@@ -32,6 +32,14 @@ export class AppointmentsService {
     if (!patient) {
       throw new NotFoundException(
         'O paciente não existe em nossa base de dados',
+      );
+    }
+
+    const professional = await this.userService.findUser(dto.professionalId);
+
+    if (!professional) {
+      throw new NotFoundException(
+        'O profissional não existe em nossa base de dados',
       );
     }
 
@@ -50,9 +58,9 @@ export class AppointmentsService {
       initialDate,
       endDate,
       notes: dto.notes ?? null,
-
       createdBy: dto.createdBy,
       patient: patient,
+      professional: professional,
     });
 
     return this.appointmentRepository.save(appointment);
@@ -67,6 +75,7 @@ export class AppointmentsService {
         relations: {
           patient: { profile: true },
           createdBy: { profile: true },
+          professional: { profile: true },
         },
       });
     }
@@ -75,6 +84,7 @@ export class AppointmentsService {
       relations: {
         patient: { profile: true },
         createdBy: { profile: true },
+        professional: { profile: true },
       },
       order: {
         initialDate: 'DESC',
@@ -92,6 +102,7 @@ export class AppointmentsService {
       relations: {
         patient: { profile: true },
         createdBy: { profile: true },
+        professional: { profile: true },
       },
     });
   }

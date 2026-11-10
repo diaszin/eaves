@@ -27,11 +27,17 @@ export class AppointmentsController {
     @CurrentUser() user: User,
     @Body() createAppointmentDto: CreateAppointmentDto,
   ) {
+
+    if(user.role !== Role.PATIENT && !createAppointmentDto.patientId){
+      throw new Error('O ID do paciente é obrigatório para criar um agendamento quando o usuário não é um paciente.');
+    }
+
     const data = {
       ...createAppointmentDto,
       patientId:
         user.role === Role.PATIENT ? user.id : createAppointmentDto.patientId,
       createdBy: user,
+      professionalId: createAppointmentDto.professionalId,
     };
 
     return this.appointmentsService.create(data);

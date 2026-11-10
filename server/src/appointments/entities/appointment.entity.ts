@@ -33,4 +33,9 @@ export class Appointment {
     nullable: false,
   })
   patient: User;
+
+  @ManyToOne(() => User, {
+    nullable: false,
+  })
+  professional: User;
 }
