@@ -1,5 +1,11 @@
 import { Tabs, useRouter } from "expo-router";
-import { MdAutoStories, MdHome, MdPerson } from "react-icons/md";
+import {
+  MdAutoStories,
+  MdCalendarMonth,
+  MdHealing,
+  MdHome,
+  MdPerson,
+} from "react-icons/md";
 import { TouchableOpacity, View } from "react-native";
 export default function TabLyout() {
   const router = useRouter();
@@ -31,12 +37,22 @@ export default function TabLyout() {
         }}
       />
       <Tabs.Screen
-      name="journal"
+        name="journal"
         options={{
           title: "Meu diário",
           headerShown: true,
           tabBarIcon({ size, color }) {
             return <MdAutoStories color={color.toString()} size={size} />;
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="appointments"
+        options={{
+          title: "Procurar consultas",
+          headerShown: true,
+          tabBarIcon({ size, color }) {
+            return <MdHealing color={color.toString()} size={size} />;
           },
         }}
       />
