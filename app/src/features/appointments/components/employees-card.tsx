@@ -15,7 +15,10 @@ export default function EmployeesCard(props: EmployeesCardProps) {
   const avatarColor = UserColorGenerator.generate(props.id);
 
   return (
-    <TouchableOpacity onPress={props.onPress}>
+    <TouchableOpacity
+      activeOpacity={props.onPress ? 0.5 : 1}
+      onPress={props.onPress}
+    >
       <View
         style={{
           overflow: "hidden",
