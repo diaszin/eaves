@@ -9,6 +9,7 @@ import {
   type CreateAppointmentDto,
   type AppointmentStatus,
 } from '@/features/appointments/services/appointments.service'
+import { usersService } from '@/features/users/services/users.service'
 import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner'
@@ -322,15 +323,21 @@ function NewAppointmentForm({
 }) {
   const [date, setDate] = useState('')
   const [time, setTime] = useState('')
-  const [patientId, setPatientId] = useState('')
+  const [patientEmail, setPatientEmail] = useState('')
+  const [professionalId, setProfessionalId] = useState('')
   const [notes, setNotes] = useState('')
+  const professionalsQ = useQuery({
+    queryKey: ['employees', 'trainee'],
+    queryFn: () => usersService.list({ role: 'trainee' }),
+  })
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!date || !time || !patientId) return
+    if (!date || !time || !patientEmail || !professionalId) return
     onSubmit({
       initialDate: new Date(`${date}T${time}`).toISOString(),
-      patientId: Number(patientId),
+      patientEmail,
+      professionalId: Number(professionalId),
       notes: notes || undefined,
     })
   }
@@ -352,13 +359,46 @@ function NewAppointmentForm({
         required
       />
       <Input
-        label="ID do Paciente"
-        type="number"
-        placeholder="Ex: 10"
-        value={patientId}
-        onChange={(e) => setPatientId(e.target.value)}
+        label="E-mail do Paciente"
+        type="email"
+        placeholder="paciente@exemplo.com"
+        value={patientEmail}
+        onChange={(e) => setPatientEmail(e.target.value)}
         required
       />
+      <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+        Profissional (Estagiário)
+        <select
+          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition-colors hover:border-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+          value={professionalId}
+          onChange={(e) => setProfessionalId(e.target.value)}
+          required
+          disabled={professionalsQ.isLoading || !professionalsQ.data?.length}
+        >
+          <option value="">
+            {professionalsQ.isLoading
+              ? 'Carregando estagiários...'
+              : 'Selecione um estagiário'}
+          </option>
+          {professionalsQ.data?.map((professional) => (
+            <option key={professional.id} value={professional.id}>
+              {professional.profile?.fullname ?? `Estagiário #${professional.id}`}
+            </option>
+          ))}
+        </select>
+        {professionalsQ.error && (
+          <span className="text-xs font-normal text-red-600">
+            Erro ao carregar a lista de estagiários.
+          </span>
+        )}
+        {!professionalsQ.isLoading &&
+          !professionalsQ.error &&
+          professionalsQ.data?.length === 0 && (
+            <span className="text-xs font-normal text-slate-500">
+              Nenhum estagiário disponível.
+            </span>
+          )}
+      </label>
       <Input
         label="Observações"
         placeholder="Observações opcionais"

@@ -22,16 +22,16 @@ export class AppointmentsService {
 
   async create(dto: {
     initialDate: string;
-    patientId: number;
+    patientEmail: string;
     professionalId: number;
     notes?: string;
     createdBy: User;
   }) {
-    const patient = await this.userService.findUser(dto.patientId);
+    const patient = await this.userService.findByEmail(dto.patientEmail);
 
     if (!patient) {
       throw new NotFoundException(
-        'O paciente não existe em nossa base de dados',
+        'Não existe um paciente com esse e-mail em nossa base de dados',
       );
     }
 

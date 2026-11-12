@@ -31,7 +31,8 @@ export interface Appointment {
 
 export interface CreateAppointmentDto {
   initialDate: string
-  patientId: number
+  patientEmail: string
+  professionalId: number
   notes?: string
 }
 

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Post,
@@ -28,14 +29,16 @@ export class AppointmentsController {
     @Body() createAppointmentDto: CreateAppointmentDto,
   ) {
 
-    if(user.role !== Role.PATIENT && !createAppointmentDto.patientId){
-      throw new Error('O ID do paciente é obrigatório para criar um agendamento quando o usuário não é um paciente.');
+    if (user.role !== Role.PATIENT && !createAppointmentDto.patientEmail) {
+      throw new BadRequestException(
+        'O e-mail do paciente é obrigatório para criar um agendamento.',
+      );
     }
 
     const data = {
       ...createAppointmentDto,
-      patientId:
-        user.role === Role.PATIENT ? user.id : createAppointmentDto.patientId,
+      patientEmail:
+        user.role === Role.PATIENT ? user.email : createAppointmentDto.patientEmail,
       createdBy: user,
       professionalId: createAppointmentDto.professionalId,
     };
