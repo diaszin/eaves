@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto.js';
-import { Repository } from 'typeorm';
+import { LessThan, MoreThan, Repository } from 'typeorm';
 import { Role, User } from '../auth/entities/user.entity.js';
 import { Appointment } from './entities/appointment.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -53,6 +53,20 @@ export class AppointmentsService {
     const endDate = new Date(
       initialDate.getTime() + therapySessionDurationMinutes * 60_000,
     );
+
+    const conflictingAppointment = await this.appointmentRepository.findOne({
+      where: {
+        professional: { id: professional.id },
+        initialDate: LessThan(endDate),
+        endDate: MoreThan(initialDate),
+      },
+    });
+
+    if (conflictingAppointment) {
+      throw new BadRequestException(
+        'O profissional já possui um agendamento nesse horário',
+      );
+    }
 
     const appointment = this.appointmentRepository.create({
       initialDate,

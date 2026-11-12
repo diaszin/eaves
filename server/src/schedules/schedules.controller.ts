@@ -75,7 +75,7 @@ export class SchedulesController {
   }
 
   @Get('user/:userId/slots')
-  @Can(SchedulesPolicy, 'view')
+  @Can(SchedulesPolicy, 'viewSchedule')
   getSlots(
     @Param('userId', ParseIntPipe) userId: number,
     @Query('date') date: string,

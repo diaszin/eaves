@@ -12,6 +12,16 @@ export class SchedulesPolicy {
     );
   }
 
+  viewSchedule(user: User | null) {
+    return (
+      user?.role === Role.COORDINATOR ||
+      user?.role === Role.PROFESSOR ||
+      user?.role === Role.LOBBY ||
+      user?.role === Role.TRAINEE || 
+      user?.role === Role.PATIENT
+    );
+  }
+
   create(user: User | null) {
     return user?.role === Role.COORDINATOR || user?.role === Role.PROFESSOR;
   }

@@ -13,6 +13,34 @@ import { CreateScheduleDto } from './dto/create-schedule.dto.js';
 import { UpdateScheduleDto } from './dto/update-schedule.dto.js';
 import { GeneralSettingsService } from '../settings/general-settings.service.js';
 
+function getTimeSlots(
+  startTime: string,
+  endTime: string,
+  slotDuration: number,
+) {
+  const shiftStart =
+    Number(startTime.slice(0, 2)) * 60 + Number(startTime.slice(3, 5));
+  const shiftEnd =
+    Number(endTime.slice(0, 2)) * 60 + Number(endTime.slice(3, 5));
+  const slots: { startTime: string; endTime: string }[] = [];
+
+  const formatTime = (minutes: number) =>
+    `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+
+  for (
+    let slotStart = shiftStart;
+    slotStart + slotDuration <= shiftEnd;
+    slotStart += slotDuration
+  ) {
+    slots.push({
+      startTime: formatTime(slotStart),
+      endTime: formatTime(slotStart + slotDuration),
+    });
+  }
+
+  return slots;
+}
+
 @Injectable()
 export class SchedulesService {
   constructor(
@@ -165,6 +193,12 @@ export class SchedulesService {
       throw new BadRequestException('Data inválida.');
     }
 
+    const slotDuration =
+      await this.settingsService.getSessionDurationInMinutes();
+    if (!Number.isInteger(slotDuration) || slotDuration < 1) {
+      throw new BadRequestException('Intervalo de horário inválido.');
+    }
+
     const dayOfWeek = targetDate.getUTCDay(); // 0 = Domingo, 1 = Segunda, etc.
     const isoDateOnly = dateStr.slice(0, 10);
 
@@ -183,12 +217,17 @@ export class SchedulesService {
       if (schedule.endDate && schedule.endDate < isoDateOnly) continue;
 
       for (const shift of schedule.shifts) {
-        // Corresponde a uma data customizada específica
-        if (shift.customDate === isoDateOnly) {
-          activeSlots.push(shift);
-        } else if (!shift.customDate && shift.dayOfWeek === dayOfWeek) {
-          // Ou corresponde ao dia da semana recorrente
-          activeSlots.push(shift);
+        const matchesDate = shift.customDate
+          ? shift.customDate === isoDateOnly
+          : shift.dayOfWeek === dayOfWeek;
+        if (!matchesDate) continue;
+
+        for (const slot of getTimeSlots(
+          shift.startTime,
+          shift.endTime,
+          slotDuration,
+        )) {
+          activeSlots.push(Object.assign({}, shift, slot));
         }
       }
     }
@@ -229,7 +268,6 @@ export class SchedulesService {
       .andWhere('schedule.isActive = :isActive', { isActive: true })
       .getMany();
 
-
     return schedules.map((schedule) => {
       const firstDate =
         schedule.startDate > rangeStart ? schedule.startDate : rangeStart;
@@ -250,27 +288,15 @@ export class SchedulesService {
             shift.customDate === dateString ||
             (!shift.customDate && shift.dayOfWeek === dayOfWeek)
           ) {
-            const shiftStart =
-              Number(shift.startTime.slice(0, 2)) * 60 +
-              Number(shift.startTime.slice(3, 5));
-            const shiftEnd =
-              Number(shift.endTime.slice(0, 2)) * 60 +
-              Number(shift.endTime.slice(3, 5));
-
-            for (
-              let slotStart = shiftStart;
-              slotStart + slotDuration <= shiftEnd;
-              slotStart += slotDuration
-            ) {
-              const slotEnd = slotStart + slotDuration;
-              const formatTime = (minutes: number) =>
-                `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
-
+            for (const slot of getTimeSlots(
+              shift.startTime,
+              shift.endTime,
+              slotDuration,
+            )) {
               shiftsForDates.push({
                 ...shift,
                 date: dateString,
-                startTime: formatTime(slotStart),
-                endTime: formatTime(slotEnd),
+                ...slot,
               });
             }
           }
