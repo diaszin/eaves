@@ -18,6 +18,7 @@ import { useForm } from "@tanstack/react-form";
 import authService from "@/features/auth/services/auth.service";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
 import SuccessBottomSheet from "@/components/SuccesssBottomSheet";
+import type { CreateAppointmentRequest } from "../services/appointment.type";
 export default function AppointmentsCreate() {
   const [visibleDateCount, setVisibleDateCount] = useState(5);
   const { id, fullname } = useLocalSearchParams<{
@@ -38,7 +39,8 @@ export default function AppointmentsCreate() {
 
   const createAppointmentMutation = useMutation({
     mutationKey: ["appointments", "create"],
-    mutationFn: appointmentService.create,
+    mutationFn: (data: CreateAppointmentRequest) =>
+      appointmentService.create(data),
   });
 
   const form = useForm({
@@ -207,7 +209,9 @@ export default function AppointmentsCreate() {
 
             return (
               <View className="flex flex-col items-start gap-y-1 mb-3">
-                <Text className="font-secondary-regular text-gray-700">Sessão selecionada</Text>
+                <Text className="font-secondary-regular text-gray-700">
+                  Sessão selecionada
+                </Text>
                 <Text className="font-secondary-bold text-gray-900">
                   {formattedDate} • {selectedHour}
                 </Text>
@@ -257,7 +261,13 @@ export default function AppointmentsCreate() {
         <SuccessBottomSheet
           isOpen
           messsage="Agendamento confirmado"
-          onDismiss={() => router.back()}
+          onDismiss={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace("/(app)/(authenticated)/(home)/appointments");
+            }
+          }}
         />
       )}
     </SafeAreaView>
