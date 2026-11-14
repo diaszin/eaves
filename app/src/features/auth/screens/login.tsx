@@ -203,7 +203,7 @@ export default function LoginScreen() {
         </authForm.Field>
 
         <View className="flex flex-row items-end justify-end">
-          <Link className="text-primary-max" href="/">
+          <Link className="text-primary-max" href="/(auth)/forgot-password">
             Esqueci minha senha
           </Link>
         </View>

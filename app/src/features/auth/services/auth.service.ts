@@ -2,8 +2,11 @@ import { AxiosInstance } from "axios";
 import { authClient } from "./auth.client";
 import {
   ChangePasswordRequest,
+  ForgotPasswordRequest,
   MicrosoftSignInRequest,
   ProfileResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
   SignInRequest,
   SignInResponse,
   SignUpRequest,
@@ -44,6 +47,20 @@ class AuthService {
 
   async changePassword(data: ChangePasswordRequest) {
     return await this.client.put("/profile/change-password", data);
+  }
+
+  async forgotPassword(data: ForgotPasswordRequest): Promise<void> {
+    await this.client.post("/password/forgot", data);
+  }
+
+  async resetPassword(
+    data: ResetPasswordRequest,
+  ): Promise<ResetPasswordResponse> {
+    const response = await this.client.post<ResetPasswordResponse>(
+      "/password/reset",
+      data,
+    );
+    return response.data;
   }
 }
 
