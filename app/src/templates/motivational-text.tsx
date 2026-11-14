@@ -1,16 +1,16 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Animated, Platform } from "react-native";
 
-export default function MotivationalText() {
-  const motivationalTexts = [
-    "Você é capaz de superar os desafios de hoje.",
-    "Cada pequeno passo também é progresso.",
-    "Cuide de você: seu bem-estar importa.",
-    "Acredite no caminho que está construindo.",
-  ];
+const motivationalTexts = [
+  "Você é capaz de superar os desafios de hoje.",
+  "Cada pequeno passo também é progresso.",
+  "Cuide de você: seu bem-estar importa.",
+  "Acredite no caminho que está construindo.",
+];
 
+export default function MotivationalText() {
   const [index, setIndex] = useState(0);
-  const opacity = useRef(new Animated.Value(1)).current;
+  const [opacity] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     const interval = setInterval(() => {
