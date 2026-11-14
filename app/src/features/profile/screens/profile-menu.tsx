@@ -101,7 +101,6 @@ export default function ProfileMenuScreen() {
           <TouchableOpacity
             onPress={() => {
               session.signOut();
-              router.dismissAll();
             }}
             className="bg-red-500 w-full h-10 flex flex-row items-center justify-center gap-1"
           >

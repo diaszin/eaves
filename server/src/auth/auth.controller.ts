@@ -100,7 +100,6 @@ export class AuthController {
     const result = await this.passwordResetService.reset(
       body.token,
       body.password,
-      { signIn: true },
     );
     if (!result) {
       throw new BadRequestException('O link pode estar inválido ou expirado');
