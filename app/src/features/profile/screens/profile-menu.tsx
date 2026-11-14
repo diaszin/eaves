@@ -9,15 +9,22 @@ import {
   MdPermIdentity,
   MdPolicy,
 } from "react-icons/md";
-import { View, Text, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  View,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import ProfileMenuItem from "../components/profile-menu-item";
 import { useQuery } from "@tanstack/react-query";
 import authService from "@/features/auth/services/auth.service";
 import { useAuth } from "@/hooks/useAuth";
 import { useSession } from "@/hooks/useSession";
+import { useState } from "react";
 export default function ProfileMenuScreen() {
   const session = useSession();
   const router = useRouter();
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const userProfileQuery = useQuery({
     queryKey: ["user", "profile"],
@@ -99,13 +106,25 @@ export default function ProfileMenuScreen() {
             </View>
           </View>
           <TouchableOpacity
-            onPress={() => {
-              session.signOut();
+            disabled={isSigningOut}
+            onPress={async () => {
+              setIsSigningOut(true);
+              try {
+                await session.signOut();
+              } finally {
+                setIsSigningOut(false);
+              }
             }}
             className="bg-red-500 w-full h-10 flex flex-row items-center justify-center gap-1"
           >
-            <MdExitToApp className="text-white" />
-            <Text className="text-white font-primary-bold">Sair do App</Text>
+            {isSigningOut ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <>
+                <MdExitToApp className="text-white" />
+                <Text className="text-white font-primary-bold">Sair do App</Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
       </View>

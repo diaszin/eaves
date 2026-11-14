@@ -1,9 +1,13 @@
-import { TouchableOpacity, View, Text } from "react-native";
+import {
+  ActivityIndicator,
+  TouchableOpacity,
+  View,
+  Text,
+} from "react-native";
 import { useContext } from "react";
 import MaskInputWithLabel from "../../components/masked_input_with_label";
 import { MultiStepContext } from "../../contexts/multiStepContext";
 import InputWithLabel from "../../components/input_with_label";
-import { CgSpinner } from "react-icons/cg";
 
 export default function AuthStepScreen() {
   const multiStepContext = useContext(MultiStepContext);
@@ -119,28 +123,32 @@ export default function AuthStepScreen() {
                   </View>
                 )}
               </multiStepContext.form.Field>
-              <View className="w-full flex items-center justify-center">
-                <TouchableOpacity
-                  className={`min-h-12 w-full m-2 flex flex-row items-center justify-center bg-white border border-secondary-max  gap-0.5 rounded-xl`}
-                  onPress={multiStepContext.previous}
-                >
-                  <Text className="text-secondary-max">Voltar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  disabled={
-                    !group.state.meta.canSubmit ||
-                    multiStepContext.form.state.isSubmitting
-                  }
-                  className={`min-h-12 w-full m-2 flex flex-row items-center justify-center ${group.state.meta.canSubmit && !multiStepContext.form.state.isSubmitting ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
-                  onPress={group.handleSubmit}
-                >
-                  {!multiStepContext.form.state.isSubmitting ? (
-                    <Text className="text-white">Criar minha conta</Text>
-                  ) : (
-                    <CgSpinner className="text-white size-4 animate-spin" />
-                  )}
-                </TouchableOpacity>
-              </View>
+              <multiStepContext.form.Subscribe
+                selector={(state) => state.isSubmitting}
+              >
+                {(isSubmitting) => (
+                  <View className="w-full flex items-center justify-center">
+                    <TouchableOpacity
+                      disabled={isSubmitting}
+                      className="min-h-12 w-full m-2 flex flex-row items-center justify-center bg-white border border-secondary-max gap-0.5 rounded-xl"
+                      onPress={multiStepContext.previous}
+                    >
+                      <Text className="text-secondary-max">Voltar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      disabled={!group.state.meta.canSubmit || isSubmitting}
+                      className={`min-h-12 w-full m-2 flex flex-row items-center justify-center ${group.state.meta.canSubmit && !isSubmitting ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
+                      onPress={group.handleSubmit}
+                    >
+                      {isSubmitting ? (
+                        <ActivityIndicator size="small" color="#FFFFFF" />
+                      ) : (
+                        <Text className="text-white">Criar minha conta</Text>
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </multiStepContext.form.Subscribe>
             </View>
           </View>
         );

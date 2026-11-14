@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   ScrollView,
   Text,
@@ -15,7 +16,6 @@ import {
   View,
 } from "react-native";
 import { MdArrowForward, MdLockOutline } from "react-icons/md";
-import { CgSpinner } from "react-icons/cg";
 
 function validatePassword(value: string) {
   if (value.length === 0) {
@@ -170,7 +170,7 @@ export default function ResetPasswordScreen() {
                   }`}
                 >
                   {isSubmitting || mutation.isPending ? (
-                    <CgSpinner className="size-4 animate-spin text-white" />
+                    <ActivityIndicator size="small" color="#FFFFFF" />
                   ) : (
                     <>
                       <Text className="text-white">Redefinir senha</Text>

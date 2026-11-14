@@ -75,8 +75,8 @@ export default function SignUpScreen() {
         email: email,
       },
     } as MultiStepData,
-    onSubmit: ({ value }) => {
-      mutation.mutate({
+    onSubmit: async ({ value }) => {
+      await mutation.mutateAsync({
         birthDate: value.personal.birthDate,
         email: value.auth.email,
         password: value.auth.password,

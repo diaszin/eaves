@@ -267,6 +267,10 @@ export class AuthService {
     const newPasswordHashed =
       await this.passwordHasherService.hash(newPassword);
 
+    return this.updatePasswordHash(id, newPasswordHashed);
+  }
+
+  async updatePasswordHash(id: string, passwordHash: string) {
     const user = await this.users.findOneBy({
       id: +id,
     });
@@ -275,9 +279,9 @@ export class AuthService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    user.password = newPasswordHashed;
+    user.password = passwordHash;
 
-    this.users.save(user);
+    await this.users.save(user);
 
     return user;
   }

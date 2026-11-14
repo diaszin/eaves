@@ -1,4 +1,10 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import InputWithLabel from "../components/input_with_label";
 import {
   MdArrowForward,
@@ -7,7 +13,6 @@ import {
   MdOutlineVisibility,
 } from "react-icons/md";
 import { FaMicrosoft } from "react-icons/fa";
-import { CgSpinner } from "react-icons/cg";
 import { Link, useRouter } from "expo-router";
 import authService from "../services/auth.service";
 import { useForm } from "@tanstack/react-form";
@@ -213,20 +218,19 @@ export default function LoginScreen() {
         >
           {([canSubmit, isSubmitting]) => (
             <TouchableOpacity
-              disabled={!canSubmit || isSubmitting}
+              disabled={!canSubmit || isSubmitting || mutate.isPending}
               onPress={() => {
                 authForm.handleSubmit();
               }}
-              className={`min-h-12 flex flex-row items-center justify-center ${canSubmit && !isSubmitting ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
+              className={`min-h-12 flex flex-row items-center justify-center ${canSubmit && !isSubmitting && !mutate.isPending ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
             >
-              {!isSubmitting || !mutate.isPending ? (
+              {isSubmitting || mutate.isPending ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
                 <>
                   <Text className="text-white">Entrar</Text>
-
                   <MdArrowForward className="text-white size-4" />
                 </>
-              ) : (
-                <CgSpinner className="text-white size-4 animate-spin" />
               )}
             </TouchableOpacity>
           )}
@@ -248,7 +252,7 @@ export default function LoginScreen() {
           className="min-h-12 flex flex-row items-center justify-center gap-3 rounded-xl border border-gray-300 bg-white"
         >
           {microsoft.isSubmitting || microsoftMutation.isPending ? (
-            <CgSpinner className="text-customgray size-4 animate-spin" />
+            <ActivityIndicator size="small" color="#6B7280" />
           ) : (
             <FaMicrosoft color="#F25022" size={18} />
           )}

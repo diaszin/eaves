@@ -5,6 +5,7 @@ import {
   FlatList,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import personalJournalService from "../services/personal-journal.service";
@@ -49,7 +50,7 @@ export default function PersonalJournalCreate() {
   const createForm = useForm({
     defaultValues: {} as CreatePersonalJournalRequest,
     onSubmit: async ({ value }) => {
-      createMutation.mutate(value);
+      await createMutation.mutateAsync(value);
     },
   });
 
@@ -89,22 +90,26 @@ export default function PersonalJournalCreate() {
         >
           {(field) => (
             <View onBlur={field.handleBlur}>
-              <FlatList
-                contentContainerStyle={{ gap: 8, height: 30 }}
-                data={getEmotionsQuery.data}
-                renderItem={({ item }) => (
-                  <EmotionButton
-                    active={item.id === field.state.value}
-                    value={item.id}
-                    onPress={(value) => field.handleChange(value)}
-                    content={item.emotion.toUpperCase()}
+              <createForm.Subscribe selector={(state) => state.isSubmitting}>
+                {(isSubmitting) => (
+                  <FlatList
+                    contentContainerStyle={{ gap: 8, height: 30 }}
+                    data={getEmotionsQuery.data}
+                    renderItem={({ item }) => (
+                      <EmotionButton
+                        active={item.id === field.state.value}
+                        value={item.id}
+                        onPress={(value) => field.handleChange(value)}
+                        content={item.emotion.toUpperCase()}
+                      />
+                    )}
+                    keyExtractor={(item) => item.id.toString()}
+                    horizontal
+                    scrollEnabled={true}
+                    showsHorizontalScrollIndicator={false}
                   />
                 )}
-                keyExtractor={(item) => item.id.toString()}
-                horizontal
-                scrollEnabled={true}
-                showsHorizontalScrollIndicator={false}
-              />
+              </createForm.Subscribe>
               {field.state.meta.errors.length > 0 && (
                 <Text className="font-secondary-regular text-error text-[0.5rem]">
                   {field.state.meta.errors[0]}
@@ -124,8 +129,8 @@ export default function PersonalJournalCreate() {
           </View>
           <View>
             <Text className="text-secondary-max font-secondary font-light ">
-              "O que pesou no seu peito hoje e o que você gostaria de
-              gentilmente deixar ir embora agora?"
+              &quot;O que pesou no seu peito hoje e o que você gostaria de
+              gentilmente deixar ir embora agora?&quot;
             </Text>
           </View>
         </View>
@@ -167,21 +172,34 @@ export default function PersonalJournalCreate() {
       <createForm.Subscribe
         selector={(state) => [state.canSubmit, state.isSubmitting]}
       >
-        {([canSubmit, isSubmitting]) => (
-          <TouchableOpacity
-            disabled={!canSubmit || isSubmitting}
-            className={
-              !canSubmit
-                ? "w-full bg-customgray rounded-md"
-                : "w-full bg-primary-min rounded-md"
-            }
-            onPress={() => createForm.handleSubmit()}
-          >
-            <Text className="text-center font-primary-bold text-white py-4">
-              Desabafar{" "}
-            </Text>
-          </TouchableOpacity>
-        )}
+        {([canSubmit, isSubmitting]) => {
+          const isBusy = isSubmitting || createMutation.isPending;
+          const isDisabled = !canSubmit || isBusy;
+
+          return (
+            <TouchableOpacity
+              disabled={isDisabled}
+              className={
+                isDisabled
+                  ? "w-full bg-customgray rounded-md"
+                  : "w-full bg-primary-min rounded-md"
+              }
+              onPress={() => createForm.handleSubmit()}
+            >
+              {isBusy ? (
+                <ActivityIndicator
+                  className="py-4"
+                  size="small"
+                  color="#FFFFFF"
+                />
+              ) : (
+                <Text className="text-center font-primary-bold text-white py-4">
+                  Desabafar
+                </Text>
+              )}
+            </TouchableOpacity>
+          );
+        }}
       </createForm.Subscribe>
       {createMutation.isError && (
         <ErrorBottomSheet

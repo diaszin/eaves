@@ -7,7 +7,14 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 function validatePassword(value: string, label: string) {
   if (!value || value.length === 0) {
@@ -163,23 +170,28 @@ export default function ProfileChangePasswordScreen() {
           <form.Subscribe
             selector={(state) => [state.canSubmit, state.isSubmitting]}
           >
-            {([canSubmit, isSubmitting]) => (
-              <TouchableOpacity
-                className={`w-full h-10 rounded-sm flex items-center justify-center ${
-                  canSubmit && !isSubmitting ? "bg-primary-max" : "bg-gray-300"
-                }`}
-                onPress={() => form.handleSubmit()}
-                disabled={
-                  !canSubmit || isSubmitting || changePasswordMutation.isPending
-                }
-              >
-                <Text className="text-white font-primary-bold">
-                  {changePasswordMutation.isPending
-                    ? "Salvando..."
-                    : "Alterar senha"}
-                </Text>
-              </TouchableOpacity>
-            )}
+            {([canSubmit, isSubmitting]) => {
+              const isBusy = isSubmitting || changePasswordMutation.isPending;
+              const isDisabled = !canSubmit || isBusy;
+
+              return (
+                <TouchableOpacity
+                  className={`w-full h-10 rounded-sm flex items-center justify-center ${
+                    !isDisabled ? "bg-primary-max" : "bg-gray-300"
+                  }`}
+                  onPress={() => form.handleSubmit()}
+                  disabled={isDisabled}
+                >
+                  {isBusy ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Text className="text-white font-primary-bold">
+                      Alterar senha
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              );
+            }}
           </form.Subscribe>
         </View>
       </View>

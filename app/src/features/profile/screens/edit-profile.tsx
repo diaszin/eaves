@@ -5,7 +5,14 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { Stack, useRouter } from "expo-router";
-import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  View,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import DropdownWithLabel from "@/features/auth/components/dropdown_with_label";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
 import SuccessBottomSheet from "@/components/SuccesssBottomSheet";
@@ -67,8 +74,8 @@ function ProfileEditForm({ profile }: { profile: ProfileResponse }) {
       emergencyPhone: profile.profile.emergencyPhone,
       cep: profile.profile.cep,
     },
-    onSubmit: ({ value }) => {
-      updateMutation.mutate({
+    onSubmit: async ({ value }) => {
+      await updateMutation.mutateAsync({
         email: value.email,
         fullname: value.fullname,
         birthDate: value.birthDate,
@@ -179,15 +186,25 @@ function ProfileEditForm({ profile }: { profile: ProfileResponse }) {
               />
             )}
           </form.Field>
-          <TouchableOpacity
-            className="w-full h-10 rounded-sm flex items-center justify-center bg-primary-max"
-            onPress={() => form.handleSubmit()}
-            disabled={updateMutation.isPending}
-          >
-            <Text className="text-white font-primary-bold">
-              {updateMutation.isPending ? "Salvando..." : "Salvar"}
-            </Text>
-          </TouchableOpacity>
+          <form.Subscribe selector={(state) => state.isSubmitting}>
+            {(isSubmitting) => {
+              const isBusy = isSubmitting || updateMutation.isPending;
+
+              return (
+                <TouchableOpacity
+                  className={`w-full h-10 rounded-sm flex items-center justify-center ${isBusy ? "bg-gray-300" : "bg-primary-max"}`}
+                  onPress={() => form.handleSubmit()}
+                  disabled={isBusy}
+                >
+                  {isBusy ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Text className="text-white font-primary-bold">Salvar</Text>
+                  )}
+                </TouchableOpacity>
+              );
+            }}
+          </form.Subscribe>
         </View>
       </View>
       <ErrorBottomSheet error={updateMutation.error} />

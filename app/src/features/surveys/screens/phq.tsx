@@ -1,5 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { View, Text, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  View,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
 import surveyService from "../services/survey.service";
 import { ErrorBoundaryProps, Stack, useRouter } from "expo-router";
@@ -17,6 +22,7 @@ export default function PHQScreen() {
   const queryProvider = useQueryClient();
 
   const [step, setStep] = useState<number>(0);
+  const [pendingAnswerId, setPendingAnswerId] = useState<number | undefined>();
   const [data, setData] = useState<
     {
       questionId: number;
@@ -103,6 +109,9 @@ export default function PHQScreen() {
           title: "Como está você hoje?",
           headerLeft: () => (
             <TouchableOpacity
+              disabled={
+                surveyMutation.isPending || doesPhq9Mutation.isPending
+              }
               onPress={() => {
                 if (step == 0) {
                   router.back();
@@ -111,7 +120,11 @@ export default function PHQScreen() {
                 }
               }}
             >
-              <CgChevronLeft />
+              {surveyMutation.isPending || doesPhq9Mutation.isPending ? (
+                <ActivityIndicator size="small" color="#2563EB" />
+              ) : (
+                <CgChevronLeft />
+              )}
             </TouchableOpacity>
           ),
         }}
@@ -125,7 +138,11 @@ export default function PHQScreen() {
 
         <AnswersGrid
           data={questions[step].answers}
+          isPending={surveyMutation.isPending || doesPhq9Mutation.isPending}
+          isLoading={surveyMutation.isPending || doesPhq9Mutation.isPending}
+          pendingAnswerId={pendingAnswerId}
           onClick={(answer) => {
+            setPendingAnswerId(answer);
             const questionResponse = {
               answerId: answer,
               questionId: questions[step].id,

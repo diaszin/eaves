@@ -54,12 +54,12 @@ export default function AppointmentsCreate() {
       date: new Date(),
       selectedHour: "",
     },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       const [hours, minutes] = value.selectedHour.split(":").map(Number);
       const initialDate = new Date(value.date);
       initialDate.setHours(hours, minutes, 0, 0);
 
-      createAppointmentMutation.mutate({
+      await createAppointmentMutation.mutateAsync({
         initialDate: initialDate.toISOString(),
         professionalId: +id,
       });
@@ -101,6 +101,9 @@ export default function AppointmentsCreate() {
                     dayoFWeek.slice(1).toLowerCase();
                   return (
                     <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={`Selecionar ${dayOFWeekInTitleCase}, ${item.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}`}
+                      disabled={professionalScheduleMutation.isPending}
                       onPress={() => {
                         field.handleChange(item);
                         form.setFieldValue("selectedHour", "");
@@ -112,23 +115,34 @@ export default function AppointmentsCreate() {
                           : "border-gray-300"
                       }`}
                     >
-                      <Text
-                        className={selected ? "text-white" : "text-gray-800"}
-                      >
-                        {dayOFWeekInTitleCase}
-                      </Text>
-                      <Text
-                        className={
-                          selected
-                            ? "font-bold text-white"
-                            : "font-bold text-gray-800"
-                        }
-                      >
-                        {item.toLocaleDateString("pt-BR", {
-                          day: "2-digit",
-                          month: "2-digit",
-                        })}
-                      </Text>
+                      {professionalScheduleMutation.isPending &&
+                      professionalScheduleMutation.variables?.date.toDateString() ===
+                        item.toDateString() ? (
+                        <ActivityIndicator
+                          size="small"
+                          color={selected ? "#FFFFFF" : "#2563EB"}
+                        />
+                      ) : (
+                        <>
+                          <Text
+                            className={selected ? "text-white" : "text-gray-800"}
+                          >
+                            {dayOFWeekInTitleCase}
+                          </Text>
+                          <Text
+                            className={
+                              selected
+                                ? "font-bold text-white"
+                                : "font-bold text-gray-800"
+                            }
+                          >
+                            {item.toLocaleDateString("pt-BR", {
+                              day: "2-digit",
+                              month: "2-digit",
+                            })}
+                          </Text>
+                        </>
+                      )}
                     </Pressable>
                   );
                 }}
@@ -248,11 +262,13 @@ export default function AppointmentsCreate() {
                     isDisabled ? "bg-gray-300" : "bg-primary-min"
                   }`}
                 >
-                  <Text className="text-[1.2rem] font-primary-medium">
-                    {createAppointmentMutation.isPending
-                      ? "Agendando..."
-                      : "Confirmar agendamento"}
-                  </Text>
+                  {isSubmitting || createAppointmentMutation.isPending ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Text className="text-[1.2rem] font-primary-medium">
+                      Confirmar agendamento
+                    </Text>
+                  )}
                 </TouchableOpacity>
               );
             }}

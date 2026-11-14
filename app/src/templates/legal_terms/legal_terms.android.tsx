@@ -83,9 +83,13 @@ export default function LegalTermsScreen() {
           disabled={isOpening}
           onPress={() => void openPdf()}
         >
-          <Text className="font-primary-bold text-white">
-            {isOpening ? "Abrindo documento..." : "Abrir documento PDF"}
-          </Text>
+          {isOpening ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <Text className="font-primary-bold text-white">
+              Abrir documento PDF
+            </Text>
+          )}
         </Pressable>
       ) : (
         <ActivityIndicator accessibilityLabel="Carregando documento" />
