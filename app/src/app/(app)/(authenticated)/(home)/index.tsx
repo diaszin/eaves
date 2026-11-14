@@ -6,10 +6,10 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MotivationalText from "@/templates/motivational-text";
 import DailySurvey from "@/templates/daily-survey";
+import GetRecentlyAppointments from "@/templates/get-recently-appointments";
 
 export default function HomePage() {
   const currentuser = useAuth()!;
-  
 
   return (
     <SafeAreaView>
@@ -20,6 +20,7 @@ export default function HomePage() {
               Olá, {currentuser.profile.name.split(" ")[0]}!
             </Text>
             <MotivationalText />
+            <GetRecentlyAppointments />
           </View>
           <DailySurvey />
         </View>

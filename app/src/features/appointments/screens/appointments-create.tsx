@@ -185,7 +185,36 @@ export default function AppointmentsCreate() {
           </form.Field>
         </View>
       </ScrollView>
-      <View className="absolute bottom-0 p-5 w-full">
+      <View className="p-5 w-full">
+        <form.Subscribe
+          selector={(state) => ({
+            date: state.values.date,
+            selectedHour: state.values.selectedHour,
+          })}
+        >
+          {({ date, selectedHour }) => {
+            const weekday = date
+              .toLocaleDateString("pt-BR", { weekday: "short" })
+              .replace(".", "");
+            const month = date
+              .toLocaleDateString("pt-BR", { month: "short" })
+              .replace(".", "");
+            const formattedDate = `${weekday[0].toUpperCase()}${weekday.slice(1)}, ${date.getDate()} ${month[0].toUpperCase()}${month.slice(1)}`;
+
+            if (!selectedHour) {
+              return null;
+            }
+
+            return (
+              <View className="flex flex-col items-start gap-y-1 mb-3">
+                <Text className="font-secondary-regular text-gray-700">Sessão selecionada</Text>
+                <Text className="font-secondary-bold text-gray-900">
+                  {formattedDate} • {selectedHour}
+                </Text>
+              </View>
+            );
+          }}
+        </form.Subscribe>
         <View className="w-full">
           <form.Subscribe
             selector={(state) => ({
@@ -205,7 +234,7 @@ export default function AppointmentsCreate() {
                 <TouchableOpacity
                   disabled={isDisabled}
                   onPress={() => form.handleSubmit()}
-                  className={`rounded-lg w-full h-16 flex items-center justify-center ${
+                  className={`rounded-lg w-full h-12 flex items-center justify-center ${
                     isDisabled ? "bg-gray-300" : "bg-primary-min"
                   }`}
                 >

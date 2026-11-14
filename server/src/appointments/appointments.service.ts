@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto.js';
-import { LessThan, MoreThan, Repository } from 'typeorm';
+import { FindOptionsSelect, LessThan, MoreThan, Repository } from 'typeorm';
 import { Role, User } from '../auth/entities/user.entity.js';
 import { Appointment } from './entities/appointment.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -81,20 +81,29 @@ export class AppointmentsService {
   }
 
   findAll(user: User) {
-    if (user.role === Role.PATIENT) {
-      return this.appointmentRepository.find({
-        where: {
-          patient: { id: user.id },
-        },
-        relations: {
-          patient: { profile: true },
-          createdBy: { profile: true },
-          professional: { profile: true },
-        },
-      });
-    }
+    const allowedUserColumns: FindOptionsSelect<User> = {
+      email: true,
+      id: true,
+      role: true,
+      profile: {
+        fullname: true,
+        emergencyPhone: true,
+        birthday: true,
+      },
+    };
 
     return this.appointmentRepository.find({
+      select: {
+        id: true,
+        initialDate: true,
+        endDate: true,
+        patient: allowedUserColumns,
+        professional: allowedUserColumns,
+        createdBy: allowedUserColumns,
+      },
+      where: {
+        patient: user.role == Role.PATIENT ? { id: user.id } : undefined,
+      },
       relations: {
         patient: { profile: true },
         createdBy: { profile: true },

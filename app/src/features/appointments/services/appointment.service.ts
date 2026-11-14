@@ -1,12 +1,10 @@
 import { AxiosInstance } from "axios";
 import { appointmentsClient, scheduleClient } from "./appointment.client";
-import {
-  CalendarPeriod,
-  CreateAppointmentRequest,
-} from "./appointment.type";
+import { Appointment, CalendarPeriod, CreateAppointmentRequest } from "./appointment.type";
 
 export class AppointmentService {
   private schedule: AxiosInstance = scheduleClient;
+  private appointments: AxiosInstance = appointmentsClient;
 
   public async getCalendar(
     trainerId: number,
@@ -22,7 +20,13 @@ export class AppointmentService {
   }
 
   public async create(data: CreateAppointmentRequest): Promise<void> {
-    await appointmentsClient.post("/", data);
+    await this.appointments.post("/", data);
+  }
+
+  public async get(): Promise<Appointment> {
+    const response = await this.appointments.get("/");
+
+    return response.data;
   }
 }
 
