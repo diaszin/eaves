@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import EmployeesCard from "../components/employees-card";
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import appointmentService from "../services/appointment.service";
 import HourBadge from "../components/hour-badge";
 import { useForm } from "@tanstack/react-form";
@@ -20,6 +20,7 @@ import ErrorBottomSheet from "@/components/ErrorBottomSheet";
 import SuccessBottomSheet from "@/components/SuccesssBottomSheet";
 import type { CreateAppointmentRequest } from "../services/appointment.type";
 export default function AppointmentsCreate() {
+  const query = useQueryClient();
   const [visibleDateCount, setVisibleDateCount] = useState(5);
   const { id, fullname } = useLocalSearchParams<{
     id: string;
@@ -41,6 +42,11 @@ export default function AppointmentsCreate() {
     mutationKey: ["appointments", "create"],
     mutationFn: (data: CreateAppointmentRequest) =>
       appointmentService.create(data),
+    onSuccess: () => {
+      query.invalidateQueries({
+        queryKey: ["appointments"],
+      });
+    },
   });
 
   const form = useForm({
