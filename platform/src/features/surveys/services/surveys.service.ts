@@ -9,7 +9,6 @@ export interface PHQ9Answer {
 export interface Survey {
   id: number
   createdAt: string
-  updatedAt: string
   totalScore: number
   severity: 'minimal' | 'mild' | 'moderate' | 'moderately_severe' | 'severe'
   answers: PHQ9Answer[]
@@ -21,19 +20,16 @@ export interface Survey {
 }
 
 export const surveysService = {
-  list: async (params?: { patientId?: number }): Promise<Survey[]> => {
-    const data = await http
-      .get<Survey[]>('/surveys', { params })
+  list: async (): Promise<Survey[]> => {
+    return http
+      .get<Survey[]>('/survey/phq/daily/responses')
       .then((r) => r.data)
-
-    if (Array.isArray(data)) {
-      return data
-    }
-    return []
   },
 
   getById: async (id: number): Promise<Survey> => {
-    return http.get<Survey>(`/surveys/${id}`).then((r) => r.data)
+    return http
+      .get<Survey>(`/survey/phq/daily/responses/${id}`)
+      .then((r) => r.data)
   },
 }
 

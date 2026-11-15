@@ -3,14 +3,17 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
-  Query,
   QueryMethod,
 } from '@nestjs/common';
 import { SurveyService } from './survey.service.js';
 import { AnswerDailyPHQSurveyRequest } from './dto/survey.dto.js';
 import { CurrentUser } from '@nestjs/authentication';
 import { User } from '../auth/entities/user.entity.js';
+import { Can } from '@nestjs/authorization';
+import { SurveyPolicy } from './survey.policy.js';
 
 @Controller('survey')
 export class SurveyController {
@@ -19,6 +22,18 @@ export class SurveyController {
   @Get('/phq')
   getPHQSurvey() {
     return this.surveyService.getPHQ9Survey();
+  }
+
+  @Get('phq/daily/responses')
+  @Can(SurveyPolicy, 'viewResponses')
+  getAnsweredPHQSurveys() {
+    return this.surveyService.getAnsweredPHQ9Surveys();
+  }
+
+  @Get('phq/daily/responses/:id')
+  @Can(SurveyPolicy, 'viewResponses')
+  getAnsweredPHQSurvey(@Param('id', ParseIntPipe) id: number) {
+    return this.surveyService.getAnsweredPHQ9Survey(id);
   }
 
   @Post('/phq/daily/answer')

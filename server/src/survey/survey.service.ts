@@ -43,6 +43,118 @@ export class SurveyService {
     });
   }
 
+  async getAnsweredPHQ9Surveys() {
+    const records = await this.surveyRepository.find({
+      where: { type: 'PHQ' },
+      relations: {
+        question: true,
+        answer: true,
+        answeredBy: { profile: true },
+      },
+      order: { answeredDate: 'DESC', id: 'ASC' },
+    });
+
+    return this.toPHQ9Responses(records);
+  }
+
+  async getAnsweredPHQ9Survey(id: number) {
+    const record = await this.surveyRepository.findOne({
+      where: { id, type: 'PHQ' },
+      relations: { answeredBy: true },
+    });
+
+    if (!record) {
+      throw new NotFoundException('Questionário não encontrado');
+    }
+
+    const records = await this.surveyRepository
+      .createQueryBuilder('survey')
+      .leftJoinAndSelect('survey.question', 'question')
+      .leftJoinAndSelect('survey.answer', 'answer')
+      .innerJoinAndSelect('survey.answeredBy', 'patient')
+      .leftJoinAndSelect('patient.profile', 'profile')
+      .where('survey.type = :type', { type: 'PHQ' })
+      .andWhere('patient.id = :patientId', {
+        patientId: record.answeredBy.id,
+      })
+      .andWhere(
+        'CAST(survey."answeredDate" AS DATE) = CAST(:answeredDate AS DATE)',
+        { answeredDate: record.answeredDate },
+      )
+      .orderBy('survey.answeredDate', 'ASC')
+      .addOrderBy('survey.id', 'ASC')
+      .getMany();
+
+    const response = (await this.toPHQ9Responses(records)).find(
+      (survey) => survey.id === id,
+    );
+    if (!response) {
+      throw new NotFoundException('Questionário não encontrado');
+    }
+
+    return response;
+  }
+
+  private async toPHQ9Responses(records: Survey[]) {
+    const questions = await this.questionRepository.find({
+      where: { category: 'PHQ' },
+      order: { id: 'ASC' },
+    });
+    const questionIndexes = new Map(
+      questions.map((question, index) => [question.id, index]),
+    );
+    const grouped = new Map<string, Survey[]>();
+
+    for (const record of records) {
+      const date = record.answeredDate.toLocaleDateString('pt-BR', {
+        timeZone: 'America/Bahia',
+      });
+      const key = `${record.answeredBy.id}:${date}`;
+      const answers = grouped.get(key) ?? [];
+      answers.push(record);
+      grouped.set(key, answers);
+    }
+
+    return Array.from(grouped.values(), (answers) => {
+      const firstAnswer = answers[0];
+      const totalScore = answers.reduce(
+        (total, answer) => total + answer.answer.score,
+        0,
+      );
+
+      return {
+        id: firstAnswer.id,
+        createdAt: firstAnswer.answeredDate,
+        totalScore,
+        severity:
+          totalScore <= 4
+            ? 'minimal'
+            : totalScore <= 9
+              ? 'mild'
+              : totalScore <= 14
+                ? 'moderate'
+                : totalScore <= 19
+                  ? 'moderately_severe'
+                  : 'severe',
+        answers: answers
+          .map((answer) => ({
+            questionIndex: questionIndexes.get(answer.question.id) ?? -1,
+            question: answer.question.content,
+            score: answer.answer.score,
+          }))
+          .filter((answer) => answer.questionIndex >= 0)
+          .sort((left, right) => left.questionIndex - right.questionIndex),
+        patient: {
+          id: firstAnswer.answeredBy.id,
+          email: firstAnswer.answeredBy.email,
+          profile: {
+            fullname: firstAnswer.answeredBy.profile.fullname,
+          },
+        },
+      };
+    });
+  }
+
   async answerPHQDailyQuestions(
     dto: AnswerDailyPHQSurveyRequest[],
     user: User,
