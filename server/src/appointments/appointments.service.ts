@@ -101,9 +101,9 @@ export class AppointmentsService {
         professional: allowedUserColumns,
         createdBy: allowedUserColumns,
       },
-      where: {
-        patient: user.role == Role.PATIENT ? { id: user.id } : undefined,
-      },
+      ...(user.role === Role.PATIENT
+        ? { where: { patient: { id: user.id } } }
+        : {}),
       relations: {
         patient: { profile: true },
         createdBy: { profile: true },
