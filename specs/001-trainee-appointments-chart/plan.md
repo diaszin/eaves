@@ -86,4 +86,9 @@ plataforma, onde o detalhe do estagiário já é renderizado. O app móvel não 
 
 ## Complexity Tracking
 
-Sem violações a justificar.
+> Nenhuma violação dos Princípios I–V. O registro abaixo trata de um desvio do gate de qualidade
+> (Development Workflow & Quality Gates), exigido pela Governança.
+
+| Violation | Why Needed | Simpler Alternative Rejected Because |
+|-----------|------------|-------------------------------------|
+| Gate "clientes afetados MUST passar em lint sem erros" não é cumprido para `platform/`: o script `lint` (`eslint .`) existe, mas `eslint` não está em `platform/package.json` e não há arquivo de configuração (situação anterior a esta feature) | A verificação estática da plataforma fica a cargo de `yarn build` (`tsc -b` + Vite), que passa sem erros com a feature | Adicionar `eslint` + `typescript-eslint` + configuração à plataforma é uma mudança de infraestrutura separada, que também traria erros de lint em código não relacionado; deve virar uma feature própria |

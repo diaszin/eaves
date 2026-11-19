@@ -54,7 +54,6 @@ export class AppointmentsController {
     return this.appointmentsService.findAll(user);
   }
 
-  // Deve ficar antes de `@Get(':id')` para não ser capturada por ele.
   @Get('professionals/:professionalId/monthly-count')
   @Can(AppointmentsPolicy, 'viewProfessionalStats')
   @ApiOkResponse({ type: MonthlyCountDto, isArray: true })

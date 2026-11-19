@@ -9,7 +9,7 @@ usuário informado é o profissional.
 
 **Autorização**: apenas `coordinator` (policy `AppointmentsPolicy.viewProfessionalStats`).
 
-**Declarar esta rota antes de `GET /appointments/:id`** no controller, para não ser capturada por ela.
+**Nota**: o caminho tem 3 segmentos após `/appointments`, então não colide com `GET /appointments/:id` (que casa um único segmento); a ordem de declaração no controller não importa.
 
 ### Parâmetros
 

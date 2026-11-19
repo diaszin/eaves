@@ -105,7 +105,7 @@ description: "Tasks for Gráfico de Agendamentos do Estagiário"
 
 - [X] T015 [P] Conferir que a resposta do endpoint traz apenas `month` e `count` (sem dados de paciente, nota ou criador) e que a documentação Swagger em `http://localhost:3000/api` mostra a nova rota
 - [X] T016 Rodar `yarn test` e `yarn lint` em `server/` e `yarn build` e `yarn lint` em `platform/`, sem erros — servidor: testes (13) e tsc OK, lint com 1 erro anterior em `src/auth/auth.service.ts:270`; plataforma: `yarn build` OK, mas `yarn lint` não roda porque `eslint` não está instalado em `platform/` (anterior a esta feature)
-- [ ] T017 Executar o roteiro completo de `specs/001-trainee-appointments-chart/quickstart.md`, incluindo o 403 para professor, recepcionista, estagiário e paciente, a ausência do gráfico para recepcionista, a troca rápida entre estagiários e o tempo de exibição de até 2 s (SC-001) — PENDENTE: lado da API verificado (200 para coordenador, 403 para professor/recepcionista/estagiário/paciente, 400 e 404); passos visuais na tela (2 a 7) ainda não executados
+- [ ] T017 Executar o roteiro completo de `specs/001-trainee-appointments-chart/quickstart.md`, incluindo o 403 para professor, recepcionista, estagiário e paciente, a ausência do gráfico para recepcionista, a troca rápida entre estagiários e o tempo de exibição de até 2 s (SC-001) — PARCIAL: verificados a API (200 para coordenador; 403 para professor/recepcionista/estagiário/paciente; 400 e 404) e o visual do gráfico (renderização real do componente com os números da API, estados com dados, volume alto e vazio). NÃO verificados em navegador: login e navegação até `/trainees`, tooltip ao passar o cursor, estado de erro, ausência do gráfico para recepcionista na tela, troca rápida entre estagiários e o tempo de 2 s (SC-001)
 
 ---
 
@@ -171,3 +171,8 @@ Frontend: T009 → T010
 - O app móvel não é alterado
 - Todos os textos em português do Brasil (Constituição)
 - Commit por tarefa ou grupo lógico
+
+## Phase 7: Convergence
+
+- [X] T018 Cobrir a rota `GET /appointments/professionals/:professionalId/monthly-count` com teste automatizado (teste Vitest do controller em `server/src/appointments/` ou e2e em `server/test/`) que verifique: 200 para coordenador, 403 para professor, recepcionista, estagiário e paciente, 400 para `professionalId` não numérico e que a rota não é capturada por `GET :id` per Constitution V (partial) — `appointments.controller.spec.ts` (8 testes; mutação na policy confirmou que o teste falha). Nota: `:id` casa um único segmento, então a ordem de declaração da rota não importa
+- [X] T019 Tornar o lint da plataforma executável (`eslint` ausente em `platform/package.json`) ou registrar formalmente a exceção, para cumprir a exigência de T016 e o gate de qualidade da constituição per T016 (partial) — exceção registrada em `plan.md` (Complexity Tracking); `yarn build` (`tsc -b`) cobre a verificação estática
