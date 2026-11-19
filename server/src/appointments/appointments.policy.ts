@@ -13,6 +13,10 @@ export class AppointmentsPolicy {
     );
   }
 
+  viewProfessionalStats(user: User | null) {
+    return user?.role === Role.COORDINATOR;
+  }
+
   create(user: User | null) {
     return (
       user?.role === Role.LOBBY ||

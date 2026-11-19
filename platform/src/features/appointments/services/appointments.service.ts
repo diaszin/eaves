@@ -29,6 +29,12 @@ export interface Appointment {
   updatedAt?: string
 }
 
+export interface MonthlyAppointmentCount {
+  /** Mês no formato YYYY-MM */
+  month: string
+  count: number
+}
+
 export interface CreateAppointmentDto {
   initialDate: string
   patientEmail: string
@@ -60,6 +66,13 @@ export const appointmentsService = {
   getById: async (id: number): Promise<Appointment> => {
     return http.get<Appointment>(`/appointments/${id}`).then((r) => r.data)
   },
+
+  monthlyByProfessional: (professionalId: number): Promise<MonthlyAppointmentCount[]> =>
+    http
+      .get<MonthlyAppointmentCount[]>(
+        `/appointments/professionals/${professionalId}/monthly-count`,
+      )
+      .then((r) => r.data),
 
   create: (dto: CreateAppointmentDto) =>
     http.post<Appointment>('/appointments', dto).then((r) => r.data),

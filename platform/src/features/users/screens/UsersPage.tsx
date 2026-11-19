@@ -6,7 +6,8 @@ import { Badge, ROLE_LABELS } from "@/shared/components/ui/Badge";
 import { Avatar } from "@/shared/components/ui/Avatar";
 import { LoadingSpinner } from "@/shared/components/ui/LoadingSpinner";
 import { EmptyState } from "@/shared/components/ui/EmptyState";
-import type { PlatformRole } from "@/features/auth/contexts/auth";
+import { useAuth, type PlatformRole } from "@/features/auth/contexts/auth";
+import { TraineeAppointmentsChart } from "@/features/users/components/TraineeAppointmentsChart";
 
 export default function UsersPage() {
   const { id } = useParams<{ id?: string }>();
@@ -52,6 +53,8 @@ function UserDetail({
 }: {
   user: Awaited<ReturnType<typeof usersService.getById>>;
 }) {
+  const { user: currentUser } = useAuth();
+
   return (
     <div className="max-w-2xl">
       {/* Profile header */}
@@ -88,6 +91,10 @@ function UserDetail({
           value={user.profile?.emergencyPhone ?? "—"}
         />
       </div>
+
+      {user.role === "trainee" && currentUser?.role === "coordinator" && (
+        <TraineeAppointmentsChart traineeId={user.id} />
+      )}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import {
   Body,
   Patch,
   Param,
+  ParseIntPipe,
   Delete,
 } from '@nestjs/common';
 import { AppointmentsService } from './appointments.service.js';
@@ -15,7 +16,8 @@ import { CurrentUser } from '@nestjs/authentication';
 import { Role, User } from '../auth/entities/user.entity.js';
 import { Can } from '@nestjs/authorization';
 import { AppointmentsPolicy } from './appointments.policy.js';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
+import { MonthlyCountDto } from './dto/monthly-count.dto.js';
 
 @Controller('appointments')
 @ApiBearerAuth('JWT-auth')
@@ -50,6 +52,16 @@ export class AppointmentsController {
   @Can(AppointmentsPolicy, 'view')
   findAll(@CurrentUser() user: User) {
     return this.appointmentsService.findAll(user);
+  }
+
+  // Deve ficar antes de `@Get(':id')` para não ser capturada por ele.
+  @Get('professionals/:professionalId/monthly-count')
+  @Can(AppointmentsPolicy, 'viewProfessionalStats')
+  @ApiOkResponse({ type: MonthlyCountDto, isArray: true })
+  monthlyCountByProfessional(
+    @Param('professionalId', ParseIntPipe) professionalId: number,
+  ) {
+    return this.appointmentsService.countByMonthForProfessional(professionalId);
   }
 
   @Get(':id')

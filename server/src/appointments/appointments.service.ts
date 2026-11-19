@@ -10,6 +10,12 @@ import { Appointment } from './entities/appointment.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from '../auth/auth.service.js';
 import { GeneralSettingsService } from '../settings/general-settings.service.js';
+import { MonthlyCountDto } from './dto/monthly-count.dto.js';
+
+const APPOINTMENTS_TIME_ZONE = 'America/Bahia';
+// America/Bahia não tem horário de verão desde 2019 (UTC-3 fixo).
+const TIME_ZONE_OFFSET = '-03:00';
+const MONTHLY_COUNT_WINDOW = 6;
 
 @Injectable()
 export class AppointmentsService {
@@ -113,6 +119,80 @@ export class AppointmentsService {
         initialDate: 'DESC',
       },
     });
+  }
+
+  /**
+   * Quantidade de agendamentos por mês (últimos 6 meses, incluindo o corrente)
+   * em que o usuário informado é o profissional. Meses sem agendamento
+   * retornam 0. Os meses seguem o fuso America/Bahia.
+   */
+  async countByMonthForProfessional(
+    professionalId: number,
+    now: Date = new Date(),
+  ): Promise<MonthlyCountDto[]> {
+    const professional = await this.userService.findUser(professionalId);
+
+    if (!professional || professional.role !== Role.TRAINEE) {
+      throw new NotFoundException('O estagiário não existe em nossa base de dados');
+    }
+
+    const months = this.lastMonths(now, MONTHLY_COUNT_WINDOW);
+    const [startYear, startMonth] = months[0].split('-');
+    const nextMonth = this.nextMonth(months[months.length - 1]);
+
+    const rows = await this.appointmentRepository
+      .createQueryBuilder('a')
+      .select(
+        `to_char(a."initialDate" AT TIME ZONE '${APPOINTMENTS_TIME_ZONE}', 'YYYY-MM')`,
+        'month',
+      )
+      .addSelect('COUNT(*)', 'count')
+      .where('a."professionalId" = :id', { id: professionalId })
+      .andWhere('a."initialDate" >= :start', {
+        start: `${startYear}-${startMonth}-01T00:00:00${TIME_ZONE_OFFSET}`,
+      })
+      .andWhere('a."initialDate" < :end', {
+        end: `${nextMonth}-01T00:00:00${TIME_ZONE_OFFSET}`,
+      })
+      .groupBy('month')
+      .getRawMany<{ month: string; count: string }>();
+
+    const countByMonth = new Map(rows.map((r) => [r.month, Number(r.count)]));
+
+    return months.map((month) => ({
+      month,
+      count: countByMonth.get(month) ?? 0,
+    }));
+  }
+
+  private currentMonth(now: Date): string {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: APPOINTMENTS_TIME_ZONE,
+      year: 'numeric',
+      month: '2-digit',
+    }).formatToParts(now);
+    const year = parts.find((p) => p.type === 'year')!.value;
+    const month = parts.find((p) => p.type === 'month')!.value;
+    return `${year}-${month}`;
+  }
+
+  private nextMonth(month: string): string {
+    const [year, m] = month.split('-').map(Number);
+    return m === 12
+      ? `${year + 1}-01`
+      : `${year}-${String(m + 1).padStart(2, '0')}`;
+  }
+
+  private lastMonths(now: Date, size: number): string[] {
+    const [endYear, endMonth] = this.currentMonth(now).split('-').map(Number);
+    const months: string[] = [];
+    for (let i = size - 1; i >= 0; i--) {
+      const index = endYear * 12 + (endMonth - 1) - i;
+      const year = Math.floor(index / 12);
+      const month = (index % 12) + 1;
+      months.push(`${year}-${String(month).padStart(2, '0')}`);
+    }
+    return months;
   }
 
   findAllByPatient(patient: User) {
