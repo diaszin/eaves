@@ -9,12 +9,12 @@ import { Input } from '@/shared/components/ui/Input'
 import { Button } from '@/shared/components/ui/Button'
 
 interface UpdateProfileDto {
-  profile?: { fullname?: string }
+  fullname?: string
   email?: string
 }
 
 interface ChangePasswordDto {
-  currentPassword: string
+  oldPassword: string
   newPassword: string
 }
 
@@ -34,7 +34,7 @@ export default function ProfilePage() {
 
   const updateProfileMutation = useMutation({
     mutationFn: (dto: UpdateProfileDto) =>
-      http.patch(`/users/${user?.id}`, dto).then((r) => r.data),
+      http.patch('/auth/profile', dto).then((r) => r.data),
     onSuccess: () => {
       setProfileSuccess(true)
       queryClient.invalidateQueries({ queryKey: ['profile'] })
@@ -44,7 +44,7 @@ export default function ProfilePage() {
 
   const changePasswordMutation = useMutation({
     mutationFn: (dto: ChangePasswordDto) =>
-      http.post('/auth/change-password', dto).then((r) => r.data),
+      http.put('/auth/profile/change-password', dto).then((r) => r.data),
     onSuccess: () => {
       setPwSuccess(true)
       setPwError(null)
@@ -65,7 +65,7 @@ export default function ProfilePage() {
     e.preventDefault()
     updateProfileMutation.mutate({
       email: email !== user?.email ? email : undefined,
-      profile: { fullname },
+      fullname,
     })
   }
 
@@ -76,11 +76,11 @@ export default function ProfilePage() {
       setPwError('As senhas não coincidem.')
       return
     }
-    if (newPassword.length < 6) {
-      setPwError('A nova senha deve ter pelo menos 6 caracteres.')
+    if (newPassword.length < 8) {
+      setPwError('A nova senha deve ter pelo menos 8 caracteres.')
       return
     }
-    changePasswordMutation.mutate({ currentPassword, newPassword })
+    changePasswordMutation.mutate({ oldPassword: currentPassword, newPassword })
   }
 
   return (
@@ -182,7 +182,7 @@ export default function ProfilePage() {
               placeholder="••••••••"
               required
               autoComplete="new-password"
-              helperText="Mínimo de 6 caracteres"
+              helperText="Mínimo de 8 caracteres"
             />
             <Input
               label="Confirmar nova senha"

@@ -5,7 +5,6 @@ import {
   CalendarRange,
   Users,
   ClipboardList,
-  BookOpen,
   LogOut,
   User,
   Settings,
@@ -56,13 +55,6 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Questionários',
     icon: ClipboardList,
     path: '/surveys',
-    roles: ['coordinator', 'professor'],
-  },
-  {
-    key: 'journals',
-    label: 'Diários',
-    icon: BookOpen,
-    path: '/journals',
     roles: ['coordinator', 'professor'],
   },
   {
