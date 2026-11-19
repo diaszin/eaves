@@ -9,10 +9,10 @@ interface ThreePaneLayoutProps {
 
 export function ThreePaneLayout({ children }: ThreePaneLayoutProps) {
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-50">
+    <div className="flex h-screen w-full overflow-hidden bg-slate-50">
       <NavigationRail />
       <SectionPanel />
-      <main className="flex-1 overflow-auto bg-white">
+      <main className="min-w-0 flex-1 overflow-auto bg-white">
         {children ?? <Outlet />}
       </main>
     </div>

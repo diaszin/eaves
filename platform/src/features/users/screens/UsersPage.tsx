@@ -19,13 +19,13 @@ export default function UsersPage() {
   });
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       {/* Header */}
       <div className="border-b border-slate-100 px-8 py-5">
         <h1 className="text-xl font-semibold text-slate-900">Usuários</h1>
       </div>
 
-      <div className="flex-1 overflow-auto px-8 py-6">
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-8 py-6">
         {id ? (
           detailQ.isLoading ? (
             <LoadingSpinner centered />

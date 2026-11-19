@@ -69,7 +69,7 @@ function Chart({ data }: { data: MonthlyAppointmentCount[] }) {
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         role="img"
         aria-label={`Gráfico de barras de agendamentos por mês. ${summary}.`}
-        className="h-auto w-full"
+        className="h-auto w-full max-w-full"
       >
         {ticks.map((t) => (
           <g key={t}>
@@ -147,7 +147,7 @@ export function TraineeAppointmentsChart({ traineeId }: { traineeId: number }) {
   const isEmpty = !!data && data.every((d) => d.count === 0)
 
   return (
-    <section className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="relative mt-6 min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <h3 className="text-base font-semibold text-slate-900">
         Agendamentos por mês
       </h3>
