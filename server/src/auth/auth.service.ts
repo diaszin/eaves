@@ -52,7 +52,7 @@ export class AuthService {
     const [username, domain] = createAuthDto.email.split('@');
     const emailRoleIdentifier = domain.split('.')[0];
 
-    if(emailRoleIdentifier === "professores"){
+    if (emailRoleIdentifier === 'professores') {
       role = Role.PROFESSOR;
     }
 
@@ -249,13 +249,20 @@ export class AuthService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    const isPasswordValid = this.compareOldAlgorithmPassword(
+    const isPasswordValid = await this.passwordHasherService.verify(
       changePasswordDTO.oldPassword,
       user.password,
     );
 
     if (!isPasswordValid) {
-      throw new NotFoundException('A senha antiga não é correspodente');
+      const isBcryptPasswordValid = this.compareOldAlgorithmPassword(
+        changePasswordDTO.oldPassword,
+        user.password,
+      );
+
+      if (!isBcryptPasswordValid) {
+        throw new NotFoundException('A senha antiga não é correspodente');
+      }
     }
 
     user.password = newPasswordHashed;
