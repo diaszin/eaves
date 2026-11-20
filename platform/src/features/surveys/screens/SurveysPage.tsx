@@ -6,11 +6,15 @@ import {
   surveysService,
   PHQ9_QUESTIONS,
   PHQ9_SEVERITY_LABELS,
+  SCORE_LABELS,
   type Survey,
 } from '@/features/surveys/services/surveys.service'
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner'
 import { EmptyState } from '@/shared/components/ui/EmptyState'
 import { Avatar } from '@/shared/components/ui/Avatar'
+import { ExportMenu } from '@/shared/components/ui/ExportMenu'
+import { exportDocument } from '@/shared/utils/export/download'
+import { buildSurveyExport } from '@/features/surveys/utils/surveyExport'
 
 function formatDate(dateStr: string) {
   try {
@@ -23,8 +27,6 @@ function formatDate(dateStr: string) {
     return dateStr
   }
 }
-
-const SCORE_LABELS = ['Nunca', 'Vários dias', 'Mais da metade dos dias', 'Quase todo dia']
 
 const SEVERITY_STYLES: Record<Survey['severity'], { bar: string; badge: string }> = {
   minimal: { bar: 'bg-green-500', badge: 'bg-green-100 text-green-700' },
@@ -102,6 +104,9 @@ function SurveyDetail({ survey }: { survey: Survey }) {
             </span>
           </div>
         </div>
+        <ExportMenu
+          onExport={(format) => exportDocument(buildSurveyExport(survey), format)}
+        />
       </div>
 
       {/* Score summary */}

@@ -60,3 +60,5 @@ export const PHQ9_SEVERITY_COLORS: Record<Survey['severity'], string> = {
   moderately_severe: 'red',
   severe: 'red',
 }
+
+export const SCORE_LABELS = ['Nunca', 'Vários dias', 'Mais da metade dos dias', 'Quase todo dia']

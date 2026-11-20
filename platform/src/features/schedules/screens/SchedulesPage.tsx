@@ -29,16 +29,14 @@ import { LoadingSpinner } from "@/shared/components/ui/LoadingSpinner";
 import { EmptyState } from "@/shared/components/ui/EmptyState";
 import { Avatar } from "@/shared/components/ui/Avatar";
 import { Badge } from "@/shared/components/ui/Badge";
-
-const DAYS_OF_WEEK = [
-  { value: 0, label: "Domingo", short: "Dom" },
-  { value: 1, label: "Segunda-feira", short: "Seg" },
-  { value: 2, label: "Terça-feira", short: "Ter" },
-  { value: 3, label: "Quarta-feira", short: "Qua" },
-  { value: 4, label: "Quinta-feira", short: "Qui" },
-  { value: 5, label: "Sexta-feira", short: "Sex" },
-  { value: 6, label: "Sábado", short: "Sáb" },
-];
+import { ExportMenu } from "@/shared/components/ui/ExportMenu";
+import { exportDocument } from "@/shared/utils/export/download";
+import { DAYS_OF_WEEK } from "@/features/schedules/utils/days";
+import {
+  buildScheduleExport,
+  countShifts,
+  type ScheduleExportScope,
+} from "@/features/schedules/utils/scheduleExport";
 
 function formatDate(dateStr?: string | null): string {
   if (!dateStr) return "Não informada";
@@ -256,6 +254,50 @@ export default function SchedulesPage() {
 }
 
 // -------------------------------------------------------------
+// Exportação (Excel / PDF) da escala do estagiário
+// -------------------------------------------------------------
+function ScheduleExportBar({ schedule }: { schedule: Schedule }) {
+  const [scope, setScope] = useState<ScheduleExportScope>("single");
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const handleExport = async (format: "xlsx" | "pdf") => {
+    setNotice(null);
+    const schedules =
+      scope === "all"
+        ? await schedulesService.list({
+            userId: schedule.user.id,
+            isActive: true,
+          })
+        : [schedule];
+    if (schedules.length === 0 || countShifts(schedules) === 0) {
+      setNotice("Não há horários para exportar.");
+      return;
+    }
+    await exportDocument(buildScheduleExport(schedules, scope), format);
+  };
+
+  return (
+    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+      <label className="flex items-center gap-2 text-sm text-slate-600">
+        Exportar:
+        <select
+          value={scope}
+          onChange={(e) => setScope(e.target.value as ScheduleExportScope)}
+          className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm"
+        >
+          <option value="single">Esta escala</option>
+          <option value="all">Todas as escalas ativas do estagiário</option>
+        </select>
+      </label>
+      <div className="flex flex-col items-end gap-1">
+        <ExportMenu onExport={handleExport} />
+        {notice && <p className="text-xs text-amber-600">{notice}</p>}
+      </div>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
 // Componente de Detalhe da Escala
 // -------------------------------------------------------------
 function ScheduleDetailView({
@@ -339,6 +381,8 @@ function ScheduleDetailView({
             </div>
           )}
         </div>
+
+        <ScheduleExportBar schedule={schedule} />
 
         {/* Metadados e Profissional */}
         <div className="mt-6 grid grid-cols-1 gap-4 border-t border-slate-100 pt-5 sm:grid-cols-3">
