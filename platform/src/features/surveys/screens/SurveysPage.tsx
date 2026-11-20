@@ -70,7 +70,14 @@ export default function SurveysPage() {
   } else if (listQ.error || !listQ.data) {
     content = (
       <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
-        Erro ao carregar pesquisas.
+        <p>Erro ao carregar pesquisas.</p>
+        <button
+          type="button"
+          onClick={() => listQ.refetch()}
+          className="mt-3 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+        >
+          Tentar novamente
+        </button>
       </div>
     )
   } else if (id) {

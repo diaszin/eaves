@@ -17,7 +17,7 @@ interface SurveysListProps {
 
 export function SurveysList({ search, onSelect }: SurveysListProps) {
   const location = useLocation()
-  const { data: items = [], isLoading, isError } = useQuery({
+  const { data: items = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['surveys'],
     queryFn: () => surveysService.list(),
   })
@@ -29,9 +29,16 @@ export function SurveysList({ search, onSelect }: SurveysListProps) {
   if (isLoading) return <LoadingSpinner centered />
   if (isError) {
     return (
-      <p className="p-4 text-sm text-red-600">
-        Erro ao carregar pesquisas.
-      </p>
+      <div className="p-4 text-sm text-red-600">
+        <p>Erro ao carregar pesquisas.</p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="mt-2 font-medium underline hover:text-red-700"
+        >
+          Tentar novamente
+        </button>
+      </div>
     )
   }
 

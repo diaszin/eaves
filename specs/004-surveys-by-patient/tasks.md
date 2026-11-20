@@ -115,3 +115,9 @@ Nenhuma tarefa: não há dependências novas nem estrutura nova a inicializar.
 
 - Total: 17 tarefas (Foundational 4, US1 4, US2 3, US3 3, Polish 3).
 - Arquivos compartilhados (`SurveysPage.tsx`) são editados por várias tarefas: executar em ordem.
+
+---
+
+## Phase 7: Convergence
+
+- [x] T018 Adicionar ação "Tentar novamente" (`refetch` do `useQuery` de `['surveys']`) nos estados de erro de `platform/src/features/surveys/components/SurveysList.tsx` e `platform/src/features/surveys/screens/SurveysPage.tsx` per spec Edge Cases "Falha ao carregar" / FR-012 (partial)
