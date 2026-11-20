@@ -108,11 +108,11 @@ export default function DashboardPage() {
         />
         {(user?.role === 'coordinator' || user?.role === 'lobby') && (
           <StatCard
-            title="Usuários cadastrados"
+            title="Estagiários cadastrados"
             value={usersQ.isLoading ? '...' : String(usersQ.data?.length ?? 0)}
             icon={<Users className="h-6 w-6" />}
             color="purple"
-            onClick={() => navigate('/users')}
+            onClick={() => navigate('/trainees')}
           />
         )}
         <StatCard
