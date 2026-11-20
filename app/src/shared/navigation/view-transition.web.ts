@@ -8,6 +8,9 @@ export type { ViewTransitionOptions };
 /** Tempo máximo esperando a nova tela ganhar foco antes de seguir sem Hero. */
 const MAX_WAIT_MS = 400;
 
+/** Rotas do fluxo: lista de profissionais e agendamento. */
+const PROFESSIONAL_FLOW_PATH = /(^|\/)appointments(\/create)?\/?$/;
+
 type ViewTransitionLike = { finished: Promise<void>; skipTransition(): void };
 type DocumentWithViewTransition = Document & {
   startViewTransition?: (
@@ -64,8 +67,9 @@ function start(update: (() => void) | null, professionalId: number | null) {
   // O nome precisa estar no DOM antes da captura do estado antigo.
   flushSync(emit);
 
-  const transition = (document as DocumentWithViewTransition)
-    .startViewTransition!(
+  // eslint-disable-next-line prefer-const
+  let transition: ViewTransitionLike | undefined;
+  transition = (document as DocumentWithViewTransition).startViewTransition!(
     () =>
       new Promise<void>((resolve) => {
         let done = false;
@@ -76,7 +80,11 @@ function start(update: (() => void) | null, professionalId: number | null) {
           resolve();
         };
         finishWaiting = end;
-        setTimeout(end, MAX_WAIT_MS);
+        setTimeout(() => {
+          // Sem mudança de foco no prazo: segue sem animação, sem congelar a tela.
+          if (!done) transition?.skipTransition();
+          end();
+        }, MAX_WAIT_MS);
         update?.();
       }),
   );
@@ -125,7 +133,13 @@ export function useProfessionalTransitionName(id: number): string | undefined {
 // antes do roteador, para capturar o estado antigo da tela (FR-005).
 if (typeof window !== "undefined") {
   window.addEventListener("popstate", () => {
-    if (lastProfessionalId === null) return;
+    // Só nas telas do fluxo profissional → agendamento (FR-009, SC-005).
+    if (
+      lastProfessionalId === null ||
+      !PROFESSIONAL_FLOW_PATH.test(location.pathname)
+    ) {
+      return;
+    }
     start(null, lastProfessionalId);
   });
 }

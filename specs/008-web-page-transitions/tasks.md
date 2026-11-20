@@ -99,3 +99,9 @@ Depois de T005: T006, T007 e T008 em paralelo
 - **MVP**: Phases 1–3 (Fade through na web). Já resolve o "não funciona na web" para todas as telas.
 - **Incremental**: acrescentar o Hero (US2) e depois Polish.
 - Como o Hero depende de API do navegador e de capturar `popstate`, validar T013 no navegador (T016) assim que existir.
+
+---
+
+## Phase 6: Convergence
+
+- [X] T019 Em `app/src/shared/navigation/view-transition.web.ts`, limitar a view transition de `popstate` ao fluxo profissional → agendamento (zerar `lastProfessionalId` ao sair desse fluxo ou comparar a rota de destino) e implementar o `skipTransition()` descrito em T003 quando a transição ficar sem resolução, para que voltar/avançar em outras telas nunca espere os 400 ms per FR-009 / SC-005 (partial)
