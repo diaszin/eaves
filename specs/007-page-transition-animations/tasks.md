@@ -73,7 +73,7 @@ description: "Lista de tarefas: Animações de Transição entre Telas"
 ## Phase 5: Polish & Cross-Cutting Concerns
 
 - [X] T013 Rodar `yarn lint` e `npx tsc --noEmit` em `app/` e corrigir erros introduzidos
-- [ ] T014 Gerar build de desenvolvimento (`npx expo run:android` em `app/`) e executar todos os cenários de [quickstart.md](quickstart.md), incluindo duração 200–500 ms (SC-003) e reduzir movimento (SC-006)
+- [ ] T014 Gerar build de desenvolvimento (`npx expo run:android` em `app/`) e executar todos os cenários de [quickstart.md](quickstart.md), incluindo duração (SC-003: 200–500 ms em iOS/web; ~150 ms aceito no Android) e reduzir movimento (SC-006)
 - [ ] T015 Se algum cenário falhar por limitação do recurso experimental, registrar a limitação e o comportamento de fallback em `specs/007-page-transition-animations/research.md`
 
 ---
@@ -96,3 +96,10 @@ Após T003: T004 e T005 (US1) em paralelo com T008, T009, T010 e T011 (US2)
 - **MVP**: Phases 1–3 (Hero). Já entrega o pedido de maior impacto e pode ser demonstrado.
 - **Incremental**: adicionar US2 (fade global) e depois Polish.
 - Como o Hero depende de recurso experimental, validar T004–T006 em build nativo o quanto antes (T014 antecipado para após a US1, se preferir).
+
+---
+
+## Phase 6: Convergence
+
+- [X] T016 Decisão: aceitar o fade padrão de ~150 ms no Android (não configurável) e ajustar SC-003 em `specs/007-page-transition-animations/spec.md` para 200–500 ms só em iOS/web per SC-003 (partial)
+- [X] T017 Consultar a documentação do Expo v57 (https://docs.expo.dev/versions/v57.0.0/) e confirmar que `animation: "fade"` nas pilhas/abas e `sharedTransitionTag` em `app/src/features/appointments/components/employees-card.tsx` seguem o uso suportado; T001 foi marcada como feita usando só o código em `node_modules` per plan: Technical Context / `app/AGENTS.md` (partial)

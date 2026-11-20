@@ -27,3 +27,10 @@
 ## 5. Escopo das navegações
 
 Mapa das telas e transições em [contracts/transitions.md](contracts/transitions.md). Telas que usam `Stack.Screen` com opções próprias (agendar, perfil, diário, PHQ) não definem `animation`, herdando o fade do layout; a de agendamento também herda o fade como base sob o Hero.
+
+## 6. Verificação na documentação e no código instalado (T017, 2026-11-20)
+
+- **Pilha**: o guia do Stack do Expo v57 lista `animation: "fade"` e `animationDuration`. `animationDuration` só vale no **iOS** (padrão 350 ms). Confere com o código instalado.
+- **Android**: o fade da pilha vem de `rns_fade_in.xml` / `rns_fade_out.xml` em `react-native-screens`, com **150 ms fixos** (não configuráveis por `animationDuration`). Isso fica abaixo dos 200 ms de SC-003. **Decisão (usuário): aceitar 150 ms no Android** e ajustar SC-003 na spec; sem patch na biblioteca. T016.
+- **Abas**: o guia de Tabs do Expo **não documenta** `animation`, mas os tipos instalados do bottom-tabs em `expo-router` aceitam `animation: 'none' | 'fade' | 'shift'`. Uso mantido, por ser suportado pelos tipos; validar em T014.
+- **Hero**: `sharedTransitionTag` não aparece nas páginas do Expo lidas; o suporte depende do Reanimated (flag `ENABLE_SHARED_ELEMENT_TRANSITIONS`) e não foi confirmado em Expo Go. Validar em T014.

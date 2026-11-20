@@ -17,6 +17,7 @@ No aplicativo móvel do paciente, a navegação entre telas hoje acontece sem um
 ### Session 2026-11-20
 
 - Q: Qual parte do card do profissional deve "viajar" da lista para a tela de agendamento na transição Hero? → A: O card inteiro, que se expande até virar o cabeçalho da tela de agendamento.
+- Q: A duração do esmaecimento no Android (150 ms fixos, abaixo dos 200 ms do SC-003) deve ser aceita ou corrigida com patch na biblioteca? → A: Aceitar 150 ms no Android e ajustar o SC-003 (200–500 ms vale para iOS e web).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -86,7 +87,7 @@ Não envolve dados novos; a feature é puramente visual e atua sobre as telas e 
 
 - **SC-001**: 100% das navegações entre telas do app apresentam transição animada (Hero ou Fade through), sem trocas bruscas.
 - **SC-002**: Em 100% das escolhas de profissional, o elemento animado parte do card escolhido e retorna a ele ao voltar.
-- **SC-003**: Cada transição dura entre 200 ms e 500 ms, perceptível mas sem atrasar a tarefa.
+- **SC-003**: Cada transição dura entre 200 ms e 500 ms no iOS e na web; no Android, o esmaecimento padrão da plataforma (cerca de 150 ms) é aceito. Em todos os casos, perceptível mas sem atrasar a tarefa.
 - **SC-004**: Os pacientes conseguem escolher um profissional e iniciar o agendamento na mesma quantidade de toques e sem aumento perceptível de tempo em relação ao comportamento anterior.
 - **SC-005**: Em testes de uso rápido (toques repetidos, voltar durante a animação), 0 ocorrências de tela duplicada, travamento ou elemento preso.
 - **SC-006**: Com "reduzir movimento" ativado, 0 transições com deslocamento de elemento são exibidas.
@@ -98,4 +99,5 @@ Não envolve dados novos; a feature é puramente visual e atua sobre as telas e 
 - O elemento compartilhado é o card inteiro do profissional; a tela de agendamento deve ter um cabeçalho que represente o mesmo profissional com os mesmos dados do card.
 - Fluxos modais ou de sobreposição (ex.: confirmações) seguem o Fade through como as demais navegações.
 - Duração e curva de movimento seguem padrões usuais de Material Design para os dois padrões de transição.
+- No Android o esmaecimento tem duração fixa de cerca de 150 ms, definida pela plataforma, e isso é aceito (ver Clarifications).
 - Android é a plataforma principal de verificação; comportamento equivalente é desejado em iOS e web sempre que suportado.

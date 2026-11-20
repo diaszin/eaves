@@ -19,5 +19,5 @@ Em `app/`: `yarn lint` e checagem de tipos (`npx tsc --noEmit`) sem erros.
 5. **Abas**: alternar entre as três abas; troca por fade. (US2 cenário 3)
 6. **Toques repetidos**: tocar 5 vezes rápido no mesmo card e voltar durante a animação. Uma única tela de agendamento, sem card preso. (FR-007, SC-005)
 7. **Reduzir movimento**: ativar "Remover animações" nas configurações do Android e repetir 1–5. Nenhum deslocamento de card; trocas sem animação. (FR-008, SC-006)
-8. **Duração**: gravar a tela e conferir transições entre 200 e 500 ms. (SC-003)
+8. **Duração**: gravar a tela e conferir transições entre 200 e 500 ms no iOS e na web; no Android, o fade de ~150 ms é aceito. (SC-003)
 9. **Sem regressão**: concluir um agendamento completo; resultado igual ao anterior. (FR-009, SC-004)
