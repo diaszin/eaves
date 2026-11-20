@@ -103,3 +103,9 @@ Após T003: T004 e T005 (US1) em paralelo com T008, T009, T010 e T011 (US2)
 
 - [X] T016 Decisão: aceitar o fade padrão de ~150 ms no Android (não configurável) e ajustar SC-003 em `specs/007-page-transition-animations/spec.md` para 200–500 ms só em iOS/web per SC-003 (partial)
 - [X] T017 Consultar a documentação do Expo v57 (https://docs.expo.dev/versions/v57.0.0/) e confirmar que `animation: "fade"` nas pilhas/abas e `sharedTransitionTag` em `app/src/features/appointments/components/employees-card.tsx` seguem o uso suportado; T001 foi marcada como feita usando só o código em `node_modules` per plan: Technical Context / `app/AGENTS.md` (partial)
+
+---
+
+## Phase 7: Convergence
+
+- [X] T018 Atualizar "Performance Goals" em `specs/007-page-transition-animations/plan.md` para refletir o SC-003 ajustado (200–500 ms em iOS/web; ~150 ms aceito no Android) per plan: Technical Context / SC-003 (partial)

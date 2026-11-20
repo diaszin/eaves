@@ -28,7 +28,7 @@ painel ou no banco.
 
 **Project Type**: mobile-app
 
-**Performance Goals**: transições de 200–500 ms sem queda perceptível de fluidez (SC-003)
+**Performance Goals**: transições de 200–500 ms em iOS e web, e ~150 ms aceito no Android (fade nativo fixo), sem queda perceptível de fluidez (SC-003)
 
 **Constraints**: textos em pt-BR; sem alterar comportamento funcional das telas; consultar a documentação do Expo v57 antes de escrever código ([app/AGENTS.md](../../app/AGENTS.md)); transição de elemento compartilhado do Reanimated é recurso experimental e precisa de flag estática habilitada
 
