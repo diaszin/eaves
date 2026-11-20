@@ -118,6 +118,7 @@ export class AppointmentsService {
       order: {
         initialDate: 'DESC',
       },
+      take: 5,
     });
   }
 
@@ -133,7 +134,9 @@ export class AppointmentsService {
     const professional = await this.userService.findUser(professionalId);
 
     if (!professional || professional.role !== Role.TRAINEE) {
-      throw new NotFoundException('O estagiário não existe em nossa base de dados');
+      throw new NotFoundException(
+        'O estagiário não existe em nossa base de dados',
+      );
     }
 
     const months = this.lastMonths(now, MONTHLY_COUNT_WINDOW);
