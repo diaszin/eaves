@@ -9,6 +9,11 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  optimizeDeps: {
+    // Carregadas só via import() dinâmico na exportação; pré-otimizar evita
+    // a reotimização (e o erro de módulo desatualizado) no primeiro clique.
+    include: ['exceljs', 'jspdf', 'jspdf-autotable'],
+  },
   server: {
     host: '0.0.0.0',
     port: 5173,
