@@ -67,5 +67,10 @@
     "lint": "expo lint",
     "prebuild": "npx expo prebuild"
   },
+  "reanimated": {
+    "staticFeatureFlags": {
+      "ENABLE_SHARED_ELEMENT_TRANSITIONS": true
+    }
+  },
   "private": true
 }

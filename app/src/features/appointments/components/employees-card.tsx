@@ -1,5 +1,7 @@
 import { UserColorGenerator } from "@/shared/user-color-generator";
 import { View, Text, TouchableOpacity } from "react-native";
+import Animated from "react-native-reanimated";
+import { useProfessionalSharedTag } from "@/shared/navigation/transitions";
 
 interface EmployeesCardProps {
   id: number;
@@ -13,13 +15,15 @@ export default function EmployeesCard(props: EmployeesCardProps) {
     reachedFullname[0][0].toUpperCase() +
     (reachedFullname[1]?.[0] ?? "").toUpperCase();
   const avatarColor = UserColorGenerator.generate(props.id);
+  const sharedTransitionTag = useProfessionalSharedTag(props.id);
 
   return (
     <TouchableOpacity
       activeOpacity={props.onPress ? 0.5 : 1}
       onPress={props.onPress}
     >
-      <View
+      <Animated.View
+        sharedTransitionTag={sharedTransitionTag}
         style={{
           overflow: "hidden",
           borderRadius: 16,
@@ -67,7 +71,7 @@ export default function EmployeesCard(props: EmployeesCardProps) {
             {props.fullname || "Profissional"}
           </Text>
         </View>
-      </View>
+      </Animated.View>
     </TouchableOpacity>
   );
 }

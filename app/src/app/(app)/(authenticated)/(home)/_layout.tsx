@@ -7,11 +7,13 @@ import {
   MdPerson,
 } from "react-icons/md";
 import { TouchableOpacity, View } from "react-native";
+import { useTabTransition } from "@/shared/navigation/transitions";
 export default function TabLyout() {
   const router = useRouter();
+  const transition = useTabTransition();
 
   return (
-    <Tabs>
+    <Tabs screenOptions={transition}>
       <Tabs.Screen
         name="index"
         options={{
