@@ -1,12 +1,13 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto.js';
 import { FindOptionsSelect, LessThan, MoreThan, Repository } from 'typeorm';
 import { Role, User } from '../auth/entities/user.entity.js';
-import { Appointment } from './entities/appointment.entity.js';
+import { Appointment, AppointmentStatus } from './entities/appointment.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from '../auth/auth.service.js';
 import { GeneralSettingsService } from '../settings/general-settings.service.js';
@@ -63,6 +64,7 @@ export class AppointmentsService {
     const conflictingAppointment = await this.appointmentRepository.findOne({
       where: {
         professional: { id: professional.id },
+        status: AppointmentStatus.SCHEDULED,
         initialDate: LessThan(endDate),
         endDate: MoreThan(initialDate),
       },
@@ -109,6 +111,7 @@ export class AppointmentsService {
     return this.appointmentRepository.find({
       select: {
         id: true,
+        status: true,
         initialDate: true,
         endDate: true,
         patient: allowedUserColumns,
@@ -219,6 +222,46 @@ export class AppointmentsService {
         professional: { profile: true },
       },
     });
+  }
+
+  async cancel(user: User, id: number) {
+    const appointment = await this.appointmentRepository.findOne({
+      where: { id },
+      relations: { patient: true },
+    });
+
+    if (!appointment) {
+      throw new NotFoundException('Agendamento não encontrado');
+    }
+
+    if (user.role === Role.PATIENT && appointment.patient.id !== user.id) {
+      throw new ForbiddenException(
+        'Você só pode cancelar os seus próprios agendamentos',
+      );
+    }
+
+    if (appointment.status === AppointmentStatus.CANCELLED) {
+      throw new BadRequestException('O agendamento já está cancelado');
+    }
+
+    if (appointment.endDate.getTime() <= Date.now()) {
+      throw new BadRequestException(
+        'Não é possível cancelar um agendamento já encerrado',
+      );
+    }
+
+    // Atualização condicional: se outro usuário cancelou entre a leitura e a
+    // escrita, nenhuma linha é afetada e respondemos como "já cancelado".
+    const result = await this.appointmentRepository.update(
+      { id, status: AppointmentStatus.SCHEDULED },
+      { status: AppointmentStatus.CANCELLED },
+    );
+
+    if (!result.affected) {
+      throw new BadRequestException('O agendamento já está cancelado');
+    }
+
+    return { id, status: AppointmentStatus.CANCELLED };
   }
 
   update(id: number, updateAppointmentDto: UpdateAppointmentDto) {

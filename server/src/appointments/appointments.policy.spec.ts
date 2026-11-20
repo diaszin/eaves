@@ -24,3 +24,22 @@ describe('AppointmentsPolicy.viewProfessionalStats', () => {
     expect(policy.viewProfessionalStats(null)).toBe(false);
   });
 });
+
+describe('AppointmentsPolicy.cancel', () => {
+  const policy = new AppointmentsPolicy();
+
+  it.each([Role.COORDINATOR, Role.LOBBY, Role.PATIENT])(
+    'permite o perfil %s',
+    (role) => {
+      expect(policy.cancel(userWithRole(role))).toBe(true);
+    },
+  );
+
+  it.each([Role.PROFESSOR, Role.TRAINEE])('nega o perfil %s', (role) => {
+    expect(policy.cancel(userWithRole(role))).toBe(false);
+  });
+
+  it('nega usuário nulo', () => {
+    expect(policy.cancel(null)).toBe(false);
+  });
+});

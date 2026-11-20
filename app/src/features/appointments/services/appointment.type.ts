@@ -25,8 +25,11 @@ export interface AppointmentProfile {
   };
 }
 
+export type AppointmentStatus = "scheduled" | "cancelled";
+
 export interface Appointment {
   id: number;
+  status?: AppointmentStatus;
   initialDate: Date;
   endDate: Date;
   createdBy: AppointmentProfile;

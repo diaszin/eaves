@@ -101,6 +101,19 @@ function getAppointmentDuration(appointment: {
     : null
 }
 
+interface CancelError {
+  id: number
+  message: string
+}
+
+function getApiErrorMessage(error: unknown): string {
+  const message = (
+    error as { response?: { data?: { message?: string | string[] } } }
+  )?.response?.data?.message
+  if (Array.isArray(message)) return message.join(' ')
+  return message ?? 'Não foi possível cancelar o agendamento. Tente novamente.'
+}
+
 export default function AppointmentsPage() {
   const { id, patientId } = useParams<{ id?: string; patientId?: string }>()
   const navigate = useNavigate()
@@ -136,6 +149,13 @@ export default function AppointmentsPage() {
       queryClient.invalidateQueries({ queryKey: ['appointments'] })
     },
   })
+  const cancelError =
+    cancelMutation.isError && cancelMutation.variables !== undefined
+      ? {
+          id: cancelMutation.variables,
+          message: getApiErrorMessage(cancelMutation.error),
+        }
+      : null
 
   return (
     <div className="flex h-full flex-col">
@@ -208,6 +228,7 @@ export default function AppointmentsPage() {
             canEdit={canEdit}
             onCancel={(apptId) => cancelMutation.mutate(apptId)}
             isCancelling={cancelMutation.isPending}
+            cancelError={cancelError}
           />
         )}
       </div>
@@ -245,12 +266,14 @@ function PatientProfileLoader({
   canEdit,
   onCancel,
   isCancelling,
+  cancelError,
 }: {
   patientId: number
   appointments: Appointment[]
   canEdit: boolean
   onCancel: (id: number) => void
   isCancelling: boolean
+  cancelError: CancelError | null
 }) {
   const patient = useMemo(
     () => groupByPatient(appointments).find((p) => p.patientId === patientId),
@@ -271,6 +294,7 @@ function PatientProfileLoader({
       canEdit={canEdit}
       onCancel={onCancel}
       isCancelling={isCancelling}
+      cancelError={cancelError}
     />
   )
 }
@@ -280,11 +304,13 @@ function PatientProfile({
   canEdit,
   onCancel,
   isCancelling,
+  cancelError,
 }: {
   patient: PatientAppointmentSummary
   canEdit: boolean
   onCancel: (id: number) => void
   isCancelling: boolean
+  cancelError: CancelError | null
 }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const [filters, setFilters] = useState<AppointmentFiltersState>(EMPTY_FILTERS)
@@ -378,8 +404,18 @@ function PatientProfile({
                       {formatAppointmentTime(appointment)}
                     </span>
                   </div>
-                  <div className="mt-1 truncate text-xs text-slate-500">
-                    {getProfessionalLabel(appointment)}
+                  <div className="mt-1 flex items-center justify-between gap-2">
+                    <span className="truncate text-xs text-slate-500">
+                      {getProfessionalLabel(appointment)}
+                    </span>
+                    <span
+                      className={clsx(
+                        'flex-shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium',
+                        STATUS_COLORS[appointment.status ?? 'scheduled'],
+                      )}
+                    >
+                      {STATUS_LABELS[appointment.status ?? 'scheduled']}
+                    </span>
                   </div>
                 </button>
               </li>
@@ -401,10 +437,16 @@ function PatientProfile({
               </div>
             ) : detailQ.data ? (
               <AppointmentDetail
+                key={detailQ.data.id}
                 appointment={detailQ.data}
                 canEdit={canEdit}
                 onCancel={() => onCancel(detailQ.data!.id)}
                 isCancelling={isCancelling}
+                error={
+                  cancelError?.id === detailQ.data.id
+                    ? cancelError.message
+                    : undefined
+                }
               />
             ) : null}
           </div>
@@ -421,17 +463,22 @@ function AppointmentDetail({
   canEdit,
   onCancel,
   isCancelling,
+  error,
 }: {
   appointment: Awaited<ReturnType<typeof appointmentsService.getById>>
   canEdit: boolean
   onCancel: () => void
   isCancelling: boolean
+  error?: string
 }) {
+  const [confirming, setConfirming] = useState(false)
   const status = appointment.status ?? 'scheduled'
   const date = appointment.initialDate ?? appointment.date
   const duration = getAppointmentDuration(appointment)
-  const isCancellable =
-    status === 'scheduled' || status === 'confirmed'
+  const hasEnded = appointment.endDate
+    ? new Date(appointment.endDate).getTime() <= Date.now()
+    : false
+  const isCancellable = status === 'scheduled' && !hasEnded
 
   return (
     <div className="max-w-2xl rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
@@ -499,15 +546,46 @@ function AppointmentDetail({
       )}
 
       {canEdit && isCancellable && (
-        <div className="flex gap-3">
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={onCancel}
-            isLoading={isCancelling}
-          >
-            Cancelar Agendamento
-          </Button>
+        <div className="space-y-3">
+          {confirming ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+              <p className="mb-3 text-sm text-red-700">
+                Tem certeza que deseja cancelar este agendamento? Essa ação não
+                pode ser desfeita.
+              </p>
+              <div className="flex gap-3">
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={onCancel}
+                  isLoading={isCancelling}
+                >
+                  Confirmar cancelamento
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setConfirming(false)}
+                  disabled={isCancelling}
+                >
+                  Voltar
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => setConfirming(true)}
+            >
+              Cancelar Agendamento
+            </Button>
+          )}
+          {error && (
+            <p role="alert" className="text-sm text-red-600">
+              {error}
+            </p>
+          )}
         </div>
       )}
     </div>

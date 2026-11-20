@@ -7,6 +7,11 @@ import {
 } from 'typeorm';
 import { User } from '../../auth/entities/user.entity.js';
 
+export enum AppointmentStatus {
+  SCHEDULED = 'scheduled',
+  CANCELLED = 'cancelled',
+}
+
 @Entity()
 export class Appointment {
   @PrimaryGeneratedColumn()
@@ -20,6 +25,14 @@ export class Appointment {
 
   @Column({ type: 'text', nullable: true })
   notes: string | null;
+
+  @Column({
+    type: 'enum',
+    enum: AppointmentStatus,
+    default: AppointmentStatus.SCHEDULED,
+    nullable: false,
+  })
+  status: AppointmentStatus;
 
   @CreateDateColumn()
   created: Date;

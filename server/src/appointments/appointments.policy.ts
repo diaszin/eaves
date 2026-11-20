@@ -13,6 +13,14 @@ export class AppointmentsPolicy {
     );
   }
 
+  cancel(user: User | null) {
+    return (
+      user?.role === Role.COORDINATOR ||
+      user?.role === Role.LOBBY ||
+      user?.role === Role.PATIENT
+    );
+  }
+
   viewProfessionalStats(user: User | null) {
     return user?.role === Role.COORDINATOR;
   }

@@ -27,6 +27,10 @@ export class AppointmentService {
     await this.appointments.post("/", data);
   }
 
+  public async cancel(id: number): Promise<void> {
+    await this.appointments.patch(`/${id}/cancel`);
+  }
+
   public async get(): Promise<Appointment[]> {
     const response = await this.appointments.get("/");
 

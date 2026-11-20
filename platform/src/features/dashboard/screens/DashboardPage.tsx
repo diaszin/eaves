@@ -64,7 +64,8 @@ export default function DashboardPage() {
 
   const today = new Date().toISOString().split('T')[0]
   const todayAppointments = (appointmentsQ.data ?? []).filter(
-    (a) => (a.initialDate ?? a.date)?.startsWith(today),
+    (a) =>
+      a.status !== 'cancelled' && (a.initialDate ?? a.date)?.startsWith(today),
   )
   const upcomingAppointments = (appointmentsQ.data ?? [])
     .filter(

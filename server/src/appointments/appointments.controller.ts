@@ -75,6 +75,22 @@ export class AppointmentsController {
     return this.appointmentsService.findOneByUser(user, +id);
   }
 
+  @Patch(':id/cancel')
+  @Can(AppointmentsPolicy, 'cancel')
+  @ApiOkResponse({
+    description: 'Agendamento cancelado',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'number', example: 1 },
+        status: { type: 'string', example: 'cancelled' },
+      },
+    },
+  })
+  cancel(@CurrentUser() user: User, @Param('id', ParseIntPipe) id: number) {
+    return this.appointmentsService.cancel(user, id);
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: string,

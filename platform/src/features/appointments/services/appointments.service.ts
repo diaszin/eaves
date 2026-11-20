@@ -95,7 +95,9 @@ export const appointmentsService = {
 
   cancel: (id: number) =>
     http
-      .patch<Appointment>(`/appointments/${id}`, { status: 'cancelled' })
+      .patch<{ id: number; status: AppointmentStatus }>(
+        `/appointments/${id}/cancel`,
+      )
       .then((r) => r.data),
 
   remove: (id: number) => http.delete(`/appointments/${id}`).then((r) => r.data),
