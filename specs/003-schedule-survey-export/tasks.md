@@ -99,3 +99,8 @@ Após a Fase 2: T007 e T009 juntos; depois T008 (US1) e T010→T011 (US2) em par
 - **MVP**: Fases 1–3 (escala em Excel e PDF). Entrega valor sozinha.
 - **Incremental**: adicionar US2 (pesquisa) em seguida; ambas são P1 e compartilham o módulo da Fase 2.
 - Fechar com a Fase 5 antes de abrir o PR.
+
+## Phase 6: Convergence
+
+- [x] T015 Incluir período de vigência e status (Ativa/Inativa) de cada escala no arquivo exportado no modo "todas as escalas ativas", por exemplo colunas adicionais em `platform/src/features/schedules/utils/scheduleExport.ts`, per FR-002 (partial)
+- [x] T016 Alinhar a tela de detalhe da pesquisa ao arquivo exportado: exibir "Sem resposta" (em vez de pontuação 0 / "Nunca") para pergunta sem registro em `platform/src/features/surveys/screens/SurveysPage.tsx`, per FR-006 (partial)

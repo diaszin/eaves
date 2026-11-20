@@ -152,6 +152,7 @@ function SurveyDetail({ survey }: { survey: Survey }) {
           {PHQ9_QUESTIONS.map((question, idx) => {
             const answer = survey.answers?.find((a) => a.questionIndex === idx)
             const score = answer?.score ?? 0
+            const answered = !!answer
             return (
               <div key={idx} className="rounded-lg bg-slate-50 p-4">
                 <div className="mb-2 flex items-start justify-between gap-2">
@@ -162,17 +163,18 @@ function SurveyDetail({ survey }: { survey: Survey }) {
                   <span
                     className={clsx(
                       'flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-bold',
-                      score === 0 && 'bg-green-100 text-green-700',
+                      !answered && 'bg-slate-100 text-slate-500',
+                      answered && score === 0 && 'bg-green-100 text-green-700',
                       score === 1 && 'bg-yellow-100 text-yellow-700',
                       score === 2 && 'bg-orange-100 text-orange-700',
                       score === 3 && 'bg-red-100 text-red-700',
                     )}
                   >
-                    {score}
+                    {answered ? score : '—'}
                   </span>
                 </div>
                 <p className="text-xs text-slate-500">
-                  {SCORE_LABELS[score] ?? '—'}
+                  {answered ? (SCORE_LABELS[score] ?? '—') : 'Sem resposta'}
                 </p>
               </div>
             )

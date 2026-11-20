@@ -34,6 +34,10 @@ function sortShifts(shifts: ScheduleShift[]): ScheduleShift[] {
   })
 }
 
+function periodOf(s: Schedule): string {
+  return `${fmtDate(s.startDate)} a ${s.endDate ? fmtDate(s.endDate) : 'sem data de término'}`
+}
+
 export function countShifts(schedules: Schedule[]): number {
   return schedules.reduce((acc, s) => acc + (s.shifts?.length ?? 0), 0)
 }
@@ -54,16 +58,14 @@ export function buildScheduleExport(
       { label: 'Escala', value: first.title },
       {
         label: 'Período',
-        value: `${fmtDate(first.startDate)} a ${
-          first.endDate ? fmtDate(first.endDate) : 'sem data de término'
-        }`,
+        value: periodOf(first),
       },
       { label: 'Status', value: first.isActive ? 'Ativa' : 'Inativa' },
     )
   }
 
   const columns = [
-    ...(all ? ['Escala'] : []),
+    ...(all ? ['Escala', 'Período', 'Status'] : []),
     'Dia',
     'Início',
     'Término',
@@ -72,7 +74,7 @@ export function buildScheduleExport(
   ]
   const rows = schedules.flatMap((sch) =>
     sortShifts(sch.shifts ?? []).map((s) => [
-      ...(all ? [sch.title] : []),
+      ...(all ? [sch.title, periodOf(sch), sch.isActive ? 'Ativa' : 'Inativa'] : []),
       dayLabel(s),
       s.startTime,
       s.endTime,
