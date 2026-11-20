@@ -25,7 +25,7 @@ export default function SuccessBottomSheet(props: SuccessBottomSheetProps) {
       <View
         className="flex flex-col items-center justify-center"
         style={{
-          height: 200,
+          height: 400,
         }}
       >
         {props.isOpen && (
@@ -33,7 +33,7 @@ export default function SuccessBottomSheet(props: SuccessBottomSheetProps) {
             source={require("../../assets/animations/json/success.json")}
             autoPlay
             loop={false}
-            style={{ width: 100, height: 100 }}
+            style={{ width: 200, height: 200 }}
           />
         )}
         <View className="flex flex-col items-center justify-center">
