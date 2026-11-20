@@ -14,6 +14,7 @@ import {
 import { useFonts } from "expo-font";
 
 import "../../global.css";
+import ScreenFade from "@/shared/navigation/web-screen-fade";
 import { useScreenTransition } from "@/shared/navigation/transitions";
 import AuthProvider from "@/components/providers/AuthProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -40,7 +41,10 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Stack screenOptions={{ headerShown: false, ...transition }} />
+        <Stack
+          screenOptions={{ headerShown: false, ...transition }}
+          screenLayout={({ children }) => <ScreenFade>{children}</ScreenFade>}
+        />
       </AuthProvider>
     </QueryClientProvider>
   );

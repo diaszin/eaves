@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import EmployeesCard from "../components/employees-card";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useRef } from "react";
+import { runWithViewTransition } from "@/shared/navigation/view-transition";
 
 export default function AppointmentsView() {
   const router = useRouter();
@@ -38,13 +39,17 @@ export default function AppointmentsView() {
             onPress={() => {
               if (isNavigating.current) return;
               isNavigating.current = true;
-              router.push({
-                pathname: "/(app)/(authenticated)/appointments/create",
-                params: {
-                  id: item.id,
-                  fullname: item.profile.fullname,
-                },
-              });
+              runWithViewTransition(
+                () =>
+                  router.push({
+                    pathname: "/(app)/(authenticated)/appointments/create",
+                    params: {
+                      id: item.id,
+                      fullname: item.profile.fullname,
+                    },
+                  }),
+                { professionalId: item.id },
+              );
             }}
           />
         )}

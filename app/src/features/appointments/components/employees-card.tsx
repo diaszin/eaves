@@ -1,7 +1,9 @@
 import { UserColorGenerator } from "@/shared/user-color-generator";
+import { useLayoutEffect, useRef } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Animated from "react-native-reanimated";
 import { useProfessionalSharedTag } from "@/shared/navigation/transitions";
+import { useProfessionalTransitionName } from "@/shared/navigation/view-transition";
 
 interface EmployeesCardProps {
   id: number;
@@ -17,61 +19,73 @@ export default function EmployeesCard(props: EmployeesCardProps) {
   const avatarColor = UserColorGenerator.generate(props.id);
   const sharedTransitionTag = useProfessionalSharedTag(props.id);
 
+  // Web: nome da view transition (Hero) aplicado ao DOM antes da captura.
+  const transitionName = useProfessionalTransitionName(props.id);
+  const wrapperRef = useRef<View>(null);
+  useLayoutEffect(() => {
+    const element = wrapperRef.current as unknown as HTMLElement | null;
+    if (element?.style) {
+      element.style.setProperty("view-transition-name", transitionName ?? "");
+    }
+  }, [transitionName]);
+
   return (
     <TouchableOpacity
       activeOpacity={props.onPress ? 0.5 : 1}
       onPress={props.onPress}
     >
-      <Animated.View
-        sharedTransitionTag={sharedTransitionTag}
-        style={{
-          overflow: "hidden",
-          borderRadius: 16,
-          backgroundColor: "white",
-          elevation: 3,
-        }}
-      >
-        <View
+      <View ref={wrapperRef}>
+        <Animated.View
+          sharedTransitionTag={sharedTransitionTag}
           style={{
-            height: 110,
-            justifyContent: "flex-end",
-            padding: 16,
-            backgroundColor: avatarColor,
-          }}
-        ></View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            padding: 16,
-            gap: 12,
+            overflow: "hidden",
+            borderRadius: 16,
+            backgroundColor: "white",
+            elevation: 3,
           }}
         >
           <View
             style={{
-              width: 52,
-              height: 52,
-              borderRadius: 26,
+              height: 110,
+              justifyContent: "flex-end",
+              padding: 16,
+              backgroundColor: avatarColor,
+            }}
+          ></View>
+          <View
+            style={{
+              flexDirection: "row",
               alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "#e5eee9",
+              padding: 16,
+              gap: 12,
             }}
           >
-            <Text
+            <View
               style={{
-                color: "#fff",
-                fontSize: 18,
-                fontWeight: "700",
+                width: 52,
+                height: 52,
+                borderRadius: 26,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#e5eee9",
               }}
             >
-              {initials}
+              <Text
+                style={{
+                  color: "#fff",
+                  fontSize: 18,
+                  fontWeight: "700",
+                }}
+              >
+                {initials}
+              </Text>
+            </View>
+            <Text style={{ color: "#222", fontSize: 16, fontWeight: "600" }}>
+              {props.fullname || "Profissional"}
             </Text>
           </View>
-          <Text style={{ color: "#222", fontSize: 16, fontWeight: "600" }}>
-            {props.fullname || "Profissional"}
-          </Text>
-        </View>
-      </Animated.View>
+        </Animated.View>
+      </View>
     </TouchableOpacity>
   );
 }

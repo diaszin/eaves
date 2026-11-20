@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   View,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import EmployeesCard from "../components/employees-card";
@@ -19,6 +20,8 @@ import authService from "@/features/auth/services/auth.service";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
 import SuccessBottomSheet from "@/components/SuccesssBottomSheet";
 import type { CreateAppointmentRequest } from "../services/appointment.type";
+import { runWithViewTransition } from "@/shared/navigation/view-transition";
+import { MdArrowBack } from "react-icons/md";
 export default function AppointmentsCreate() {
   const query = useQueryClient();
   const [visibleDateCount, setVisibleDateCount] = useState(5);
@@ -69,7 +72,27 @@ export default function AppointmentsCreate() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Stack.Screen
-        options={{ title: "Agendar consulta", headerShown: true }}
+        options={{
+          title: "Agendar consulta",
+          headerShown: true,
+          // Web: voltar dentro de uma view transition (Hero); móvel usa o botão nativo.
+          headerLeft:
+            Platform.OS === "web"
+              ? () => (
+                  <TouchableOpacity
+                    accessibilityLabel="Voltar"
+                    onPress={() =>
+                      runWithViewTransition(() => router.back(), {
+                        professionalId: +id,
+                      })
+                    }
+                    style={{ paddingHorizontal: 12 }}
+                  >
+                    <MdArrowBack size={24} />
+                  </TouchableOpacity>
+                )
+              : undefined,
+        }}
       />
       <ScrollView className="flex flex-col m-2 px-3 h-full">
         <EmployeesCard id={+id} fullname={fullname} />
