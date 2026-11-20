@@ -10,14 +10,14 @@ export class EmployeesService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  findEmployeesByRole(role: string): Promise<User[]> {
+  findEmployeesByRole(role?: string): Promise<User[]> {
     const mappedRole = {
       coordinator: Role.COORDINATOR,
       trainee: Role.TRAINEE,
       lobby: Role.LOBBY,
       professor: Role.PROFESSOR,
       patient: Role.PATIENT,
-    }[role.toLowerCase()];
+    }[role ? role.toLowerCase() : 'trainee'];
 
     return this.userRepository.find({
       where: { role: mappedRole },
