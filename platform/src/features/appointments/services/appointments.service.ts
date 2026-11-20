@@ -20,6 +20,11 @@ export interface Appointment {
     email: string
     profile?: { fullname: string }
   }
+  professional?: {
+    id: number
+    email: string
+    profile?: { fullname: string }
+  }
   therapist?: {
     id: number
     email: string
@@ -61,6 +66,14 @@ export const appointmentsService = {
       return data
     }
     return []
+  },
+
+  listAll: async (): Promise<Appointment[]> => {
+    const data = await http
+      .get<Appointment[]>('/appointments/all')
+      .then((r) => r.data)
+
+    return Array.isArray(data) ? data : []
   },
 
   getById: async (id: number): Promise<Appointment> => {

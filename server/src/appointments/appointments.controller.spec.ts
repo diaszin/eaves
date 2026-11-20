@@ -20,6 +20,7 @@ describe('AppointmentsController GET professionals/:professionalId/monthly-count
   const service = {
     countByMonthForProfessional: vi.fn(),
     findOneByUser: vi.fn(),
+    findAllUnlimited: vi.fn(),
   };
 
   beforeAll(async () => {
@@ -53,6 +54,7 @@ describe('AppointmentsController GET professionals/:professionalId/monthly-count
   beforeEach(() => {
     service.countByMonthForProfessional.mockReset().mockResolvedValue(COUNTS);
     service.findOneByUser.mockReset();
+    service.findAllUnlimited.mockReset().mockResolvedValue([{ id: 1 }]);
   });
 
   it('200 para o coordenador, com as contagens do serviço', async () => {
@@ -95,6 +97,74 @@ describe('AppointmentsController GET professionals/:professionalId/monthly-count
   it('não é tratada pela rota GET :id', async () => {
     await request(app.getHttpServer())
       .get(ROUTE)
+      .set('x-test-role', Role.COORDINATOR)
+      .expect(200);
+
+    expect(service.findOneByUser).not.toHaveBeenCalled();
+  });
+});
+
+describe('AppointmentsController GET all', () => {
+  let app: INestApplication;
+  const service = {
+    findAllUnlimited: vi.fn(),
+    findOneByUser: vi.fn(),
+  };
+
+  beforeAll(async () => {
+    Reflect.defineMetadata('design:paramtypes', [AppointmentsService], AppointmentsController);
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AuthorizationModule.forRoot()],
+      controllers: [AppointmentsController],
+      providers: [
+        AppointmentsPolicy,
+        { provide: AppointmentsService, useValue: service },
+      ],
+    }).compile();
+
+    app = moduleRef.createNestApplication();
+    app.use((req: any, _res: unknown, next: () => void) => {
+      const role = req.headers['x-test-role'];
+      if (role) req.user = { id: 1, role };
+      next();
+    });
+    await app.init();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  beforeEach(() => {
+    service.findAllUnlimited.mockReset().mockResolvedValue([{ id: 1 }, { id: 2 }]);
+    service.findOneByUser.mockReset();
+  });
+
+  it.each([Role.COORDINATOR, Role.PROFESSOR, Role.LOBBY, Role.TRAINEE, Role.PATIENT])(
+    '200 para o perfil %s, delegando a findAllUnlimited',
+    async (role) => {
+      const res = await request(app.getHttpServer())
+        .get('/appointments/all')
+        .set('x-test-role', role)
+        .expect(200);
+
+      expect(res.body).toHaveLength(2);
+      // O usuário vem de @CurrentUser (não resolvido neste módulo de teste);
+      // o escopo por papel é coberto em appointments.service.spec.ts.
+      expect(service.findAllUnlimited).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it('401 sem usuário autenticado', async () => {
+    await request(app.getHttpServer()).get('/appointments/all').expect(401);
+
+    expect(service.findAllUnlimited).not.toHaveBeenCalled();
+  });
+
+  it('não é capturada pela rota GET :id', async () => {
+    await request(app.getHttpServer())
+      .get('/appointments/all')
       .set('x-test-role', Role.COORDINATOR)
       .expect(200);
 

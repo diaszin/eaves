@@ -89,7 +89,9 @@ export function SectionPanel() {
         {section === 'appointments' && (
           <AppointmentsList
             search={search}
-            onSelect={(id) => navigate(`/appointments/${id}`)}
+            onSelect={(patientId) =>
+              navigate(`/appointments/patient/${patientId}`)
+            }
           />
         )}
         {section === 'schedules' && (

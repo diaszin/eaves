@@ -1,11 +1,17 @@
-import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import {
+  Navigate,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, CalendarDays, Clock, User, FileText, X } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuth } from '@/features/auth/contexts/auth'
 import {
   appointmentsService,
+  type Appointment,
   type CreateAppointmentDto,
   type AppointmentStatus,
 } from '@/features/appointments/services/appointments.service'
@@ -14,6 +20,17 @@ import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner'
 import { EmptyState } from '@/shared/components/ui/EmptyState'
+import { Avatar } from '@/shared/components/ui/Avatar'
+import { PatientAppointmentFilters } from '@/features/appointments/components/PatientAppointmentFilters'
+import {
+  EMPTY_FILTERS,
+  filterAppointments,
+  getProfessionalLabel,
+  getProfessionalOptions,
+  groupByPatient,
+  type PatientAppointmentFilters as AppointmentFiltersState,
+  type PatientAppointmentSummary,
+} from '@/features/appointments/utils/patientAppointments'
 
 const STATUS_LABELS: Record<AppointmentStatus, string> = {
   scheduled: 'Agendado',
@@ -85,7 +102,7 @@ function getAppointmentDuration(appointment: {
 }
 
 export default function AppointmentsPage() {
-  const { id } = useParams<{ id?: string }>()
+  const { id, patientId } = useParams<{ id?: string; patientId?: string }>()
   const navigate = useNavigate()
   const { user } = useAuth()
   const queryClient = useQueryClient()
@@ -94,18 +111,19 @@ export default function AppointmentsPage() {
   const canCreate = user?.role === 'coordinator' || user?.role === 'lobby'
   const canEdit = user?.role === 'coordinator' || user?.role === 'lobby'
 
-  // Detail query
-  const detailQ = useQuery({
-    queryKey: ['appointments', id],
-    queryFn: () => appointmentsService.getById(Number(id)),
-    enabled: !!id,
+  // Lista completa (agrupada por paciente); usada pelo perfil e pela rota legada
+  const listQ = useQuery({
+    queryKey: ['appointments', 'all'],
+    queryFn: () => appointmentsService.listAll(),
+    enabled: !!id || !!patientId,
   })
 
   // Create mutation
   const createMutation = useMutation({
     mutationFn: (dto: CreateAppointmentDto) => appointmentsService.create(dto),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['appointments'] })
+    onSuccess: async (data) => {
+      // Aguarda a lista atualizar para que a rota legada encontre o novo agendamento.
+      await queryClient.invalidateQueries({ queryKey: ['appointments'] })
       setShowForm(false)
       navigate(`/appointments/${data.id}`)
     },
@@ -124,7 +142,7 @@ export default function AppointmentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 px-8 py-5">
         <h1 className="text-xl font-semibold text-slate-900">
-          {id ? 'Detalhe do Agendamento' : 'Agendamentos'}
+          Agendamentos
         </h1>
         {canCreate && (
           <Button
@@ -156,32 +174,242 @@ export default function AppointmentsPage() {
           </div>
         )}
 
-        {/* Detail */}
-        {id ? (
-          detailQ.isLoading ? (
-            <LoadingSpinner centered />
-          ) : detailQ.error ? (
-            <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
-              Erro ao carregar agendamento.
-            </div>
-          ) : detailQ.data ? (
-            <AppointmentDetail
-              appointment={detailQ.data}
-              canEdit={canEdit}
-              onCancel={() => cancelMutation.mutate(detailQ.data!.id)}
-              isCancelling={cancelMutation.isPending}
-            />
-          ) : null
-        ) : (
+        {/* Perfil do paciente */}
+        {!id && !patientId ? (
           !showForm && (
             <EmptyState
-              title="Selecione um agendamento"
-              description="Escolha um agendamento na lista à esquerda para ver os detalhes, ou crie um novo."
+              title="Selecione um paciente"
+              description="Escolha um paciente na lista à esquerda para ver seus agendamentos, ou crie um novo."
               icon={<CalendarDays className="h-7 w-7" />}
             />
           )
+        ) : listQ.isLoading ? (
+          <LoadingSpinner centered />
+        ) : listQ.error || !listQ.data ? (
+          <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
+            <p>Erro ao carregar agendamentos.</p>
+            <button
+              type="button"
+              onClick={() => listQ.refetch()}
+              className="mt-3 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+            >
+              Tentar novamente
+            </button>
+          </div>
+        ) : id ? (
+          <LegacyAppointmentRedirect
+            appointmentId={Number(id)}
+            appointments={listQ.data}
+          />
+        ) : (
+          <PatientProfileLoader
+            patientId={Number(patientId)}
+            appointments={listQ.data}
+            canEdit={canEdit}
+            onCancel={(apptId) => cancelMutation.mutate(apptId)}
+            isCancelling={cancelMutation.isPending}
+          />
         )}
       </div>
+    </div>
+  )
+}
+
+function LegacyAppointmentRedirect({
+  appointmentId,
+  appointments,
+}: {
+  appointmentId: number
+  appointments: Appointment[]
+}) {
+  const appointment = appointments.find((a) => a.id === appointmentId)
+  if (!appointment?.patient) {
+    return (
+      <EmptyState
+        title="Agendamento não encontrado"
+        icon={<CalendarDays className="h-7 w-7" />}
+      />
+    )
+  }
+  return (
+    <Navigate
+      to={`/appointments/patient/${appointment.patient.id}?appointment=${appointment.id}`}
+      replace
+    />
+  )
+}
+
+function PatientProfileLoader({
+  patientId,
+  appointments,
+  canEdit,
+  onCancel,
+  isCancelling,
+}: {
+  patientId: number
+  appointments: Appointment[]
+  canEdit: boolean
+  onCancel: (id: number) => void
+  isCancelling: boolean
+}) {
+  const patient = useMemo(
+    () => groupByPatient(appointments).find((p) => p.patientId === patientId),
+    [appointments, patientId],
+  )
+  if (!patient) {
+    return (
+      <EmptyState
+        title="Paciente não encontrado"
+        icon={<User className="h-7 w-7" />}
+      />
+    )
+  }
+  return (
+    <PatientProfile
+      key={patient.patientId}
+      patient={patient}
+      canEdit={canEdit}
+      onCancel={onCancel}
+      isCancelling={isCancelling}
+    />
+  )
+}
+
+function PatientProfile({
+  patient,
+  canEdit,
+  onCancel,
+  isCancelling,
+}: {
+  patient: PatientAppointmentSummary
+  canEdit: boolean
+  onCancel: (id: number) => void
+  isCancelling: boolean
+}) {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [filters, setFilters] = useState<AppointmentFiltersState>(EMPTY_FILTERS)
+
+  const professionals = useMemo(
+    () => getProfessionalOptions(patient.appointments),
+    [patient.appointments],
+  )
+  const filtered = useMemo(
+    () => filterAppointments(patient.appointments, filters),
+    [patient.appointments, filters],
+  )
+
+  const requestedId = Number(searchParams.get('appointment'))
+  const selected =
+    filtered.find((a) => a.id === requestedId) ?? filtered[0] ?? null
+
+  // A listagem não traz as observações; o detalhe completo vem de getById.
+  const detailQ = useQuery({
+    queryKey: ['appointments', selected?.id],
+    queryFn: () => appointmentsService.getById(selected!.id),
+    enabled: !!selected,
+  })
+
+  return (
+    <div className="max-w-5xl space-y-6">
+      <div className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <Avatar name={patient.displayName} size="md" />
+        <div className="flex-1">
+          <h2 className="font-semibold text-slate-900">{patient.displayName}</h2>
+          <div className="mt-1 flex items-center gap-3 text-xs text-slate-500">
+            <span className="flex items-center gap-1">
+              <User className="h-3 w-3" />
+              {patient.email}
+            </span>
+            <span className="flex items-center gap-1">
+              <CalendarDays className="h-3 w-3" />
+              {patient.appointmentCount}{' '}
+              {patient.appointmentCount === 1 ? 'agendamento' : 'agendamentos'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <PatientAppointmentFilters
+        filters={filters}
+        professionals={professionals}
+        onChange={setFilters}
+      />
+
+      {filtered.length === 0 ? (
+        <EmptyState
+          title="Nenhum agendamento encontrado para os filtros selecionados"
+          icon={<CalendarDays className="h-7 w-7" />}
+          action={
+            <button
+              type="button"
+              onClick={() => setFilters(EMPTY_FILTERS)}
+              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+            >
+              Limpar filtros
+            </button>
+          }
+        />
+      ) : (
+        <div className="grid gap-6 lg:grid-cols-[18rem_1fr]">
+          <ul className="space-y-2" aria-label="Histórico de agendamentos">
+            {filtered.map((appointment) => (
+              <li key={appointment.id}>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSearchParams(
+                      { appointment: String(appointment.id) },
+                      { replace: true },
+                    )
+                  }
+                  className={clsx(
+                    'w-full rounded-xl border bg-white p-3 text-left shadow-sm transition-colors hover:bg-slate-50',
+                    selected?.id === appointment.id
+                      ? 'border-indigo-500 ring-1 ring-indigo-500'
+                      : 'border-slate-200',
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1 text-sm font-medium text-slate-800">
+                      <CalendarDays className="h-3 w-3 text-slate-400" />
+                      {formatDate(appointment.initialDate ?? appointment.date)}
+                    </span>
+                    <span className="text-xs text-slate-500">
+                      {formatAppointmentTime(appointment)}
+                    </span>
+                  </div>
+                  <div className="mt-1 truncate text-xs text-slate-500">
+                    {getProfessionalLabel(appointment)}
+                  </div>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div>
+            {detailQ.isLoading ? (
+              <LoadingSpinner centered />
+            ) : detailQ.error ? (
+              <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
+                <p>Erro ao carregar agendamento.</p>
+                <button
+                  type="button"
+                  onClick={() => detailQ.refetch()}
+                  className="mt-3 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                >
+                  Tentar novamente
+                </button>
+              </div>
+            ) : detailQ.data ? (
+              <AppointmentDetail
+                appointment={detailQ.data}
+                canEdit={canEdit}
+                onCancel={() => onCancel(detailQ.data!.id)}
+                isCancelling={isCancelling}
+              />
+            ) : null}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -246,12 +474,8 @@ function AppointmentDetail({
         )}
         <InfoField
           icon={<User className="h-4 w-4" />}
-          label="Terapeuta"
-          value={
-            appointment.therapist?.profile?.fullname ??
-            appointment.therapist?.email ??
-            '—'
-          }
+          label="Profissional"
+          value={getProfessionalLabel(appointment)}
         />
         <InfoField
           icon={<User className="h-4 w-4" />}

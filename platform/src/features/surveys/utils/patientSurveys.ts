@@ -1,4 +1,7 @@
 import type { Survey } from '@/features/surveys/services/surveys.service'
+import { isDateRangeValid, toLocalDateKey } from '@/shared/utils/dateRange'
+
+export { isDateRangeValid, toLocalDateKey }
 
 export interface PatientSurveySummary {
   patientId: number
@@ -19,15 +22,6 @@ export const EMPTY_FILTERS: PatientSurveyFilters = {
   from: '',
   to: '',
   category: '',
-}
-
-/** Data local (YYYY-MM-DD) de um timestamp ISO. */
-export function toLocalDateKey(iso: string): string {
-  const date = new Date(iso)
-  if (Number.isNaN(date.getTime())) return ''
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${date.getFullYear()}-${month}-${day}`
 }
 
 function byCreatedAtDesc(a: Survey, b: Survey) {
@@ -76,10 +70,6 @@ export function searchPatients(
 
 export function getAvailableCategories(surveys: Survey[]): string[] {
   return Array.from(new Set(surveys.map((s) => s.category))).sort()
-}
-
-export function isDateRangeValid(from: string, to: string): boolean {
-  return !from || !to || from <= to
 }
 
 export function hasActiveFilters(filters: PatientSurveyFilters): boolean {

@@ -109,3 +109,49 @@ describe('AppointmentsService.countByMonthForProfessional', () => {
     ).rejects.toBeInstanceOf(NotFoundException);
   });
 });
+
+describe('AppointmentsService.findAll / findAllUnlimited', () => {
+  function setupFind() {
+    const repository = {
+      find: vi.fn().mockResolvedValue([]),
+      createQueryBuilder: vi.fn(),
+    };
+    const service = new AppointmentsService(
+      repository as never,
+      {} as never,
+      {} as never,
+    );
+    return { service, repository };
+  }
+
+  it('findAll mantém o limite de 5 itens', async () => {
+    const { service, repository } = setupFind();
+
+    await service.findAll({ id: 1, role: Role.COORDINATOR } as never);
+
+    expect(repository.find).toHaveBeenCalledWith(
+      expect.objectContaining({ take: 5 }),
+    );
+  });
+
+  it('findAllUnlimited não aplica limite e mantém a ordenação', async () => {
+    const { service, repository } = setupFind();
+
+    await service.findAllUnlimited({ id: 1, role: Role.COORDINATOR } as never);
+
+    const options = repository.find.mock.calls[0][0];
+    expect(options).not.toHaveProperty('take');
+    expect(options.order).toEqual({ initialDate: 'DESC' });
+    expect(options).not.toHaveProperty('where');
+  });
+
+  it('paciente só consulta os próprios agendamentos', async () => {
+    const { service, repository } = setupFind();
+
+    await service.findAllUnlimited({ id: 9, role: Role.PATIENT } as never);
+
+    expect(repository.find.mock.calls[0][0].where).toEqual({
+      patient: { id: 9 },
+    });
+  });
+});

@@ -87,6 +87,14 @@ export class AppointmentsService {
   }
 
   findAll(user: User) {
+    return this.queryAppointments(user, 5);
+  }
+
+  findAllUnlimited(user: User) {
+    return this.queryAppointments(user);
+  }
+
+  private queryAppointments(user: User, limit?: number) {
     const allowedUserColumns: FindOptionsSelect<User> = {
       email: true,
       id: true,
@@ -118,7 +126,7 @@ export class AppointmentsService {
       order: {
         initialDate: 'DESC',
       },
-      take: 5,
+      ...(limit !== undefined ? { take: limit } : {}),
     });
   }
 

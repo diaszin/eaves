@@ -54,6 +54,13 @@ export class AppointmentsController {
     return this.appointmentsService.findAll(user);
   }
 
+  @Get('all')
+  @Can(AppointmentsPolicy, 'view')
+  @ApiOkResponse({ description: 'Todos os agendamentos, sem limite de quantidade' })
+  findAllUnlimited(@CurrentUser() user: User) {
+    return this.appointmentsService.findAllUnlimited(user);
+  }
+
   @Get('professionals/:professionalId/monthly-count')
   @Can(AppointmentsPolicy, 'viewProfessionalStats')
   @ApiOkResponse({ type: MonthlyCountDto, isArray: true })
