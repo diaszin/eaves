@@ -4,9 +4,10 @@ Pasta: `app/src/shared/navigation/`. Cada módulo tem versão móvel (sem efeito
 
 ## Interface
 
-- `runWithViewTransition(update: () => void, options?: { name?: string }): void`
-  - Web: se houver suporte e movimento não estiver reduzido, inicia `document.startViewTransition`, executa `update` e resolve quando o foco da tela mudar (limite de 400 ms); caso contrário, apenas executa `update`.
+- `runWithViewTransition(update: () => void, options?: { professionalId?: number }): void`
+  - Web: se houver suporte e movimento não estiver reduzido, inicia `document.startViewTransition`, executa `update` e resolve quando o foco da tela mudar (limite de 400 ms, depois do qual a transição é pulada); caso contrário, apenas executa `update`.
   - Móvel: apenas executa `update`.
+- `notifyScreenFocused(): void`: avisa que uma tela ganhou foco e libera a view transition em andamento (web); no móvel não faz nada. Chamado pelo `ScreenFade`.
 - `useViewTransitionActive(): boolean`: verdadeiro enquanto uma view transition está ativa (só web; falso no móvel).
 - `ScreenFade` (componente): envoltório de tela. Web: opacidade 0→1 em ~250 ms com atraso de 60 ms ao ganhar foco, desligado com reduzir movimento ou com view transition ativa. Móvel: devolve os filhos sem alteração.
 - `useProfessionalTransitionName(id: number): string | undefined`: devolve `professional-card-{id}` apenas para o card em navegação (web); `undefined` nos demais casos e no móvel.

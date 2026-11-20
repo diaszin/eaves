@@ -105,3 +105,10 @@ Depois de T005: T006, T007 e T008 em paralelo
 ## Phase 6: Convergence
 
 - [X] T019 Em `app/src/shared/navigation/view-transition.web.ts`, limitar a view transition de `popstate` ao fluxo profissional → agendamento (zerar `lastProfessionalId` ao sair desse fluxo ou comparar a rota de destino) e implementar o `skipTransition()` descrito em T003 quando a transição ficar sem resolução, para que voltar/avançar em outras telas nunca espere os 400 ms per FR-009 / SC-005 (partial)
+
+---
+
+## Phase 7: Convergence
+
+- [X] T020 Em `app/src/features/appointments/components/employees-card.tsx`, renderizar a `View` de envoltório (ref do `view-transition-name`) somente na web, para que a árvore do card no Android e no iOS fique idêntica à da feature 007 per FR-011 / SC-007 (partial)
+- [X] T021 Incluir `notifyScreenFocused()` na seção "Interface" de `specs/008-web-page-transitions/contracts/web-transitions.md`, com a descrição de que libera a view transition em andamento quando uma tela ganha foco per plan: Project Structure (partial)
