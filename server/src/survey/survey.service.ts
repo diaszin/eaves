@@ -125,6 +125,7 @@ export class SurveyService {
       return {
         id: firstAnswer.id,
         createdAt: firstAnswer.answeredDate,
+        category: firstAnswer.type,
         totalScore,
         severity:
           totalScore <= 4

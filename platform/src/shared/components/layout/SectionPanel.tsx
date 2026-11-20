@@ -26,7 +26,7 @@ const SECTION_TITLES: Record<string, string> = {
   appointments: 'Agendamentos',
   schedules: 'Escalas de Atendimento',
   trainees: 'Estagiários',
-  surveys: 'Questionários PHQ-9',
+  surveys: 'Pesquisas',
   journals: 'Diários',
   profile: 'Meu Perfil',
   settings: 'Configuração geral',
@@ -108,7 +108,7 @@ export function SectionPanel() {
         {section === 'surveys' && (
           <SurveysList
             search={search}
-            onSelect={(id) => navigate(`/surveys/${id}`)}
+            onSelect={(patientId) => navigate(`/surveys/patient/${patientId}`)}
           />
         )}
         {section === 'journals' && (

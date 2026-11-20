@@ -9,6 +9,7 @@ export interface PHQ9Answer {
 export interface Survey {
   id: number
   createdAt: string
+  category: string
   totalScore: number
   severity: 'minimal' | 'mild' | 'moderate' | 'moderately_severe' | 'severe'
   answers: PHQ9Answer[]
@@ -62,3 +63,11 @@ export const PHQ9_SEVERITY_COLORS: Record<Survey['severity'], string> = {
 }
 
 export const SCORE_LABELS = ['Nunca', 'Vários dias', 'Mais da metade dos dias', 'Quase todo dia']
+
+export const SURVEY_CATEGORY_LABELS: Record<string, string> = {
+  PHQ: 'PHQ-9',
+}
+
+export function getCategoryLabel(category: string): string {
+  return SURVEY_CATEGORY_LABELS[category] ?? category
+}
