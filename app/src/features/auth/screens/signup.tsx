@@ -10,6 +10,7 @@ import authService from "../services/auth.service";
 import { useMutation } from "@tanstack/react-query";
 import { Link, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
+import SuccessBottomSheet from "@/components/SuccesssBottomSheet";
 import { AxiosError } from "axios";
 import { MdChevronLeft } from "react-icons/md";
 
@@ -48,6 +49,7 @@ export default function SignUpScreen() {
     : false;
 
   const [step, setStep] = useState<number>(1);
+  const [accountCreated, setAccountCreated] = useState(false);
   const router = useRouter();
 
   const mutation = useMutation<any, AxiosError, SignupMutationData>({
@@ -65,7 +67,7 @@ export default function SignUpScreen() {
         value.localization,
       ),
     onSuccess: () => {
-      router.replace("/(auth)/sign-in");
+      setAccountCreated(true);
     },
   });
 
@@ -144,6 +146,14 @@ export default function SignUpScreen() {
           </View>
         </View>
         <ErrorBottomSheet error={mutation.error} />
+        <SuccessBottomSheet
+          messsage="Sua conta foi criada com sucesso."
+          isOpen={accountCreated}
+          onDismiss={() => {
+            setAccountCreated(false);
+            router.replace("/(auth)/sign-in");
+          }}
+        />
       </View>
     </MultiStepContext.Provider>
   );
