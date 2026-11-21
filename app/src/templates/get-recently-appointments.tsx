@@ -1,9 +1,10 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import appointmentService from "@/features/appointments/services/appointment.service";
 import type { Appointment } from "@/features/appointments/services/appointment.type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { MdNaturePeople } from "react-icons/md";
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
+import { View, Text, FlatList } from "react-native";
 
 const STATUS_LABELS: Record<string, string> = {
   scheduled: "Agendado",
@@ -101,7 +102,7 @@ function AppointmentItem({ item }: { item: Appointment }) {
               pode ser desfeita.
             </Text>
             <View className="flex flex-row gap-2">
-              <TouchableOpacity
+              <PressableScale
                 accessibilityRole="button"
                 disabled={cancelMutation.isPending}
                 onPress={() => cancelMutation.mutate()}
@@ -112,8 +113,8 @@ function AppointmentItem({ item }: { item: Appointment }) {
                     ? "Cancelando..."
                     : "Confirmar cancelamento"}
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+              </PressableScale>
+              <PressableScale
                 accessibilityRole="button"
                 disabled={cancelMutation.isPending}
                 onPress={() => {
@@ -123,7 +124,7 @@ function AppointmentItem({ item }: { item: Appointment }) {
                 className="border border-gray-300 rounded-md px-3 py-2"
               >
                 <Text className="text-[0.8rem]">Voltar</Text>
-              </TouchableOpacity>
+              </PressableScale>
             </View>
             {cancelMutation.isError && (
               <Text className="text-red-700 text-[0.8rem]">
@@ -132,13 +133,13 @@ function AppointmentItem({ item }: { item: Appointment }) {
             )}
           </View>
         ) : (
-          <TouchableOpacity
+          <PressableScale
             accessibilityRole="button"
             onPress={() => setConfirming(true)}
             className="self-start border border-red-600 rounded-md px-3 py-2"
           >
             <Text className="text-red-600 text-[0.8rem]">Cancelar</Text>
-          </TouchableOpacity>
+          </PressableScale>
         ))}
     </View>
   );

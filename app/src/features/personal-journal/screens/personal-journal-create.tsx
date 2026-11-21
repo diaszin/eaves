@@ -1,10 +1,10 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   View,
   Text,
   FlatList,
   TextInput,
-  TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -177,7 +177,7 @@ export default function PersonalJournalCreate() {
           const isDisabled = !canSubmit || isBusy;
 
           return (
-            <TouchableOpacity
+            <PressableScale
               disabled={isDisabled}
               className={
                 isDisabled
@@ -197,7 +197,7 @@ export default function PersonalJournalCreate() {
                   Desabafar
                 </Text>
               )}
-            </TouchableOpacity>
+            </PressableScale>
           );
         }}
       </createForm.Subscribe>

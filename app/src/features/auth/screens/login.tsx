@@ -1,9 +1,9 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import {
   ActivityIndicator,
   View,
   Text,
   Image,
-  TouchableOpacity,
 } from "react-native";
 import InputWithLabel from "../components/input_with_label";
 import {
@@ -217,7 +217,7 @@ export default function LoginScreen() {
           selector={(state) => [state.canSubmit, state.isSubmitting]}
         >
           {([canSubmit, isSubmitting]) => (
-            <TouchableOpacity
+            <PressableScale
               disabled={!canSubmit || isSubmitting || mutate.isPending}
               onPress={() => {
                 authForm.handleSubmit();
@@ -232,7 +232,7 @@ export default function LoginScreen() {
                   <MdArrowForward className="text-white size-4" />
                 </>
               )}
-            </TouchableOpacity>
+            </PressableScale>
           )}
         </authForm.Subscribe>
 
@@ -242,7 +242,7 @@ export default function LoginScreen() {
           <View className="h-0.5 w-20 bg-gray-300" />
         </View>
 
-        <TouchableOpacity
+        <PressableScale
           accessibilityRole="button"
           accessibilityLabel="Continuar com Microsoft"
           disabled={microsoft.isSubmitting || microsoftMutation.isPending}
@@ -259,7 +259,7 @@ export default function LoginScreen() {
           <Text className="font-secondary-medium text-customblack-min">
             Continuar com Microsoft
           </Text>
-        </TouchableOpacity>
+        </PressableScale>
       </View>
       <View className="flex flex-col items-center justify-center">
         <Text className="font-secondary-regular text-sm text-gray-600">
@@ -275,9 +275,9 @@ export default function LoginScreen() {
       <View className="flex flex-row items-center justify-center gap-4">
         <Text className="text-customblack-min">Privacidade</Text>
         <Text className="text-customblack-min">•</Text>
-        <TouchableOpacity onPress={() => router.push("/legal_terms")}>
+        <PressableScale onPress={() => router.push("/legal_terms")}>
           <Text className="text-customblack-min">Termos</Text>
-        </TouchableOpacity>
+        </PressableScale>
         <Text className="text-customblack-min">•</Text>
         <Text className="text-customblack-min">Ajuda</Text>
       </View>

@@ -1,7 +1,7 @@
 import { BottomSheet } from "@expo/ui";
 import { useEffect, useState } from "react";
 import LottieView from "lottie-react-native";
-import { useColorScheme, Text, View, TouchableOpacity } from "react-native";
+import { useColorScheme, Text, View } from "react-native";
 
 interface SuccessBottomSheetProps {
   messsage: string;

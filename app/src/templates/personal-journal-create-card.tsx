@@ -1,4 +1,5 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import PressableScale from "@/shared/components/pressable-scale";
+import { View, Text } from "react-native";
 import { TbBrain } from "react-icons/tb";
 import { MdAdd, MdPlusOne } from "react-icons/md";
 import { useRouter } from "expo-router";
@@ -23,7 +24,7 @@ export default function PersonalJournalCreateCard() {
         </Text>
       </View>
       <View className="flex flex-col items-center w-full">
-        <TouchableOpacity
+        <PressableScale
           onPress={() => {
             router.push("/(app)/(authenticated)/journal/create");
           }}
@@ -31,7 +32,7 @@ export default function PersonalJournalCreateCard() {
         >
           <MdAdd className="text-white" />
           <Text className="text-white">Escrever uma nova memória</Text>
-        </TouchableOpacity>
+        </PressableScale>
       </View>
     </View>
   );

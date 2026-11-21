@@ -1,4 +1,5 @@
-import { Text, TouchableOpacity, View } from "react-native";
+import PressableScale from "@/shared/components/pressable-scale";
+import { Text, View } from "react-native";
 import EmotionButton from "./emotion-button";
 
 interface PersonalJournalCardProps {
@@ -17,7 +18,7 @@ export default function PersonalJournalCard(props: PersonalJournalCardProps) {
   const formattedPublishDate = dateFormatter.format(convertedDate);
 
   return (
-    <TouchableOpacity
+    <PressableScale size="card"
       onPress={props.onPress}
       className="flex flex-col justify-center gap-2 w-full h-28 p-2 border  border-customgray bg-white rounded-md"
     >
@@ -29,6 +30,6 @@ export default function PersonalJournalCard(props: PersonalJournalCardProps) {
           {props.emotion.toUpperCase()}
         </Text>
       </View>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }

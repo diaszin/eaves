@@ -1,7 +1,8 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import { Asset } from "expo-asset";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import * as Sharing from "expo-sharing";
 
 const PDF_DOCUMENT = require("../../../assets/others/TERMO DE CONSENTIMENTO LIVRE E ESCLARECIDO TDICs.pdf");
@@ -77,7 +78,7 @@ export default function LegalTermsScreen() {
         Abra o termo de consentimento em um aplicativo compatível com PDF.
       </Text>
       {pdfUri ? (
-        <Pressable
+        <PressableScale
           accessibilityRole="button"
           className="rounded-lg bg-blue-600 px-6 py-3"
           disabled={isOpening}
@@ -90,7 +91,7 @@ export default function LegalTermsScreen() {
               Abrir documento PDF
             </Text>
           )}
-        </Pressable>
+        </PressableScale>
       ) : (
         <ActivityIndicator accessibilityLabel="Carregando documento" />
       )}

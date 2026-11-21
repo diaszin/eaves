@@ -1,6 +1,6 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import {
   ActivityIndicator,
-  TouchableOpacity,
   View,
   Text,
 } from "react-native";
@@ -128,14 +128,14 @@ export default function AuthStepScreen() {
               >
                 {(isSubmitting) => (
                   <View className="w-full flex items-center justify-center">
-                    <TouchableOpacity
+                    <PressableScale
                       disabled={isSubmitting}
                       className="min-h-12 w-full m-2 flex flex-row items-center justify-center bg-white border border-secondary-max gap-0.5 rounded-xl"
                       onPress={multiStepContext.previous}
                     >
                       <Text className="text-secondary-max">Voltar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
+                    </PressableScale>
+                    <PressableScale
                       disabled={!group.state.meta.canSubmit || isSubmitting}
                       className={`min-h-12 w-full m-2 flex flex-row items-center justify-center ${group.state.meta.canSubmit && !isSubmitting ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
                       onPress={group.handleSubmit}
@@ -145,7 +145,7 @@ export default function AuthStepScreen() {
                       ) : (
                         <Text className="text-white">Criar minha conta</Text>
                       )}
-                    </TouchableOpacity>
+                    </PressableScale>
                   </View>
                 )}
               </multiStepContext.form.Subscribe>

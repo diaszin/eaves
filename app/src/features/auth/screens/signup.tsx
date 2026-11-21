@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { View, Text, Image, TouchableOpacity, Pressable } from "react-native";
+import { View, Text, Image } from "react-native";
 import PersonalStep from "./signup_steps/personal_step_screen";
 import { MultiStepContext } from "../contexts/multiStepContext";
 import CommunicationStep from "./signup_steps/communication_step_screen";

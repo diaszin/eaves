@@ -2,7 +2,7 @@ import { BottomSheet } from "@expo/ui";
 import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { MdDisabledByDefault, MdError } from "react-icons/md";
-import { useColorScheme, Text, View, TouchableOpacity } from "react-native";
+import { useColorScheme, Text, View } from "react-native";
 
 interface ErrorBottomSheetProps {
   error: AxiosError | Error | null;

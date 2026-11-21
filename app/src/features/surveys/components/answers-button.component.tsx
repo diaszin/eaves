@@ -1,4 +1,5 @@
-import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
+import PressableScale from "@/shared/components/pressable-scale";
+import { ActivityIndicator, Text } from "react-native";
 
 interface AnswerButtonProps {
   text: string;
@@ -9,7 +10,7 @@ interface AnswerButtonProps {
 
 export default function AnswerButton(props: AnswerButtonProps) {
   return (
-    <TouchableOpacity
+    <PressableScale
       accessibilityRole="button"
       disabled={props.disabled}
       onPress={() => {
@@ -24,6 +25,6 @@ export default function AnswerButton(props: AnswerButtonProps) {
           {props.text}
         </Text>
       )}
-    </TouchableOpacity>
+    </PressableScale>
   );
 }

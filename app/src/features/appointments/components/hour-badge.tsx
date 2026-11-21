@@ -1,4 +1,5 @@
-import { Text, TouchableOpacity, View } from "react-native";
+import PressableScale from "@/shared/components/pressable-scale";
+import { Text, View } from "react-native";
 
 interface HourBadgeProps {
   startTime: string;
@@ -14,9 +15,11 @@ export default function HourBadge({
   isSelected,
 }: HourBadgeProps) {
   return (
-    <TouchableOpacity
+    <PressableScale
       onPress={onPress}
-      className={`flex flex-col justify-center  border  gap-1 rounded-md shadow  bg-white h-14 w-[48%] p-2 ${isSelected ? "border-blue-300" : "border-transparent"}`}
+      selected={isSelected}
+      selectedColors={{ borderColor: ["rgba(147,197,253,0)", "#93C5FD"] }}
+      className="flex flex-col justify-center  border  gap-1 rounded-md shadow  bg-white h-14 w-[48%] p-2"
     >
       <View className="flex flex-row items-center justify-start gap-1">
         <Text className="text-customblack-max font-primary-bold">
@@ -34,6 +37,6 @@ export default function HourBadge({
           </Text>
         )}
       </View>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }

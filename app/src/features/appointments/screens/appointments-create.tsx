@@ -1,12 +1,11 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import {
   Text,
   ScrollView,
   FlatList,
-  Pressable,
   ActivityIndicator,
   View,
-  TouchableOpacity,
   Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -79,7 +78,7 @@ export default function AppointmentsCreate() {
           headerLeft:
             Platform.OS === "web"
               ? () => (
-                  <TouchableOpacity
+                  <PressableScale size="icon"
                     accessibilityLabel="Voltar"
                     onPress={() =>
                       runWithViewTransition(() => router.back(), {
@@ -89,7 +88,7 @@ export default function AppointmentsCreate() {
                     style={{ paddingHorizontal: 12 }}
                   >
                     <MdArrowBack size={24} />
-                  </TouchableOpacity>
+                  </PressableScale>
                 )
               : undefined,
         }}
@@ -123,7 +122,7 @@ export default function AppointmentsCreate() {
                     dayoFWeek.charAt(0).toUpperCase() +
                     dayoFWeek.slice(1).toLowerCase();
                   return (
-                    <Pressable
+                    <PressableScale
                       accessibilityRole="button"
                       accessibilityLabel={`Selecionar ${dayOFWeekInTitleCase}, ${item.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}`}
                       disabled={professionalScheduleMutation.isPending}
@@ -132,11 +131,12 @@ export default function AppointmentsCreate() {
                         form.setFieldValue("selectedHour", "");
                         professionalScheduleMutation.mutate({ date: item });
                       }}
-                      className={`items-center justify-center rounded-lg h-16 w-24 border px-3 py-2 ${
-                        selected
-                          ? "border-blue-600 bg-blue-600"
-                          : "border-gray-300"
-                      }`}
+                      selected={selected}
+                      selectedColors={{
+                        backgroundColor: ["rgba(37,99,235,0)", "#2563EB"],
+                        borderColor: ["#D1D5DB", "#2563EB"],
+                      }}
+                      className="items-center justify-center rounded-lg h-16 w-24 border px-3 py-2"
                     >
                       {professionalScheduleMutation.isPending &&
                       professionalScheduleMutation.variables?.date.toDateString() ===
@@ -166,7 +166,7 @@ export default function AppointmentsCreate() {
                           </Text>
                         </>
                       )}
-                    </Pressable>
+                    </PressableScale>
                   );
                 }}
               />
@@ -278,7 +278,7 @@ export default function AppointmentsCreate() {
                 profileQuery.isError;
 
               return (
-                <TouchableOpacity
+                <PressableScale
                   disabled={isDisabled}
                   onPress={() => form.handleSubmit()}
                   className={`rounded-lg w-full h-12 flex items-center justify-center ${
@@ -292,7 +292,7 @@ export default function AppointmentsCreate() {
                       Confirmar agendamento
                     </Text>
                   )}
-                </TouchableOpacity>
+                </PressableScale>
               );
             }}
           </form.Subscribe>

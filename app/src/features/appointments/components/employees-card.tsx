@@ -1,6 +1,7 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import { UserColorGenerator } from "@/shared/user-color-generator";
 import { useLayoutEffect, useRef } from "react";
-import { Platform, View, Text, TouchableOpacity } from "react-native";
+import { Platform, View, Text } from "react-native";
 import Animated from "react-native-reanimated";
 import { useProfessionalSharedTag } from "@/shared/navigation/transitions";
 import { useProfessionalTransitionName } from "@/shared/navigation/view-transition";
@@ -83,12 +84,13 @@ export default function EmployeesCard(props: EmployeesCardProps) {
   );
 
   return (
-    <TouchableOpacity
-      activeOpacity={props.onPress ? 0.5 : 1}
+    <PressableScale
+      size="card"
+      disabled={!props.onPress}
       onPress={props.onPress}
     >
       {/* O envoltório com ref existe só na web (Hero); no móvel a árvore não muda. */}
       {Platform.OS === "web" ? <View ref={wrapperRef}>{card}</View> : card}
-    </TouchableOpacity>
+    </PressableScale>
   );
 }

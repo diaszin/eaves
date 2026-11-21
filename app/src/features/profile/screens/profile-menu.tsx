@@ -1,3 +1,4 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import { Stack, useRouter } from "expo-router";
 import {
   MdCardMembership,
@@ -13,7 +14,6 @@ import {
   ActivityIndicator,
   View,
   Text,
-  TouchableOpacity,
 } from "react-native";
 import ProfileMenuItem from "../components/profile-menu-item";
 import { useQuery } from "@tanstack/react-query";
@@ -105,7 +105,7 @@ export default function ProfileMenuScreen() {
               />
             </View>
           </View>
-          <TouchableOpacity
+          <PressableScale
             disabled={isSigningOut}
             onPress={async () => {
               setIsSigningOut(true);
@@ -125,7 +125,7 @@ export default function ProfileMenuScreen() {
                 <Text className="text-white font-primary-bold">Sair do App</Text>
               </>
             )}
-          </TouchableOpacity>
+          </PressableScale>
         </View>
       </View>
     </View>

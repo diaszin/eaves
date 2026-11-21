@@ -1,3 +1,4 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import authService from "@/features/auth/services/auth.service";
 import { ProfileResponse } from "@/features/auth/services/auth.type";
 import InputWithLabel from "@/features/auth/components/input_with_label";
@@ -11,7 +12,6 @@ import {
   Text,
   Image,
   ScrollView,
-  TouchableOpacity,
 } from "react-native";
 import DropdownWithLabel from "@/features/auth/components/dropdown_with_label";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
@@ -191,7 +191,7 @@ function ProfileEditForm({ profile }: { profile: ProfileResponse }) {
               const isBusy = isSubmitting || updateMutation.isPending;
 
               return (
-                <TouchableOpacity
+                <PressableScale
                   className={`w-full h-10 rounded-sm flex items-center justify-center ${isBusy ? "bg-gray-300" : "bg-primary-max"}`}
                   onPress={() => form.handleSubmit()}
                   disabled={isBusy}
@@ -201,7 +201,7 @@ function ProfileEditForm({ profile }: { profile: ProfileResponse }) {
                   ) : (
                     <Text className="text-white font-primary-bold">Salvar</Text>
                   )}
-                </TouchableOpacity>
+                </PressableScale>
               );
             }}
           </form.Subscribe>

@@ -1,4 +1,5 @@
-import { TouchableOpacity, View, Text } from "react-native";
+import PressableScale from "@/shared/components/pressable-scale";
+import { View, Text } from "react-native";
 import { useContext } from "react";
 import MaskInputWithLabel from "../../components/masked_input_with_label";
 import { MultiStepContext } from "../../contexts/multiStepContext";
@@ -86,19 +87,19 @@ export default function CommunicationStep() {
                 )}
               </multiStepContext.form.Field>
               <View className="w-full flex items-center justify-center">
-                <TouchableOpacity
+                <PressableScale
                   className={`min-h-12 w-full m-2 flex flex-row items-center justify-center bg-white border border-secondary-max gap-0.5 rounded-xl`}
                   onPress={multiStepContext.previous}
                 >
                   <Text className="text-secondary-max">Voltar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
+                </PressableScale>
+                <PressableScale
                   disabled={!group.state.meta.canSubmit}
                   className={`min-h-12 w-full m-2 flex flex-row items-center justify-center ${group.state.meta.canSubmit ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
                   onPress={group.handleSubmit}
                 >
                   <Text className="text-white">Avançar</Text>
-                </TouchableOpacity>
+                </PressableScale>
               </View>
             </View>
           </View>

@@ -1,5 +1,6 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import { IconType } from "react-icons/lib";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text } from "react-native";
 
 interface EmotionButtonProps {
   value: number;
@@ -10,15 +11,13 @@ interface EmotionButtonProps {
 
 export default function EmotionButton(props: EmotionButtonProps) {
   return (
-    <TouchableOpacity
+    <PressableScale
       onPress={() => {
         props.onPress?.(props.value);
       }}
-      className={
-        props.active
-          ? "bg-primary-max text-white rounded-lg border-[0.6px] border-black flex items-center justify-center w-20 px-14"
-          : "bg-secondary-min rounded-lg border-[0.6px] border-black flex items-center justify-center w-20 px-14"
-      }
+      selected={props.active}
+      selectedColors={{ backgroundColor: ["#FBF0FF", "#19648C"] }}
+      className="rounded-lg border-[0.6px] border-black flex items-center justify-center w-20 px-14"
     >
       <Text
         className={
@@ -29,6 +28,6 @@ export default function EmotionButton(props: EmotionButtonProps) {
       >
         {props.content}
       </Text>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }

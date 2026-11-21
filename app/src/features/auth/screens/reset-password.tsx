@@ -1,3 +1,4 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
 import SuccessBottomSheet from "@/components/SuccesssBottomSheet";
 import InputWithLabel from "@/features/auth/components/input_with_label";
@@ -12,7 +13,6 @@ import {
   Image,
   ScrollView,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { MdArrowForward, MdLockOutline } from "react-icons/md";
@@ -159,7 +159,7 @@ export default function ResetPasswordScreen() {
               selector={(state) => [state.isSubmitting]}
             >
               {([isSubmitting]) => (
-                <TouchableOpacity
+                <PressableScale
                   accessibilityRole="button"
                   disabled={isSubmitting || mutation.isPending}
                   onPress={() => form.handleSubmit()}
@@ -177,7 +177,7 @@ export default function ResetPasswordScreen() {
                       <MdArrowForward className="size-4 text-white" />
                     </>
                   )}
-                </TouchableOpacity>
+                </PressableScale>
               )}
             </form.Subscribe>
           </View>

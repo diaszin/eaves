@@ -1,9 +1,9 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ActivityIndicator,
   View,
   Text,
-  TouchableOpacity,
 } from "react-native";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
 import surveyService from "../services/survey.service";
@@ -108,7 +108,7 @@ export default function PHQScreen() {
           headerShown: true,
           title: "Como está você hoje?",
           headerLeft: () => (
-            <TouchableOpacity
+            <PressableScale size="icon"
               disabled={
                 surveyMutation.isPending || doesPhq9Mutation.isPending
               }
@@ -125,7 +125,7 @@ export default function PHQScreen() {
               ) : (
                 <CgChevronLeft />
               )}
-            </TouchableOpacity>
+            </PressableScale>
           ),
         }}
       />

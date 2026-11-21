@@ -1,7 +1,8 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import { Href } from "expo-router";
 import { IconType } from "react-icons/lib";
 import { MdArrowRight, MdChevronRight, MdPermIdentity } from "react-icons/md";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text } from "react-native";
 
 interface ProfileMenuItemProps {
   title: string;
@@ -12,7 +13,7 @@ interface ProfileMenuItemProps {
 
 export default function ProfileMenuItem(props: ProfileMenuItemProps) {
   return (
-    <TouchableOpacity onPress={props.onPress}>
+    <PressableScale onPress={props.onPress}>
       <View className="w-full bg-white p-2 flex flex-row justify-between items-center rounded-md">
         <View className="flex flex-row gap-4 items-center">
           <View className="h-8 w-8 bg-secondary-min text-blue-300 flex items-center justify-center rounded-md">
@@ -31,6 +32,6 @@ export default function ProfileMenuItem(props: ProfileMenuItemProps) {
           <MdChevronRight />
         </View>
       </View>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }

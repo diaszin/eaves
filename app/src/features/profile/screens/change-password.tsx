@@ -1,3 +1,4 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import ErrorBottomSheet from "@/components/ErrorBottomSheet";
 import SuccessBottomSheet from "@/components/SuccesssBottomSheet";
 import InputWithLabel from "@/features/auth/components/input_with_label";
@@ -12,7 +13,6 @@ import {
   Image,
   ScrollView,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 
@@ -175,7 +175,7 @@ export default function ProfileChangePasswordScreen() {
               const isDisabled = !canSubmit || isBusy;
 
               return (
-                <TouchableOpacity
+                <PressableScale
                   className={`w-full h-10 rounded-sm flex items-center justify-center ${
                     !isDisabled ? "bg-primary-max" : "bg-gray-300"
                   }`}
@@ -189,7 +189,7 @@ export default function ProfileChangePasswordScreen() {
                       Alterar senha
                     </Text>
                   )}
-                </TouchableOpacity>
+                </PressableScale>
               );
             }}
           </form.Subscribe>

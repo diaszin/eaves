@@ -1,8 +1,9 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import surveyService from "@/features/surveys/services/survey.service";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { MdTimelapse, MdChevronRight, MdCheck } from "react-icons/md";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text } from "react-native";
 
 export default function DailySurvey() {
   const verifyDailySurveyQuery = useQuery({
@@ -29,7 +30,7 @@ export default function DailySurvey() {
           Uma breve reflexão sobre como você está se sentindo hoje.
         </Text>
       </View>
-      <TouchableOpacity
+      <PressableScale
         disabled={verifyDailySurveyQuery.data?.answered}
         onPress={() => {
           if (!verifyDailySurveyQuery.data?.answered) {
@@ -60,7 +61,7 @@ export default function DailySurvey() {
             </>
           )}
         </View>
-      </TouchableOpacity>
+      </PressableScale>
     </View>
   );
 }

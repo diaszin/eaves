@@ -1,3 +1,4 @@
+import PressableScale from "@/shared/components/pressable-scale";
 import { Tabs, useRouter } from "expo-router";
 import {
   MdAutoStories,
@@ -6,7 +7,7 @@ import {
   MdHome,
   MdPerson,
 } from "react-icons/md";
-import { TouchableOpacity, View } from "react-native";
+import { View } from "react-native";
 import { useTabTransition } from "@/shared/navigation/transitions";
 export default function TabLyout() {
   const router = useRouter();
@@ -25,14 +26,14 @@ export default function TabLyout() {
           headerRight: () => {
             return (
               <View className="flex flex-row m-2 px-5 bg-transparent ">
-                <TouchableOpacity
+                <PressableScale size="icon"
                   onPress={() => {
                     router.push("/(app)/(authenticated)/profile/menu");
                   }}
                   className="bg-primary-max size-8 rounded-full flex items-center justify-center"
                 >
                   <MdPerson className="text-white" size={20} />
-                </TouchableOpacity>
+                </PressableScale>
               </View>
             );
           },
