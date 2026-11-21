@@ -1,0 +1,18 @@
+# Dependencies and generated output
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Environment files and logs
+.env*
+!.env.example
+*.log
+
+# Temporary and operating-system files
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.idea/
