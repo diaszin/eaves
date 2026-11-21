@@ -1,4 +1,6 @@
 import PressableScale from "@/shared/components/pressable-scale";
+import ButtonSuccessCheck from "@/shared/components/button-success-check";
+import { useState } from "react";
 import {
   ActivityIndicator,
   View,
@@ -26,6 +28,8 @@ import { SignInRequest, SignInResponse } from "../services/auth.type";
 
 WebBrowser.maybeCompleteAuthSession();
 
+const SUCCESS_GREEN = "#00C885";
+
 async function handleLogin(email: string, password: string) {
   const response = await authService.login({ email, password });
 
@@ -36,6 +40,10 @@ export default function LoginScreen() {
   const { signIn } = useSession();
   const router = useRouter();
   const microsoft = useLoginWithMicrosoft();
+  const [successButton, setSuccessButton] = useState<
+    "email" | "microsoft" | null
+  >(null);
+  const goHome = () => router.replace("/");
 
   const mutate = useMutation<SignInResponse, AxiosError, SignInRequest>({
     mutationKey: ["auth", "login"],
@@ -44,7 +52,7 @@ export default function LoginScreen() {
     onSuccess: async (data) => {
       await signIn(data.access_token, data.expires);
 
-      router.replace("/");
+      setSuccessButton("email");
     },
   });
 
@@ -84,7 +92,7 @@ export default function LoginScreen() {
     onSuccess: async (data) => {
       if (data) {
         await signIn(data.access_token, data.expires);
-        router.replace("/");
+        setSuccessButton("microsoft");
       }
     },
   });
@@ -218,13 +226,25 @@ export default function LoginScreen() {
         >
           {([canSubmit, isSubmitting]) => (
             <PressableScale
-              disabled={!canSubmit || isSubmitting || mutate.isPending}
+              disabled={
+                !canSubmit ||
+                isSubmitting ||
+                mutate.isPending ||
+                successButton !== null
+              }
               onPress={() => {
                 authForm.handleSubmit();
               }}
+              style={
+                successButton === "email"
+                  ? { backgroundColor: SUCCESS_GREEN }
+                  : undefined
+              }
               className={`min-h-12 flex flex-row items-center justify-center ${canSubmit && !isSubmitting && !mutate.isPending ? "bg-primary-min" : "bg-gray-300"} gap-0.5 rounded-xl`}
             >
-              {isSubmitting || mutate.isPending ? (
+              {successButton === "email" ? (
+                <ButtonSuccessCheck onFinish={goHome} />
+              ) : isSubmitting || mutate.isPending ? (
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
                 <>
@@ -245,13 +265,24 @@ export default function LoginScreen() {
         <PressableScale
           accessibilityRole="button"
           accessibilityLabel="Continuar com Microsoft"
-          disabled={microsoft.isSubmitting || microsoftMutation.isPending}
+          disabled={
+            microsoft.isSubmitting ||
+            microsoftMutation.isPending ||
+            successButton !== null
+          }
           onPress={async () => {
             microsoftMutation.mutate();
           }}
+          style={
+            successButton === "microsoft"
+              ? { backgroundColor: SUCCESS_GREEN, borderColor: SUCCESS_GREEN }
+              : undefined
+          }
           className="min-h-12 flex flex-row items-center justify-center gap-3 rounded-xl border border-gray-300 bg-white"
         >
-          {microsoft.isSubmitting || microsoftMutation.isPending ? (
+          {successButton === "microsoft" ? (
+            <ButtonSuccessCheck onFinish={goHome} />
+          ) : microsoft.isSubmitting || microsoftMutation.isPending ? (
             <ActivityIndicator size="small" color="#6B7280" />
           ) : (
             <FaMicrosoft color="#F25022" size={18} />
