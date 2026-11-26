@@ -24,29 +24,31 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder()
-    .setTitle('Eaves API')
-    .setDescription('API for managing eaves')
-    .setVersion('1.0')
-    .addTag('eaves')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        description: 'Informe o token JWT de acesso',
-      },
-      'JWT-auth',
-    )
-    .build();
-
   app.enableVersioning();
   app.enableShutdownHooks();
 
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('Eaves API')
+      .setDescription('API for managing eaves')
+      .setVersion('1.0')
+      .addTag('eaves')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Informe o token JWT de acesso',
+        },
+        'JWT-auth',
+      )
+      .build();
+
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, documentFactory);
+    Logger.log(`Swagger disponível em: ${await app.getUrl()}/api`, 'Bootstrap');
+  }
 
   await app.listen(process.env.PORT ?? 3000);
-  Logger.log(`Swagger disponível em: ${await app.getUrl()}/api`, 'Bootstrap');
 }
 await bootstrap();
