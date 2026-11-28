@@ -5,6 +5,7 @@ on:
     paths:
       - "server/**"
       - ".github/workflows/server-deploy.yml"
+      - "platform/**"
     branches:
       - main
   pull_request:
