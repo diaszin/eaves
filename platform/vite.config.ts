@@ -22,5 +22,4 @@ export default defineConfig({
       interval: 1000,
     },
   },
-  base: process.env.NODE_ENV === "production" ? "/hub/" : undefined,
 });

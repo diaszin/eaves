@@ -24,6 +24,8 @@ async function bootstrap() {
     }),
   );
 
+  app.setGlobalPrefix('api');
+
   app.enableVersioning();
   app.enableShutdownHooks();
 
